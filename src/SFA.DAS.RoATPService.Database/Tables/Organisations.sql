@@ -2,7 +2,7 @@
 	[Id] [uniqueidentifier] NOT NULL,
 	[CreatedBy] [nvarchar] (255) NOT NULL,
 	[CreationDate] [datetime2](7) NOT NULL,
-	[LastUpdatedBy] [nvarchar] (255) NOT NULL,
+	[LastUpdatedBy] [nvarchar] (255) NULL,
 	[LastUpdatedDate] [datetime2](7) NULL,
 	[ApplicationRouteId] INT NOT NULL,
 	[OrganisationTypeId] int NOT NULL,  
