@@ -38,6 +38,7 @@ BEGIN
 	INSERT INTO dbo.OrganisationTypes
 	(Id, [Status], [Type])
 	VALUES
+	(0, 'Live', 'Unassigned'),
 	(1, 'Live', 'Academy'),
 	(2, 'Live', 'Central government department, executive agency or Non-Departmental Public Body'),
 	(3, 'Live', 'Delivery organisation connected to an Apprenticeship Training Agency (ATA)'),
@@ -58,7 +59,7 @@ BEGIN
 	(18, 'Live', 'Employer training apprentices within their connected companies'),
 	(19, 'Live', 'Employer training apprentices in own organisation and those in their connected companies'),
 	(20, 'Live', 'None of the above')
-
+	
 	SET IDENTITY_INSERT dbo.OrganisationTypes OFF
 
 END
@@ -108,7 +109,10 @@ BEGIN
 	(34, 3, 20),
 	(35, 2, 17),
 	(36, 2, 18),
-	(37, 2, 19)
+	(37, 2, 19),
+	(38, 1, 0),
+	(39, 1, 0),
+	(40, 1, 0)
 
 	SET IDENTITY_INSERT dbo.ApplicationRouteOrganisationTypes OFF
 END
