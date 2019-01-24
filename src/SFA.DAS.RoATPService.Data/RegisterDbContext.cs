@@ -25,13 +25,13 @@
             var saveTime = DateTime.UtcNow;
             foreach (var entry in ChangeTracker.Entries()
                 .Where(e => e.State == EntityState.Added && e.Entity is BaseEntity))
-                if (entry.Property("CreationDate").CurrentValue == null ||
-                    (DateTime)entry.Property("CreationDate").CurrentValue == DateTime.MinValue)
-                    entry.Property("CreationDate").CurrentValue = saveTime;
+                if (entry.Property("CreatedAt").CurrentValue == null ||
+                    (DateTime)entry.Property("CreatedAt").CurrentValue == DateTime.MinValue)
+                    entry.Property("CreatedAt").CurrentValue = saveTime;
 
             foreach (var entry in ChangeTracker.Entries()
                 .Where(e => e.State == EntityState.Modified && e.Entity is BaseEntity))
-                entry.Property("LastUpdatedDate").CurrentValue = saveTime;
+                entry.Property("UpdatedAt").CurrentValue = saveTime;
             return base.SaveChanges();
         }
 
@@ -39,10 +39,10 @@
             CancellationToken cancellationToken = default(CancellationToken))
         {
             var addedEntities = ChangeTracker.Entries().Where(e => e.State == EntityState.Added && e.Entity is BaseEntity).ToList();
-            addedEntities.ForEach(e => { e.Property("CreationDate").CurrentValue = DateTime.UtcNow; });
+            addedEntities.ForEach(e => { e.Property("CreatedAt").CurrentValue = DateTime.UtcNow; });
 
             var editedEntities = ChangeTracker.Entries().Where(e => e.State == EntityState.Modified && e.Entity is BaseEntity).ToList();
-            editedEntities.ForEach(e => { e.Property("LastUpdatedDate").CurrentValue = DateTime.UtcNow; });
+            editedEntities.ForEach(e => { e.Property("UpdatedAt").CurrentValue = DateTime.UtcNow; });
 
             return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
         }

@@ -17,14 +17,14 @@ BEGIN
 	SET IDENTITY_INSERT dbo.ApplicationRoutes ON
 	
 	INSERT INTO dbo.ApplicationRoutes
-	(Id, [Route])
+	([Id], [Route], [CreatedBy], [CreatedAt], [Status])
 	VALUES
 	(1,
-	'Main Provider'),
+	'Main Provider', 'System', SYSDATETIME(), 'Live'),
 	(2,
-	'Employer Provider'),
+	'Employer Provider', 'System', SYSDATETIME(), 'Live'),
 	(3,
-	'Supporting Provider')
+	'Supporting Provider', 'System', SYSDATETIME(), 'Live')
 
 	SET IDENTITY_INSERT dbo.ApplicationRoutes OFF
 END
@@ -36,9 +36,9 @@ BEGIN
 	SET IDENTITY_INSERT dbo.OrganisationTypes ON
 
 	INSERT INTO dbo.OrganisationTypes
-	(Id, [Status], [Type])
+	([Id], [Type], [CreatedBy], [CreatedAt], [Status])
 	VALUES
-	(0, 'Live', 'Unassigned')
+	(0, 'Unassigned', 'System', SYSDATETIME(), 'Live')
 	
 	SET IDENTITY_INSERT dbo.OrganisationTypes OFF
 
@@ -51,11 +51,11 @@ BEGIN
 	SET IDENTITY_INSERT dbo.ApplicationRouteOrganisationTypes ON
 
 	INSERT INTO dbo.ApplicationRouteOrganisationTypes
-	(Id, ApplicationRouteId, OrganisationTypeId)
+	([Id], [ApplicationRouteId], [OrganisationTypeId], [CreatedBy], [CreatedAt], [Status])
 	VALUES
-	(1, 1, 0),
-	(2, 1, 0),
-	(3, 1, 0)
+	(1, 1, 0, 'System', SYSDATETIME(), 'Live'),
+	(2, 1, 0, 'System', SYSDATETIME(), 'Live'),
+	(3, 1, 0, 'System', SYSDATETIME(), 'Live')
 
 	SET IDENTITY_INSERT dbo.ApplicationRouteOrganisationTypes OFF
 END
@@ -65,25 +65,25 @@ BEGIN
 	SET IDENTITY_INSERT dbo.EndReasons ON
 	
 	INSERT INTO dbo.EndReasons
-	([Id], [Status], [EndReason])
+	([Id], [Status], [EndReason], [CreatedBy], [CreatedAt])
 	VALUES
-	(1, 'Live', 'Administration'),
-	(2, 'Live', 'Change in Academy Trust'),
-	(3, 'Live', 'Change of entity'),
-	(4, 'Live', 'Contract termination'),
-	(5, 'Live', 'Dissolved'),
-	(6, 'Live', 'High risk policy'),
-	(7, 'Live', 'Inadequate financial health'),
-	(8, 'Live', 'Insolvency'),
-	(9, 'Live', 'Internal error'),
-	(10, 'Live', 'Liquidation'),
-	(11, 'Live', 'Merger'),
-	(12, 'Live', 'Minimum Standards'),
-	(13, 'Live', 'Ofsted Grade 4 (Inadequate)'),
-	(14, 'Live', 'Serious breach'),
-	(15, 'Live', 'Unable to provide response(s)'),
-	(16, 'Live', 'Voluntary removal'),
-	(17, 'Live', 'Winding up proceedings')
+	(1, 'Live', 'Administration', 'System', SYSDATETIME()),
+	(2, 'Live', 'Change in Academy Trust', 'System', SYSDATETIME()),
+	(3, 'Live', 'Change of entity', 'System', SYSDATETIME()),
+	(4, 'Live', 'Contract termination', 'System', SYSDATETIME()),
+	(5, 'Live', 'Dissolved', 'System', SYSDATETIME()),
+	(6, 'Live', 'High risk policy', 'System', SYSDATETIME()),
+	(7, 'Live', 'Inadequate financial health', 'System', SYSDATETIME()),
+	(8, 'Live', 'Insolvency', 'System', SYSDATETIME()),
+	(9, 'Live', 'Internal error', 'System', SYSDATETIME()),
+	(10, 'Live', 'Liquidation', 'System', SYSDATETIME()),
+	(11, 'Live', 'Merger', 'System', SYSDATETIME()),
+	(12, 'Live', 'Minimum Standards', 'System', SYSDATETIME()),
+	(13, 'Live', 'Ofsted Grade 4 (Inadequate)', 'System', SYSDATETIME()),
+	(14, 'Live', 'Serious breach', 'System', SYSDATETIME()),
+	(15, 'Live', 'Unable to provide response(s)', 'System', SYSDATETIME()),
+	(16, 'Live', 'Voluntary removal', 'System', SYSDATETIME()),
+	(17, 'Live', 'Winding up proceedings', 'System', SYSDATETIME())
 
 	SET IDENTITY_INSERT dbo.EndReasons OFF
 	
