@@ -60,31 +60,25 @@ BEGIN
 	SET IDENTITY_INSERT dbo.ApplicationRouteOrganisationTypes OFF
 END
 
-IF NOT EXISTS (SELECT 1 FROM dbo.EndReasons)
+IF NOT EXISTS (SELECT 1 FROM dbo.InactiveReasons)
 BEGIN
-	SET IDENTITY_INSERT dbo.EndReasons ON
+	SET IDENTITY_INSERT dbo.InactiveReasons ON
 	
-	INSERT INTO dbo.EndReasons
+	INSERT INTO dbo.InactiveReasons
 	([Id], [Status], [EndReason], [CreatedBy], [CreatedAt])
 	VALUES
-	(1, 'Live', 'Administration', 'System', SYSDATETIME()),
-	(2, 'Live', 'Change in Academy Trust', 'System', SYSDATETIME()),
-	(3, 'Live', 'Change of entity', 'System', SYSDATETIME()),
-	(4, 'Live', 'Contract termination', 'System', SYSDATETIME()),
-	(5, 'Live', 'Dissolved', 'System', SYSDATETIME()),
-	(6, 'Live', 'High risk policy', 'System', SYSDATETIME()),
-	(7, 'Live', 'Inadequate financial health', 'System', SYSDATETIME()),
-	(8, 'Live', 'Insolvency', 'System', SYSDATETIME()),
-	(9, 'Live', 'Internal error', 'System', SYSDATETIME()),
-	(10, 'Live', 'Liquidation', 'System', SYSDATETIME()),
-	(11, 'Live', 'Merger', 'System', SYSDATETIME()),
-	(12, 'Live', 'Minimum Standards', 'System', SYSDATETIME()),
-	(13, 'Live', 'Ofsted Grade 4 (Inadequate)', 'System', SYSDATETIME()),
-	(14, 'Live', 'Serious breach', 'System', SYSDATETIME()),
-	(15, 'Live', 'Unable to provide response(s)', 'System', SYSDATETIME()),
-	(16, 'Live', 'Voluntary removal', 'System', SYSDATETIME()),
-	(17, 'Live', 'Winding up proceedings', 'System', SYSDATETIME())
+	(1, 'Live', 'Breach', 'System', SYSDATETIME()),
+	(2, 'Live', 'Change of trading status', 'System', SYSDATETIME()),
+	(3, 'Live', 'High risk policy', 'System', SYSDATETIME()),
+	(4, 'Live', 'Inadequate financial health', 'System', SYSDATETIME()),
+	(5, 'Live', 'Inadequate Ofsted grade', 'System', SYSDATETIME()),
+	(6, 'Live', 'Internal error', 'System', SYSDATETIME()),
+	(7, 'Live', 'Merger', 'System', SYSDATETIME()),
+	(8, 'Live', 'Minimum standards not met', 'System', SYSDATETIME()),
+	(9, 'Live', 'Provider error', 'System', SYSDATETIME()),
+	(10, 'Live', 'Provider request', 'System', SYSDATETIME()),
+	(11, 'Live', 'Other', 'System', SYSDATETIME())
 
-	SET IDENTITY_INSERT dbo.EndReasons OFF
+	SET IDENTITY_INSERT dbo.InactiveReasons OFF
 	
 END

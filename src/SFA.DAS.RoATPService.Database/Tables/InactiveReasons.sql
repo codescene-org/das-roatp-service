@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[EndReasons]
+﻿CREATE TABLE [dbo].[InactiveReasons]
 (
 	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
     [Status] NVARCHAR(20) NOT NULL, 
