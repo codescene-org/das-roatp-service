@@ -5,8 +5,8 @@
     public class BaseEntity
     {
         public string CreatedBy { get; set; }
-        public DateTime CreationDate { get; set; }
-        public string LastUpdatedBy { get; set; }
-        public DateTime? LastUpdatedDate { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public string UpdatedBy { get; set; }
+        public DateTime? UpdatedAt { get; set; }
     }
 }
