@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2036
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "SFA.DAS.RoATPService.Database", "SFA.DAS.RoATPService.Database\SFA.DAS.RoATPService.Database.sqlproj", "{8BC5F439-3B71-47DF-A7DB-F4DDD73592D1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.RoATPService.Data", "SFA.DAS.RoATPService.Data\SFA.DAS.RoATPService.Data.csproj", "{B0CD30D7-06DF-483F-9D33-A1B6495FAB59}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.RoATPService.Domain", "SFA.DAS.RoATPService.Domain\SFA.DAS.RoATPService.Domain.csproj", "{8EDE82AD-F4DA-4AA9-9275-6A23FDFFFABA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{A41E0780-CADF-4AEC-B37C-D37DAB8A79E5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8BC5F439-3B71-47DF-A7DB-F4DDD73592D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BC5F439-3B71-47DF-A7DB-F4DDD73592D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BC5F439-3B71-47DF-A7DB-F4DDD73592D1}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{8BC5F439-3B71-47DF-A7DB-F4DDD73592D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BC5F439-3B71-47DF-A7DB-F4DDD73592D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8BC5F439-3B71-47DF-A7DB-F4DDD73592D1}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{B0CD30D7-06DF-483F-9D33-A1B6495FAB59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0CD30D7-06DF-483F-9D33-A1B6495FAB59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0CD30D7-06DF-483F-9D33-A1B6495FAB59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0CD30D7-06DF-483F-9D33-A1B6495FAB59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EDE82AD-F4DA-4AA9-9275-6A23FDFFFABA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EDE82AD-F4DA-4AA9-9275-6A23FDFFFABA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EDE82AD-F4DA-4AA9-9275-6A23FDFFFABA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EDE82AD-F4DA-4AA9-9275-6A23FDFFFABA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C5B677B2-0D72-4629-A5FD-F94B00EC858B}
+	EndGlobalSection
+EndGlobal
