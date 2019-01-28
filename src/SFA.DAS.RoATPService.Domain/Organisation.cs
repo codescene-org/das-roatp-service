@@ -5,6 +5,7 @@
     public class Organisation : BaseEntity
     {
         public Guid Id { get; set; }
+        public string Status { get; set; }
         public int ApplicationRouteId { get; set; }
         public int OrganisationTypeId { get; set; }
         public long UKPRN { get; set; }
