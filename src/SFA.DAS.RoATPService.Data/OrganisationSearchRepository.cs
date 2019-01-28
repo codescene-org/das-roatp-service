@@ -32,7 +32,7 @@
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();
 
-                var organisations = await connection.QueryAsync<Organisation>($"select * from [Organisations] where UKPRN = {ukPrnValue}");
+                var organisations = await connection.QueryAsync<Organisation>($"select * from [Organisations] where UKPRN = @ukPrnValue", new {ukPrnValue});
                 return await Task.FromResult(organisations);
             }
          }
@@ -41,12 +41,14 @@
         {
             var connectionString = _configuration.SqlConnectionString;
 
+            var organisationNameFilter = $"%{organisationName}%";
+       
             using (var connection = new SqlConnection(connectionString))
             {
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();
 
-                var organisations = await connection.QueryAsync<Organisation>($"select * from [Organisations] where LegalName LIKE '%{organisationName}%' OR TradingName LIKE '%{organisationName}%'");
+                var organisations = await connection.QueryAsync<Organisation>($"select * from [Organisations] where LegalName LIKE @organisationNameFilter OR TradingName LIKE @organisationNameFilter", new { organisationNameFilter });
                 return await Task.FromResult(organisations);
             }
         }

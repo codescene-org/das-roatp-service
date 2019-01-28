@@ -160,8 +160,8 @@
                     .UseSwaggerUI(c =>
                     {
                         c.SwaggerEndpoint("/swagger/v1/swagger.json", "SFA.DAS.RoATPService.Application.Api v1");
-                    });
-                //    .UseAuthentication();
+                    })
+                    .UseAuthentication();
 
                 app.UseMiddleware(typeof(ErrorHandlingMiddleware));
 
