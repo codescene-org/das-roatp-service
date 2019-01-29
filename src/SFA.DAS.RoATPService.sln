@@ -17,9 +17,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.RoATPService.Applic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.RoATPService.Application.Api", "SFA.DAS.RoATPService.Application.Api\SFA.DAS.RoATPService.Application.Api.csproj", "{20890A5B-05D1-402A-A3B8-171AADCB42DE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.RoATPService.Application.Tests", "SFA.DAS.RoATPService.Application.Tests\SFA.DAS.RoATPService.Application.Tests.csproj", "{694F3100-C5C8-42C8-A636-F42F6747DDA7}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.RoATPService.Settings", "SFA.DAS.RoATPService.Settings\SFA.DAS.RoATPService.Settings.csproj", "{DA772D6A-5A4F-4769-983D-2035796D2522}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.RoATPService.Application.UnitTests", "SFA.DAS.RoATPService.Application.UnitTests\SFA.DAS.RoATPService.Application.UnitTests.csproj", "{1AB6600C-1B47-42ED-9C76-8B14D9B10BBB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,20 +53,20 @@ Global
 		{20890A5B-05D1-402A-A3B8-171AADCB42DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{20890A5B-05D1-402A-A3B8-171AADCB42DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{20890A5B-05D1-402A-A3B8-171AADCB42DE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{694F3100-C5C8-42C8-A636-F42F6747DDA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{694F3100-C5C8-42C8-A636-F42F6747DDA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{694F3100-C5C8-42C8-A636-F42F6747DDA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{694F3100-C5C8-42C8-A636-F42F6747DDA7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DA772D6A-5A4F-4769-983D-2035796D2522}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DA772D6A-5A4F-4769-983D-2035796D2522}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DA772D6A-5A4F-4769-983D-2035796D2522}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DA772D6A-5A4F-4769-983D-2035796D2522}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1AB6600C-1B47-42ED-9C76-8B14D9B10BBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AB6600C-1B47-42ED-9C76-8B14D9B10BBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1AB6600C-1B47-42ED-9C76-8B14D9B10BBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1AB6600C-1B47-42ED-9C76-8B14D9B10BBB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{694F3100-C5C8-42C8-A636-F42F6747DDA7} = {A41E0780-CADF-4AEC-B37C-D37DAB8A79E5}
+		{1AB6600C-1B47-42ED-9C76-8B14D9B10BBB} = {A41E0780-CADF-4AEC-B37C-D37DAB8A79E5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C5B677B2-0D72-4629-A5FD-F94B00EC858B}
