@@ -67,6 +67,7 @@
     <Build Include="Tables\ApplicationRoutes.sql" />
     <Build Include="Tables\ApplicationRouteOrganisationTypes.sql" />
     <Build Include="Tables\InactiveReasons.sql" />
+    <Build Include="Tables\Audit.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Script.PostDeployment1.sql" />
