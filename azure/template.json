@@ -43,18 +43,25 @@
         },
         "loggingRedisConnectionString": {
             "type": "string"
+        },
+        "internalApiCustomHostname": {
+            "type": "string",
+            "defaultValue": ""
+        },
+        "internalApiCertificateName": {
+            "type": "string"
         }
     },
     "variables": {
         "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
         "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName')))]",
-        "apiAppServiceName": "[concat(variables('resourceNamePrefix'), '-roatpapi-as')]",
+        "internalApiAppServiceName": "[concat(variables('resourceNamePrefix'), '-roatpintapi-as')]",
         "databaseName": "[concat(variables('resourceNamePrefix'), '-roatp-db')]"
     },
     "resources": [
         {
             "apiVersion": "2017-08-01",
-            "name": "ApiAppInsights",
+            "name": "InternalApiAppInsights",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
@@ -64,10 +71,10 @@
                 },
                 "parameters": {
                     "appInsightsName": {
-                        "value": "[variables('apiAppServiceName')]"
+                        "value": "[variables('internalApiAppServiceName')]"
                     },
                     "attachedService": {
-                        "value": "[variables('apiAppServiceName')]"
+                        "value": "[variables('internalApiAppServiceName')]"
                     }
                 }
             },
@@ -75,7 +82,7 @@
         },
         {
             "apiVersion": "2017-08-01",
-            "name": "ApiAppService",
+            "name": "InternalApiAppService",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
@@ -85,7 +92,7 @@
                 },
                 "parameters": {
                     "appServiceName": {
-                        "value": "[variables('apiAppServiceName')]"
+                        "value": "[variables('internalApiAppServiceName')]"
                     },
                     "appServicePlanName": {
                         "value": "[parameters('SharedAppServicePlanName')]"
@@ -117,11 +124,17 @@
                                 "type": "Custom"
                             }
                         ]
+                    },
+                    "customHostName": {
+                        "value": "[parameters('internalApiCustomHostname')]"
+                    },
+                    "certificateThumbprint": {
+                        "value": "[reference(resourceId(parameters('sharedAppServicePlanResourceGroup'), 'Microsoft.Web/certificates', parameters('internalApiCertificateName')), '2016-03-01').Thumbprint]"
                     }
                 }
             },
             "dependsOn": [
-                "ApiAppInsights"
+                "InternalApiAppInsights"
             ]
         },
         {
@@ -161,5 +174,14 @@
             }
         }
     ],
-    "outputs": {}
+    "outputs": {
+        "InternalApiAppServiceName": {
+            "type": "string",
+            "value": "[variables('internalApiAppServiceName')]"
+        },
+        "DatabaseName": {
+            "type": "string",
+            "value": "[variables('databaseName')]"
+        }
+    }
 }
