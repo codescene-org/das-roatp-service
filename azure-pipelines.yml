@@ -49,7 +49,7 @@ steps:
   displayName: 'Publish Internal API'
   inputs:
     command: publish
-    publishWebProjects: true
+    publishWebProjects: false
     projects: 'src\SFA.DAS.RoATPService.Application.Api\SFA.DAS.RoATPService.Application.Api.csproj'
     arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/publish --no-restore'
 
