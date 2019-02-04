@@ -19,9 +19,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.RoATPService.Applic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.RoATPService.Settings", "SFA.DAS.RoATPService.Settings\SFA.DAS.RoATPService.Settings.csproj", "{DA772D6A-5A4F-4769-983D-2035796D2522}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.RoATPService.Data.IntegrationTests", "SFA.DAS.RoATPService.Data.IntegrationTests\SFA.DAS.RoATPService.Data.IntegrationTests.csproj", "{50AF1A22-3F58-42E7-94BA-1CAFCBE6E7E8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.RoATPService.Data.IntegrationTests", "SFA.DAS.RoATPService.Data.IntegrationTests\SFA.DAS.RoATPService.Data.IntegrationTests.csproj", "{50AF1A22-3F58-42E7-94BA-1CAFCBE6E7E8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.RoATPService.Application.UnitTests", "SFA.DAS.RoATPService.Application.UnitTests\SFA.DAS.RoATPService.Application.UnitTests.csproj", "{1AB6600C-1B47-42ED-9C76-8B14D9B10BBB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.RoATPService.Importer", "SFA.DAS.RoATPService.Importer\SFA.DAS.RoATPService.Importer.csproj", "{AC0ED35D-9A01-40BF-BC59-62423EE1B6DC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.RoATPService.Web.Staff", "SFA.DAS.RoATPService.Web.Staff\SFA.DAS.RoATPService.Web.Staff.csproj", "{AF756617-753B-44D2-863F-6FC1FF118DAC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,12 +71,19 @@ Global
 		{1AB6600C-1B47-42ED-9C76-8B14D9B10BBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1AB6600C-1B47-42ED-9C76-8B14D9B10BBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1AB6600C-1B47-42ED-9C76-8B14D9B10BBB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC0ED35D-9A01-40BF-BC59-62423EE1B6DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC0ED35D-9A01-40BF-BC59-62423EE1B6DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC0ED35D-9A01-40BF-BC59-62423EE1B6DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC0ED35D-9A01-40BF-BC59-62423EE1B6DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF756617-753B-44D2-863F-6FC1FF118DAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF756617-753B-44D2-863F-6FC1FF118DAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF756617-753B-44D2-863F-6FC1FF118DAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF756617-753B-44D2-863F-6FC1FF118DAC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{694F3100-C5C8-42C8-A636-F42F6747DDA7} = {A41E0780-CADF-4AEC-B37C-D37DAB8A79E5}
 		{50AF1A22-3F58-42E7-94BA-1CAFCBE6E7E8} = {A41E0780-CADF-4AEC-B37C-D37DAB8A79E5}
 		{1AB6600C-1B47-42ED-9C76-8B14D9B10BBB} = {A41E0780-CADF-4AEC-B37C-D37DAB8A79E5}
 	EndGlobalSection

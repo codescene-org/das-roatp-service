@@ -122,7 +122,9 @@
         
         private async Task<bool> UpdateAuditLog(Organisation originalOrganisation, Organisation updatedOrganisation, SqlConnection connection)
         {
-            var auditLogEntries = await BuildAuditLogEntries(originalOrganisation, updatedOrganisation);
+            var auditLogEntries = await BuildListOfFieldsChanged(
+                updatedOrganisation.Id, updatedOrganisation.UpdatedAt.Value, updatedOrganisation.UpdatedBy,
+                originalOrganisation, updatedOrganisation);
 
             int auditLogsWritten = 0;
 
@@ -148,45 +150,11 @@
             return await Task.FromResult(auditLogsWritten > 0);
         }
 
-        private async Task<List<AuditLogEntry>> BuildAuditLogEntries(Organisation originalOrganisation, Organisation updatedOrganisation)
-        {
-            List<AuditLogEntry> auditLogEntries = new List<AuditLogEntry>();
-
-            IEnumerable<AuditLogEntry> organisationLogEntries = await BuildListOfFieldsChanged<Organisation>(
-                updatedOrganisation.Id, updatedOrganisation.UpdatedAt.Value, updatedOrganisation.UpdatedBy,
-                originalOrganisation, updatedOrganisation);
-
-            if (organisationLogEntries.Any())
-            {
-                auditLogEntries.AddRange(organisationLogEntries.ToList());
-            }
-
-            IEnumerable<AuditLogEntry> applicationRouteLogEntries = await BuildListOfFieldsChanged<ApplicationRoute>(
-                updatedOrganisation.Id, updatedOrganisation.UpdatedAt.Value, updatedOrganisation.UpdatedBy,
-                originalOrganisation.ApplicationRoute, updatedOrganisation.ApplicationRoute);
-
-            if (applicationRouteLogEntries.Any())
-            {
-                auditLogEntries.AddRange(applicationRouteLogEntries.ToList());
-            }
-
-            IEnumerable<AuditLogEntry> organisationTypeLogEntries = await BuildListOfFieldsChanged<OrganisationType>(
-                updatedOrganisation.Id, updatedOrganisation.UpdatedAt.Value, updatedOrganisation.UpdatedBy,
-                originalOrganisation.OrganisationType, updatedOrganisation.OrganisationType);
-
-            if (organisationTypeLogEntries.Any())
-            {
-                auditLogEntries.AddRange(organisationTypeLogEntries.ToList());
-            }
-
-            return auditLogEntries;
-        }
-
-        private async Task<IEnumerable<AuditLogEntry>> BuildListOfFieldsChanged<T>(Guid id, DateTime updatedAt, string updatedBy, T original, T updated)
+        private async Task<IEnumerable<AuditLogEntry>> BuildListOfFieldsChanged(Guid id, DateTime updatedAt, string updatedBy, Organisation original, Organisation updated)
         {
             CompareLogic organisationComparison = new CompareLogic(new ComparisonConfig
                 {
-                    CompareChildren = false,
+                    CompareChildren = true,
                     MaxDifferences = byte.MaxValue
                 }
             );
@@ -194,24 +162,21 @@
             List<AuditLogEntry> auditLogEntries = new List<AuditLogEntry>();
             foreach (var difference in comparisonResult.Differences)
             {
-                PropertyInfo property = updated.GetType().GetProperty(difference.PropertyName);
-                bool excluded = Attribute.IsDefined(property, typeof(ExcludeFromAuditLog));
-
-                if (excluded)
+                if (_configuration.RegisterAuditLogSettings.IgnoredFields.Contains(difference.PropertyName))
                 {
                     continue;
                 }
 
                 string propertyName = difference.PropertyName;
-                if (Attribute.IsDefined(property, typeof(DisplayNameAttribute)))
-                {
-                    DisplayNameAttribute attribute = (DisplayNameAttribute)Attribute.GetCustomAttribute(property, typeof(DisplayNameAttribute));
-                    if (!String.IsNullOrWhiteSpace(attribute.DisplayName))
-                    {
-                        propertyName = attribute.DisplayName;
-                    }
-                }
 
+                AuditLogDisplayName displayNameForProperty =
+                    _configuration.RegisterAuditLogSettings.DisplayNames.FirstOrDefault(x => x.FieldName == propertyName);
+
+                if (displayNameForProperty != null)
+                { 
+                    propertyName = displayNameForProperty.DisplayName;
+                }
+                
                 AuditLogEntry entry = new AuditLogEntry
                 {
                     OrganisationId = id,
