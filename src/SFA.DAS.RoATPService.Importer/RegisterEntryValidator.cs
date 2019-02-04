@@ -11,7 +11,7 @@
 
             var errorMessages = new List<string>();
 
-            if (registerEntry.ApplicationRouteId < 1 || registerEntry.ApplicationRouteId > 3)
+            if (registerEntry.ProviderTypeId < 1 || registerEntry.ProviderTypeId > 3)
             {
                 errorMessages.Add("Application route id should be between 1 and 3");
             }
@@ -31,7 +31,7 @@
                 errorMessages.Add("Legal Name is required");
             }
 
-            if (registerEntry.Status != "0" && registerEntry.Status != "1")
+            if (registerEntry.Status != "0" && registerEntry.Status != "1" && registerEntry.Status != "2")
             {
                 errorMessages.Add("Unsupported status id : " + registerEntry.Status);
             }

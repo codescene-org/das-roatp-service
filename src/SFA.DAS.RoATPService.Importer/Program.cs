@@ -1,11 +1,18 @@
 ﻿namespace SFA.DAS.RoATPService.Importer
 {
+    using Microsoft.Extensions.Configuration;
+    using SFA.DAS.RoATPService.Settings;
     using System;
     using System.Diagnostics;
     using System.IO;
 
     class Program
     {
+        private const string ServiceName = "SFA.DAS.RoATPService";
+        private const string Version = "1.0";
+        public static IConfiguration Configuration { get; set; }
+        public static IWebConfiguration ApplicationConfiguration { get; set; }
+
         static void Main(string[] args)
         {
             var stopWatch = Stopwatch.StartNew();
@@ -19,6 +26,12 @@
 
             string csvFilePath = args[0];
 
+            Configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", true, true)
+                .Build();
+
+            ApplicationConfiguration = ConfigurationService.GetConfig(Configuration["EnvironmentName"], Configuration["ConfigurationStorageConnectionString"], Version, ServiceName).Result;
+
             using (var reader = new StreamReader(csvFilePath))
             {
                 CsvParser parser = new CsvParser();
@@ -26,9 +39,18 @@
 
                 if (results.ErrorLog.Count == 0)
                 {
-                    RegisterImporter importer = new RegisterImporter();
+                    RegisterImporter importer = new RegisterImporter(ApplicationConfiguration.SqlConnectionString);
 
-                    importer.ImportRegisterEntries(results.Entries).GetAwaiter().GetResult();
+                    try
+                    {
+                        importer.ImportRegisterEntries(results.Entries).GetAwaiter().GetResult();
+                    }
+                    catch (RegisterImportException importException)
+                    {
+                        Console.WriteLine("Unexpected error when importing organisation " + importException.UKPRN);
+                        Console.WriteLine(importException.ImportErrorMessage);
+                        Environment.Exit(-1);
+                    }
 
                     Console.WriteLine(results.Entries.Count + " register entries imported successfully");
                 }

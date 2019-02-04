@@ -9,13 +9,27 @@
 
     public class RegisterImporter
     {
+        private string ConnectionString { get; }
+
+        public RegisterImporter(string connectionString)
+        {
+            ConnectionString = connectionString;
+        }
+
         public async Task<bool> ImportRegisterEntries(List<RegisterEntry> registerEntries)
         {
             TruncateRegisterTable();
 
             foreach (RegisterEntry entry in registerEntries)
             {
-                await ImportRegisterEntry(entry);
+                try
+                {
+                    await ImportRegisterEntry(entry);
+                }
+                catch (SqlException sqlException)
+                {
+                    throw new RegisterImportException {UKPRN = entry.UKPRN, ImportErrorMessage = sqlException.Message};
+                }
             }
 
             return true;
@@ -23,10 +37,7 @@
 
         private async void TruncateRegisterTable()
         {
-            using (var connection =
-                new SqlConnection(
-                    "Data Source=localhost\\SQLEXPRESS;Initial Catalog=SFA.DAS.RoATPService.Database;Integrated Security=True;MultipleActiveResultSets=True;")
-            )
+            using (var connection = new SqlConnection(ConnectionString))
             {
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();
@@ -41,7 +52,7 @@
 
         private async Task<bool> ImportRegisterEntry(RegisterEntry registerEntry)
         {
-            using (var connection = new SqlConnection("Data Source=localhost\\SQLEXPRESS;Initial Catalog=SFA.DAS.RoATPService.Database;Integrated Security=True;MultipleActiveResultSets=True;"))
+            using (var connection = new SqlConnection(ConnectionString))
             {
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();
@@ -54,8 +65,8 @@
                              " ([Id] " +
                              ",[CreatedAt] " +
                              ",[CreatedBy] " +
-                             ",[Status] " +
-                             ",[ApplicationRouteId] " +
+                             ",[StatusId] " +
+                             ",[ProviderTypeId] " +
                              ",[OrganisationTypeId] " +
                              ",[UKPRN] " +
                              ",[LegalName] " +
@@ -63,10 +74,10 @@
                              ",[StatusDate] " +
                              ",[OrganisationData]) " +
                              "VALUES " +
-                             "(@organisationId, @createdAt, @createdBy, @status, @applicationRouteId, @organisationTypeId," +
+                             "(@organisationId, @createdAt, @createdBy, @statusId, @applicationRouteId, @organisationTypeId," +
                              " @ukprn, @legalName, @tradingName, @statusDate, @organisationData)";
 
-                var status = registerEntry.StatusLongText;
+                var statusId = registerEntry.Status;
                 DateTime statusDate = DateTime.Now;
                 var organisationData = "{}";
 
@@ -76,8 +87,8 @@
                         organisationId,
                         createdAt,
                         createdBy,
-                        status,
-                        registerEntry.ApplicationRouteId,
+                        statusId,
+                        ApplicationRouteId = registerEntry.ProviderTypeId,
                         registerEntry.OrganisationTypeId,
                         registerEntry.UKPRN,
                         registerEntry.LegalName,
