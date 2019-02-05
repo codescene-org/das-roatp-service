@@ -1,4 +1,4 @@
-﻿namespace SFA.DAS.RoATPService.Application.Tests
+﻿namespace SFA.DAS.RoATPService.Application.UnitTests
 {
     using FluentAssertions;
     using NUnit.Framework;
