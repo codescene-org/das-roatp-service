@@ -5,7 +5,6 @@
     using System.Data.SqlClient;
     using System.Linq;
     using System.Threading.Tasks;
-    using Api.Types.Models;
     using Application.Interfaces;
     using AssessorService.Data.DapperTypeHandlers;
     using Dapper;
@@ -20,6 +19,28 @@
         {
             _configuration = configuration;
             SqlMapper.AddTypeHandler(typeof(OrganisationData), new OrganisationDataHandler());
+        }
+
+        public async Task<Organisation> GetOrganisation(Guid organisationId)
+        {
+            using (var connection = new SqlConnection(_configuration.SqlConnectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                string sql = $"select * from [Organisations] o " +
+                             "inner join ApplicationRoutes ao on o.ApplicationRouteId = ao.Id  " +
+                             "inner join OrganisationTypes ot on o.OrganisationTypeId = ot.Id " +
+                             "where o.Id = @organisationId";
+
+                var organisations = await connection.QueryAsync<Organisation, ApplicationRoute, OrganisationType, Organisation>(sql, (org, route, type) => {
+                        org.OrganisationType = type;
+                        org.ApplicationRoute = route;
+                        return org;
+                    },
+                    new { organisationId });
+                return await Task.FromResult(organisations.FirstOrDefault());
+            }
         }
 
         public async Task<bool> CreateOrganisation(Organisation organisation, string username)
@@ -65,71 +86,50 @@
 
         public async Task<bool> UpdateOrganisation(Organisation organisation, string username)
         {
-            bool updateSuccess;
-
             using (var connection = new SqlConnection(_configuration.SqlConnectionString))
             {
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();
 
-                updateSuccess = await UpdateOrganisationTable(organisation, username, connection);
-            }
 
-            return await Task.FromResult(updateSuccess);
-        }
-        
-        private static async Task<bool> UpdateOrganisationTable(Organisation organisation, string username, SqlConnection connection)
-        {
-            DateTime updatedAt = DateTime.Now;
-            string updatedBy = username;
-            int applicationRouteId = organisation.ApplicationRoute.Id;
-            int organisationTypeId = organisation.OrganisationType.Id;
-            Guid organisationId = organisation.Id;
+                DateTime updatedAt = DateTime.Now;
+                string updatedBy = username;
+                int applicationRouteId = organisation.ApplicationRoute.Id;
+                int organisationTypeId = organisation.OrganisationType.Id;
+                Guid organisationId = organisation.Id;
 
-            string sql = $"UPDATE [Organisations] " +
-                         "SET[UpdatedAt] = @updatedAt " +
-                         ",[UpdatedBy] = @updatedBy " +
-                         ",[Status] = @status " +
-                         ",[ApplicationRouteId] = @applicationRouteId " +
-                         ",[OrganisationTypeId] = @organisationTypeId " +
-                         ",[UKPRN] = @ukprn " +
-                         ",[LegalName] = @legalName " +
-                         ",[TradingName] = @tradingName " +
-                         ",[StatusDate] = @statusDate " +
-                         ",[OrganisationData] = @organisationData " +
-                         "WHERE Id = @organisationId";
+                string sql = $"UPDATE [Organisations] " +
+                             "SET[UpdatedAt] = @updatedAt " +
+                             ",[UpdatedBy] = @updatedBy " +
+                             ",[Status] = @status " +
+                             ",[ApplicationRouteId] = @applicationRouteId " +
+                             ",[OrganisationTypeId] = @organisationTypeId " +
+                             ",[UKPRN] = @ukprn " +
+                             ",[LegalName] = @legalName " +
+                             ",[TradingName] = @tradingName " +
+                             ",[StatusDate] = @statusDate " +
+                             ",[OrganisationData] = @organisationData " +
+                             "WHERE Id = @organisationId";
 
-            var organisationsUpdated = await connection.ExecuteAsync(sql,
-                new {
-                    updatedAt, updatedBy, organisation.Status, applicationRouteId, organisationTypeId,
-                    organisation.UKPRN, organisation.LegalName, organisation.TradingName, organisation.StatusDate,
-                    organisation.OrganisationData, organisationId
-                });
-            organisation.UpdatedAt = updatedAt;
-            organisation.UpdatedBy = updatedBy;
+                var organisationsUpdated = await connection.ExecuteAsync(sql,
+                    new
+                    {
+                        updatedAt,
+                        updatedBy,
+                        organisation.Status,
+                        applicationRouteId,
+                        organisationTypeId,
+                        organisation.UKPRN,
+                        organisation.LegalName,
+                        organisation.TradingName,
+                        organisation.StatusDate,
+                        organisation.OrganisationData,
+                        organisationId
+                    });
+                organisation.UpdatedAt = updatedAt;
+                organisation.UpdatedBy = updatedBy;
 
-            return await Task.FromResult(organisationsUpdated > 0);
-        }
-        
-        public async Task<Organisation> GetOrganisation(Guid organisationId)
-        {
-            using (var connection = new SqlConnection(_configuration.SqlConnectionString))
-            {
-                if (connection.State != ConnectionState.Open)
-                    await connection.OpenAsync();
-
-                string sql = $"select * from [Organisations] o " +
-                             "inner join ApplicationRoutes ao on o.ApplicationRouteId = ao.Id  " +
-                             "inner join OrganisationTypes ot on o.OrganisationTypeId = ot.Id " +
-                             "where o.Id = @organisationId";
-
-                var organisations = await connection.QueryAsync<Organisation, ApplicationRoute, OrganisationType, Organisation>(sql, (org, route, type) => {
-                        org.OrganisationType = type;
-                        org.ApplicationRoute = route;
-                        return org;
-                    },
-                new { organisationId });
-                return await Task.FromResult(organisations.FirstOrDefault());
+                return await Task.FromResult(organisationsUpdated > 0);
             }
         }
     }

@@ -1,5 +1,6 @@
 ﻿namespace SFA.DAS.RoATPService.Application
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -42,6 +43,16 @@
                 if (displayNameForProperty != null)
                 {
                     propertyName = displayNameForProperty.DisplayName;
+                }
+
+                if (!updatedOrganisation.UpdatedAt.HasValue)
+                {
+                    updatedOrganisation.UpdatedAt = DateTime.Now;
+                }
+
+                if (String.IsNullOrWhiteSpace(updatedOrganisation.UpdatedBy))
+                {
+                    updatedOrganisation.UpdatedBy = "System";
                 }
 
                 AuditLogEntry entry = new AuditLogEntry
