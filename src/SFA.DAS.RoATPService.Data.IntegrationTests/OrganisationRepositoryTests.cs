@@ -1,6 +1,7 @@
 namespace SFA.DAS.RoATPService.Data.IntegrationTests
 {
     using System;
+    using Application.Interfaces;
     using Domain;
     using NUnit.Framework;
     using Settings;
@@ -9,6 +10,7 @@ namespace SFA.DAS.RoATPService.Data.IntegrationTests
     {
         private IWebConfiguration _configuration;
         private OrganisationRepository _repository;
+        private IAuditLogRepository _auditLogRepository;
 
         [SetUp]
         public void Setup()
@@ -18,7 +20,9 @@ namespace SFA.DAS.RoATPService.Data.IntegrationTests
                 SqlConnectionString =
                     "Data Source=localhost\\SQLEXPRESS;Initial Catalog=SFA.DAS.RoATPService.Database;User ID=sa;Password=Password1;MultipleActiveResultSets=True;"
             };
-            _repository = new OrganisationRepository(_configuration);
+            _auditLogRepository = new AuditLogRepository(_configuration);
+
+            _repository = new OrganisationRepository(_configuration, _auditLogRepository);
         }
         
         [Test]

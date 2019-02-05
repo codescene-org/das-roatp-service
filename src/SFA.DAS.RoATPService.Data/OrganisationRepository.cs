@@ -1,27 +1,27 @@
 ﻿namespace SFA.DAS.RoATPService.Data
 {
     using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
     using System.Data;
     using System.Data.SqlClient;
     using System.Linq;
-    using System.Reflection;
     using System.Threading.Tasks;
+    using Api.Types.Models;
     using Application.Interfaces;
     using AssessorService.Data.DapperTypeHandlers;
     using Dapper;
     using Domain;
-    using KellermanSoftware.CompareNetObjects;
     using Settings;
 
     public class OrganisationRepository : IOrganisationRepository
     {
         private IWebConfiguration _configuration;
 
-        public OrganisationRepository(IWebConfiguration configuration)
+        private IAuditLogRepository _auditLogRepository;
+
+        public OrganisationRepository(IWebConfiguration configuration, IAuditLogRepository auditLogRepository)
         {
             _configuration = configuration;
+            _auditLogRepository = auditLogRepository;
             SqlMapper.AddTypeHandler(typeof(OrganisationData), new OrganisationDataHandler());
         }
 
@@ -66,7 +66,7 @@
             }
         }
 
-        public async Task<bool> UpdateOrganisation(Organisation organisation, string username)
+        public async Task<UpdateOrganisationResult> UpdateOrganisation(Organisation organisation, string username)
         {
             Organisation existingOrganisation = await GetOrganisation(organisation.Id);
             bool updateSuccess;
@@ -77,14 +77,16 @@
                     await connection.OpenAsync();
 
                 updateSuccess = await UpdateOrganisationTable(organisation, username, connection);
-
-                if (updateSuccess)
-                {
-                    updateSuccess = await UpdateAuditLog(existingOrganisation, organisation, connection);
-                }
             }
 
-            return await Task.FromResult(updateSuccess);
+            UpdateOrganisationResult updateResult = new UpdateOrganisationResult
+            {
+                Success = updateSuccess,
+                OriginalOrganisation = existingOrganisation,
+                UpdatedOrganisation = organisation
+            };
+
+            return await Task.FromResult(updateResult);
         }
         
         private static async Task<bool> UpdateOrganisationTable(Organisation organisation, string username, SqlConnection connection)
@@ -120,78 +122,6 @@
             return await Task.FromResult(organisationsUpdated > 0);
         }
         
-        private async Task<bool> UpdateAuditLog(Organisation originalOrganisation, Organisation updatedOrganisation, SqlConnection connection)
-        {
-            var auditLogEntries = await BuildListOfFieldsChanged(
-                updatedOrganisation.Id, updatedOrganisation.UpdatedAt.Value, updatedOrganisation.UpdatedBy,
-                originalOrganisation, updatedOrganisation);
-
-            int auditLogsWritten = 0;
-
-            foreach (AuditLogEntry logEntry in auditLogEntries)
-            {
-                string sql = $"INSERT INTO Audit " +
-                              "([OrganisationId], [UpdatedBy], [UpdatedAt], [FieldChanged], [PreviousValue], [NewValue]) " +
-                              "VALUES(@organisationId, @updatedBy, @updatedAt, @fieldChanged, @previousValue, @newValue)";
-
-                var recordsAffected = await connection.ExecuteAsync(sql,
-                    new
-                    {
-                        logEntry.OrganisationId,
-                        logEntry.UpdatedBy,
-                        logEntry.UpdatedAt,
-                        logEntry.FieldChanged,
-                        logEntry.PreviousValue,
-                        logEntry.NewValue
-                    });
-                auditLogsWritten += recordsAffected;
-            }
-
-            return await Task.FromResult(auditLogsWritten > 0);
-        }
-
-        private async Task<IEnumerable<AuditLogEntry>> BuildListOfFieldsChanged(Guid id, DateTime updatedAt, string updatedBy, Organisation original, Organisation updated)
-        {
-            CompareLogic organisationComparison = new CompareLogic(new ComparisonConfig
-                {
-                    CompareChildren = true,
-                    MaxDifferences = byte.MaxValue
-                }
-            );
-            ComparisonResult comparisonResult = organisationComparison.Compare(original, updated);
-            List<AuditLogEntry> auditLogEntries = new List<AuditLogEntry>();
-            foreach (var difference in comparisonResult.Differences)
-            {
-                if (_configuration.RegisterAuditLogSettings.IgnoredFields.Contains(difference.PropertyName))
-                {
-                    continue;
-                }
-
-                string propertyName = difference.PropertyName;
-
-                AuditLogDisplayName displayNameForProperty =
-                    _configuration.RegisterAuditLogSettings.DisplayNames.FirstOrDefault(x => x.FieldName == propertyName);
-
-                if (displayNameForProperty != null)
-                { 
-                    propertyName = displayNameForProperty.DisplayName;
-                }
-                
-                AuditLogEntry entry = new AuditLogEntry
-                {
-                    OrganisationId = id,
-                    FieldChanged = propertyName,
-                    PreviousValue = difference.Object1Value,
-                    NewValue = difference.Object2Value,
-                    UpdatedAt = updatedAt,
-                    UpdatedBy = updatedBy
-                };
-                auditLogEntries.Add(entry);
-            }
-
-            return await Task.FromResult(auditLogEntries);
-        }
-
         public async Task<Organisation> GetOrganisation(Guid organisationId)
         {
             using (var connection = new SqlConnection(_configuration.SqlConnectionString))
