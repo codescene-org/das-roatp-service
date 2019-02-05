@@ -43,20 +43,21 @@
 
             _logger.LogInformation($@"Handling Update Organisation for UKPRN [{request.Organisation.UKPRN}]");
 
-            UpdateOrganisationResult updateResult = await _organisationRepository.UpdateOrganisation(request.Organisation, request.Username);
+            Organisation existingOrganisation = await _organisationRepository.GetOrganisation(request.Organisation.Id);
 
-            if (updateResult.Success)
-            {
-                var auditLogEntries = await
-                    _auditLogFieldComparison.BuildListOfFieldsChanged(updateResult.OriginalOrganisation,
-                        updateResult.UpdatedOrganisation);
+            var auditLogEntries = await _auditLogFieldComparison
+                .BuildListOfFieldsChanged(existingOrganisation, request.Organisation);
 
-                if (auditLogEntries.Any())
+            if (auditLogEntries.Any())
+            { 
+                bool updateSuccess = await _organisationRepository.UpdateOrganisation(request.Organisation, request.Username);
+
+                if (updateSuccess)
                 {
                     return await _auditLogRepository.WriteFieldChangesToAuditLog(auditLogEntries);
                 }
             }
-
+            
             return false;
         }
 

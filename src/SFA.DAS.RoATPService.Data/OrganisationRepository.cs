@@ -16,12 +16,9 @@
     {
         private IWebConfiguration _configuration;
 
-        private IAuditLogRepository _auditLogRepository;
-
-        public OrganisationRepository(IWebConfiguration configuration, IAuditLogRepository auditLogRepository)
+        public OrganisationRepository(IWebConfiguration configuration)
         {
             _configuration = configuration;
-            _auditLogRepository = auditLogRepository;
             SqlMapper.AddTypeHandler(typeof(OrganisationData), new OrganisationDataHandler());
         }
 
@@ -66,9 +63,8 @@
             }
         }
 
-        public async Task<UpdateOrganisationResult> UpdateOrganisation(Organisation organisation, string username)
+        public async Task<bool> UpdateOrganisation(Organisation organisation, string username)
         {
-            Organisation existingOrganisation = await GetOrganisation(organisation.Id);
             bool updateSuccess;
 
             using (var connection = new SqlConnection(_configuration.SqlConnectionString))
@@ -79,14 +75,7 @@
                 updateSuccess = await UpdateOrganisationTable(organisation, username, connection);
             }
 
-            UpdateOrganisationResult updateResult = new UpdateOrganisationResult
-            {
-                Success = updateSuccess,
-                OriginalOrganisation = existingOrganisation,
-                UpdatedOrganisation = organisation
-            };
-
-            return await Task.FromResult(updateResult);
+            return await Task.FromResult(updateSuccess);
         }
         
         private static async Task<bool> UpdateOrganisationTable(Organisation organisation, string username, SqlConnection connection)
