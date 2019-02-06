@@ -2,7 +2,6 @@
 {
     using System;
     using System.Threading.Tasks;
-    using Api.Types.Models;
     using Domain;
 
     public interface IOrganisationRepository

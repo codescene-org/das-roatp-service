@@ -1,6 +1,5 @@
 ﻿namespace SFA.DAS.RoATPService.Application.Handlers
 {
-    using System;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -36,9 +35,9 @@
         {
             if (!IsValidUpdateOrganisation(request.Organisation))
             {
-                string invalidSearchTermError = $@"Invalid Organisation data";
-                _logger.LogInformation(invalidSearchTermError);
-                throw new BadRequestException(invalidSearchTermError);
+                string invalidOrganisationError = $@"Invalid Organisation data";
+                _logger.LogInformation(invalidOrganisationError);
+                throw new BadRequestException(invalidOrganisationError);
             }
 
             _logger.LogInformation($@"Handling Update Organisation for UKPRN [{request.Organisation.UKPRN}]");
@@ -64,7 +63,6 @@
         private bool IsValidUpdateOrganisation(Organisation requestOrganisation)
         {
             return (_organisationValidator.IsValidLegalName(requestOrganisation.LegalName)
-                    && _organisationValidator.IsValidTradingName(requestOrganisation.TradingName)
                     && _organisationValidator.IsValidApplicationRouteId(requestOrganisation.ApplicationRoute.Id)
                     && _organisationValidator.IsValidStatus(requestOrganisation.Status)
                     && _organisationValidator.IsValidStatusDate(requestOrganisation.StatusDate)

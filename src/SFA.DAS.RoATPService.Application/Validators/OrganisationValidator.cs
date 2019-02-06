@@ -34,11 +34,6 @@
             return true;
         }
 
-        public bool IsValidTradingName(string tradingName)
-        {
-            return true;
-        }
-
         public bool IsValidStatusDate(DateTime statusDate)
         {
             return (statusDate > DateTime.MinValue);
