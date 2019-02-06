@@ -1,4 +1,4 @@
-namespace SFA.DAS.RoATPService.Application.UnitTests
+namespace SFA.DAS.RoATPService.Application.Tests
 {
     using System;
     using System.Collections.Generic;
