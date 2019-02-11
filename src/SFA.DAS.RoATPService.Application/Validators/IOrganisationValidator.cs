@@ -5,10 +5,10 @@
     public interface IOrganisationValidator
     {
         bool IsValidOrganisationId(Guid organisationId);
-        bool IsValidApplicationRouteId(int applicationRouteId);
+        bool IsValidProviderTypeId(int providerTypeId);
         bool IsValidUKPRN(long ukPrn);
         bool IsValidLegalName(string legalName);
         bool IsValidStatusDate(DateTime statusDate);
-        bool IsValidStatus(string status);
+        bool IsValidStatus(int status);
     }
 }

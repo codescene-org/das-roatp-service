@@ -64,12 +64,16 @@
   <ItemGroup>
     <Build Include="Tables\OrganisationTypes.sql" />
     <Build Include="Tables\Organisations.sql" />
-    <Build Include="Tables\ApplicationRoutes.sql" />
-    <Build Include="Tables\ApplicationRouteOrganisationTypes.sql" />
-    <Build Include="Tables\InactiveReasons.sql" />
+    <Build Include="Tables\ProviderTypeOrganisationTypes.sql" />
+    <Build Include="Tables\RemovedReasons.sql" />
     <Build Include="Tables\Audit.sql" />
+    <Build Include="Tables\ProviderTypes.sql" />
+    <Build Include="Tables\OrganisationStatus.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Script.PostDeployment1.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="SFA.DAS.RoATPService.Database.refactorlog" />
   </ItemGroup>
 </Project>

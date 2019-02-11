@@ -41,8 +41,8 @@
         private bool IsValidCreateOrganisation(Organisation requestOrganisation)
         {
             return (_organisationValidator.IsValidLegalName(requestOrganisation.LegalName)
-                    && _organisationValidator.IsValidApplicationRouteId(requestOrganisation.ApplicationRoute.Id)
-                    && _organisationValidator.IsValidStatus(requestOrganisation.Status)
+                    && _organisationValidator.IsValidProviderTypeId(requestOrganisation.ProviderType.Id)
+                    && _organisationValidator.IsValidStatus(requestOrganisation.OrganisationStatus.Id)
                     && _organisationValidator.IsValidStatusDate(requestOrganisation.StatusDate)
                     && _organisationValidator.IsValidUKPRN(requestOrganisation.UKPRN));
         }

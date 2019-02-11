@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CompareNETObjects" Version="4.57.0" />
     <PackageReference Include="Dapper" Version="1.50.5" />
   </ItemGroup>
 

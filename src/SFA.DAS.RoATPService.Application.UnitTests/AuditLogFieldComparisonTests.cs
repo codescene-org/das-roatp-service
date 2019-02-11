@@ -23,7 +23,7 @@
             _firstOrganisation = new Organisation
             {
                 Id = Guid.NewGuid(),
-                ApplicationRoute = new ApplicationRoute {Id = 1, Route = "Main "},
+                ProviderType = new ProviderType { Id = 1, Type = "Main "},
                 LegalName = "Legal Name",
                 OrganisationType = new OrganisationType {Id = 0, Type = "Unassigned"},
                 TradingName = "Trading Name",
@@ -34,7 +34,7 @@
             _secondOrganisation = new Organisation
             {
                 Id = _firstOrganisation.Id,
-                ApplicationRoute = _firstOrganisation.ApplicationRoute,
+                ProviderType = _firstOrganisation.ProviderType,
                 LegalName = _firstOrganisation.LegalName,
                 OrganisationType = _firstOrganisation.OrganisationType,
                 TradingName = _firstOrganisation.TradingName,

@@ -4,8 +4,8 @@
     [CreatedBy] NVARCHAR(30) NOT NULL, 
     [UpdatedAt] DATETIME2 NULL, 
     [UpdatedBy] NVARCHAR(30) NULL, 
-    [Status] NVARCHAR(20) NOT NULL, 
-	[ApplicationRouteId] INT NOT NULL,
+    [StatusId] INT NOT NULL, 
+	[ProviderTypeId] INT NOT NULL,
 	[OrganisationTypeId] int NOT NULL,  
 	[UKPRN] bigint NOT NULL,
 	[LegalName] [nvarchar] (200) NOT NULL,
@@ -17,7 +17,8 @@
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY], 
-    CONSTRAINT [FK_Organisations_ApplicationRoute] FOREIGN KEY ([ApplicationRouteId]) REFERENCES [ApplicationRoutes]([Id]),
+    CONSTRAINT [FK_Organisations_ProviderType] FOREIGN KEY ([ProviderTypeId]) REFERENCES [ProviderTypes]([Id]), 
+    CONSTRAINT [FK_Organisations_Status] FOREIGN KEY ([StatusId]) REFERENCES [OrganisationStatus]([Id]),
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
 
