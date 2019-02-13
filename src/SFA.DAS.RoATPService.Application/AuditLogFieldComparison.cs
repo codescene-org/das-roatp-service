@@ -11,11 +11,11 @@
 
     public class AuditLogFieldComparison : IAuditLogFieldComparison
     {
-        private IWebConfiguration _configuration;
+        private RegisterAuditLogSettings _settings;
 
-        public AuditLogFieldComparison(IWebConfiguration configuration)
+        public AuditLogFieldComparison(RegisterAuditLogSettings settings)
         {
-            _configuration = configuration;
+            _settings = settings;
         }
 
         public async Task<IEnumerable<AuditLogEntry>> BuildListOfFieldsChanged(Organisation originalOrganisation, Organisation updatedOrganisation)
@@ -30,15 +30,14 @@
             List<AuditLogEntry> auditLogEntries = new List<AuditLogEntry>();
             foreach (var difference in comparisonResult.Differences)
             {
-                if (_configuration.RegisterAuditLogSettings.IgnoredFields.Contains(difference.PropertyName))
+                if (_settings.IgnoredFields.Contains(difference.PropertyName))
                 {
                     continue;
                 }
 
                 string propertyName = difference.PropertyName;
 
-                AuditLogDisplayName displayNameForProperty =
-                    _configuration.RegisterAuditLogSettings.DisplayNames.FirstOrDefault(x => x.FieldName == propertyName);
+                AuditLogDisplayName displayNameForProperty = _settings.DisplayNames.FirstOrDefault(x => x.FieldName == propertyName);
 
                 if (displayNameForProperty != null)
                 {

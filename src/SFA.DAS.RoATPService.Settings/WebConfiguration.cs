@@ -9,7 +9,5 @@
         [JsonRequired] public string SqlConnectionString { get; set; }
 
         [JsonRequired] public string SessionRedisConnectionString { get; set; }
-
-        [JsonRequired] public RegisterAuditLogSettings RegisterAuditLogSettings { get; set; }
     }
 }
