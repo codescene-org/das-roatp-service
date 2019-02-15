@@ -16,7 +16,7 @@
 
         public bool IsValidProviderTypeId(int providerTypeId)
         {
-            return (providerTypeId > 0);
+            return (providerTypeId >= 1 && providerTypeId <= 3);
         }
 
         public bool IsValidUKPRN(long ukPrn)

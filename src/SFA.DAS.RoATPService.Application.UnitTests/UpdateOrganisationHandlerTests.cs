@@ -67,6 +67,7 @@
 
         [TestCase(0)]
         [TestCase(-1)]
+        [TestCase(4)]
         public void Update_organisation_not_performed_if_provider_type_invalid(int providerTypeId)
         {
             _request.Organisation.ProviderType = new ProviderType { Id = providerTypeId };
