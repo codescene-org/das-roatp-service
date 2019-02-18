@@ -54,8 +54,8 @@ BEGIN
 	([Id], [ProviderTypeId], [OrganisationTypeId], [CreatedBy], [CreatedAt], [Status])
 	VALUES
 	(1, 1, 0, 'System', SYSDATETIME(), 'Live'),
-	(2, 1, 0, 'System', SYSDATETIME(), 'Live'),
-	(3, 1, 0, 'System', SYSDATETIME(), 'Live')
+	(2, 2, 0, 'System', SYSDATETIME(), 'Live'),
+	(3, 3, 0, 'System', SYSDATETIME(), 'Live')
 
 	SET IDENTITY_INSERT dbo.ProviderTypeOrganisationTypes OFF
 END
