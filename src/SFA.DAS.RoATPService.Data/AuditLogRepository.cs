@@ -1,5 +1,6 @@
 ﻿namespace SFA.DAS.RoATPService.Data
 {
+    using System;
     using System.Collections.Generic;
     using System.Data;
     using System.Data.SqlClient;
@@ -39,12 +40,14 @@
                                  "([OrganisationId], [UpdatedBy], [UpdatedAt], [FieldChanged], [PreviousValue], [NewValue]) " +
                                  "VALUES(@organisationId, @updatedBy, @updatedAt, @fieldChanged, @previousValue, @newValue)";
 
+                    var updatedAt = DateTime.Now;
+
                     var recordsAffected = await connection.ExecuteAsync(sql,
                         new
                         {
                             logEntry.OrganisationId,
                             logEntry.UpdatedBy,
-                            logEntry.UpdatedAt,
+                            updatedAt,
                             logEntry.FieldChanged,
                             logEntry.PreviousValue,
                             logEntry.NewValue
