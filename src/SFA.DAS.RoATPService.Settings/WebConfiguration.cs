@@ -10,6 +10,5 @@
 
         public string SessionRedisConnectionString { get; set; }
         
-        [JsonRequired] public RegisterAuditLogSettings RegisterAuditLogSettings { get; set; }
     }
 }
