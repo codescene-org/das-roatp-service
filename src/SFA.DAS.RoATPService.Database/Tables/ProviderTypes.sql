@@ -1,6 +1,6 @@
-﻿CREATE TABLE [dbo].[ApplicationRoutes] (
+﻿CREATE TABLE [dbo].[ProviderTypes] (
     [Id]				[int] NOT NULL IDENTITY,
-    [Route]				NVARCHAR (100) NOT NULL,
+    [ProviderType]				NVARCHAR (100) NOT NULL,
     [Description] NVARCHAR(255) NULL, 
 	[CreatedAt] DATETIME2 NOT NULL, 
     [CreatedBy] NVARCHAR(30) NOT NULL, 

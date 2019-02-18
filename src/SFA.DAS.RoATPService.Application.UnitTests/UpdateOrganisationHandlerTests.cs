@@ -33,13 +33,14 @@
                 Organisation = new Organisation
                 {
                     Id = Guid.NewGuid(),
-                    ApplicationRoute = new ApplicationRoute {Id = 1, Route = "Main Provider"},
+                    ProviderType = new ProviderType { Id = 1, Type = "Main Provider"},
                     UKPRN = 10001234,
                     LegalName = "Trainer Legal Name",
                     OrganisationData = new OrganisationData(),
                     OrganisationType = new OrganisationType {Id = 0, Type = "Unassigned"},
                     Status = "Live",
                     StatusDate = DateTime.Now,
+                    OrganisationStatus = new OrganisationStatus { Id = 1, Status = "Active" },
                     TradingName = "Trainer Trading Name"
                 }
             };
@@ -66,9 +67,10 @@
 
         [TestCase(0)]
         [TestCase(-1)]
-        public void Update_organisation_not_performed_if_application_route_invalid(int applicationRouteId)
+        [TestCase(4)]
+        public void Update_organisation_not_performed_if_provider_type_invalid(int providerTypeId)
         {
-            _request.Organisation.ApplicationRoute = new ApplicationRoute {Id = applicationRouteId};
+            _request.Organisation.ProviderType = new ProviderType { Id = providerTypeId };
 
             Func<Task> result = async () => await
                 _handler.Handle(_request, new CancellationToken());
@@ -87,12 +89,11 @@
             result.Should().Throw<BadRequestException>();
          }
 
-        [TestCase(null)]
-        [TestCase("")]
-        [TestCase("  ")]
-        public void Update_organisation_not_performed_if_status_invalid(string status)
+        [TestCase(3)]
+        [TestCase(-1)]
+        public void Update_organisation_not_performed_if_status_invalid(int status)
         {
-            _request.Organisation.Status = status;
+            _request.Organisation.OrganisationStatus.Id = status;
 
             Func<Task> result = async () => await
                 _handler.Handle(_request, new CancellationToken());

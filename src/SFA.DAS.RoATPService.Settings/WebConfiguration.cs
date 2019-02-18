@@ -6,8 +6,9 @@
     {
         [JsonRequired] public ApiAuthentication ApiAuthentication { get; set; }
      
-        [JsonRequired] public string SqlConnectionString { get; set; }
+        public string SqlConnectionString { get; set; }
 
-        [JsonRequired] public string SessionRedisConnectionString { get; set; }
+        public string SessionRedisConnectionString { get; set; }
+        
     }
 }

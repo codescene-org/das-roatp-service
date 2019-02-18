@@ -29,13 +29,17 @@
                     await connection.OpenAsync();
 
                 string sql = $"select * from [Organisations] o " +
-                             "inner join ApplicationRoutes ao on o.ApplicationRouteId = ao.Id  " +
+                             "inner join ProviderTypes pt on o.ProviderTypeId = pt.Id  " +
                              "inner join OrganisationTypes ot on o.OrganisationTypeId = ot.Id " +
+                             "inner join OrganisationStatus os on o.StatusId = os.Id " +
                              "where o.Id = @organisationId";
 
-                var organisations = await connection.QueryAsync<Organisation, ApplicationRoute, OrganisationType, Organisation>(sql, (org, route, type) => {
+                var organisations = await connection.QueryAsync<Organisation, ProviderType, OrganisationType, 
+                                                                OrganisationStatus, Organisation>
+                    (sql, (org, providerType, type, status) => {
                         org.OrganisationType = type;
-                        org.ApplicationRoute = route;
+                        org.ProviderType = providerType;
+                        org.OrganisationStatus = status;
                         return org;
                     },
                     new { organisationId });
@@ -53,15 +57,16 @@
                 Guid organisationId = Guid.NewGuid();
                 DateTime createdAt = DateTime.Now;
                 string createdBy = username;
-                int applicationRouteId = organisation.ApplicationRoute.Id;
+                int providerTypeId = organisation.ProviderType.Id;
                 int organisationTypeId = organisation.OrganisationType.Id;
+                int statusId = organisation.OrganisationStatus.Id;
 
                 string sql = $"INSERT INTO [dbo].[Organisations] " +
                     " ([Id] " +
                     ",[CreatedAt] " +
                     ",[CreatedBy] " +
-                    ",[Status] " +
-                    ",[ApplicationRouteId] " +
+                    ",[StatusId] " +
+                    ",[ProviderTypeId] " +
                     ",[OrganisationTypeId] " +
                     ",[UKPRN] " +
                     ",[LegalName] " +
@@ -69,14 +74,14 @@
                     ",[StatusDate] " +
                     ",[OrganisationData]) " +
                "VALUES " +
-                "(@organisationId, @createdAt, @createdBy, @status, @applicationRouteId, @organisationTypeId," +
+                "(@organisationId, @createdAt, @createdBy, @statusId, @providerTypeId, @organisationTypeId," +
                 " @ukprn, @legalName, @tradingName, @statusDate, @organisationData)";
 
                 var organisationsCreated = await connection.ExecuteAsync(sql,
                     new
                     {
-                        organisationId, createdAt, createdBy, organisation.Status,
-                        applicationRouteId, organisationTypeId, organisation.UKPRN,
+                        organisationId, createdAt, createdBy, statusId,
+                        providerTypeId, organisationTypeId, organisation.UKPRN,
                         organisation.LegalName, organisation.TradingName, organisation.StatusDate,
                         organisation.OrganisationData
                     });
@@ -94,15 +99,16 @@
 
                 DateTime updatedAt = DateTime.Now;
                 string updatedBy = username;
-                int applicationRouteId = organisation.ApplicationRoute.Id;
+                int providerTypeId = organisation.ProviderType.Id;
                 int organisationTypeId = organisation.OrganisationType.Id;
                 Guid organisationId = organisation.Id;
+                int statusId = organisation.OrganisationStatus.Id;
 
                 string sql = $"UPDATE [Organisations] " +
                              "SET[UpdatedAt] = @updatedAt " +
                              ",[UpdatedBy] = @updatedBy " +
-                             ",[Status] = @status " +
-                             ",[ApplicationRouteId] = @applicationRouteId " +
+                             ",[StatusId] = @statusId " +
+                             ",[ProviderTypeId] = @providerTypeId " +
                              ",[OrganisationTypeId] = @organisationTypeId " +
                              ",[UKPRN] = @ukprn " +
                              ",[LegalName] = @legalName " +
@@ -116,8 +122,8 @@
                     {
                         updatedAt,
                         updatedBy,
-                        organisation.Status,
-                        applicationRouteId,
+                        statusId,
+                        providerTypeId,
                         organisationTypeId,
                         organisation.UKPRN,
                         organisation.LegalName,

@@ -14,9 +14,9 @@
             return true;
         }
 
-        public bool IsValidApplicationRouteId(int applicationRouteId)
+        public bool IsValidProviderTypeId(int providerTypeId)
         {
-            return (applicationRouteId > 0);
+            return (providerTypeId >= 1 && providerTypeId <= 3);
         }
 
         public bool IsValidUKPRN(long ukPrn)
@@ -39,9 +39,9 @@
             return (statusDate > DateTime.MinValue);
         }
 
-        public bool IsValidStatus(string status)
+        public bool IsValidStatus(int status)
         {
-            return !String.IsNullOrWhiteSpace(status);
+            return (status >= 0 && status <= 2);
         }
     }
 }

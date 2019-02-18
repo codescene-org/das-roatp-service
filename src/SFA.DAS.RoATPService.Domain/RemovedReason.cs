@@ -1,9 +1,11 @@
 ﻿namespace SFA.DAS.RoATPService.Domain
 {
-    public class ApplicationRoute : BaseEntity
+    using System.ComponentModel;
+
+    public class RemovedReason : BaseEntity
     {
         public int Id { get; set; }
-        public string Route { get; set; }
+        public string Reason { get; set; }
         public string Description { get; set; }
     }
 }
