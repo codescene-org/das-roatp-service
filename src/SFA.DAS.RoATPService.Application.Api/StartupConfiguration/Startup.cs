@@ -31,6 +31,8 @@
         private readonly IHostingEnvironment _env;
         private readonly ILogger<Startup> _logger;
 
+        private IConfiguration ApplicationConfiguration { get; }
+
         public Startup(IHostingEnvironment env, IConfiguration config, ILogger<Startup> logger)
         {
             _env = env;
@@ -38,6 +40,7 @@
             _logger.LogInformation("In startup constructor.  Before GetConfig");
             Configuration = ConfigurationService
                 .GetConfig(config["EnvironmentName"], config["ConfigurationStorageConnectionString"], Version, ServiceName).Result;
+            ApplicationConfiguration = config;
             _logger.LogInformation("In startup constructor.  After GetConfig");
         }
 
@@ -76,6 +79,10 @@
                     options.SupportedUICultures = new List<CultureInfo> { new CultureInfo("en-GB") };
                     options.RequestCultureProviders.Clear();
                 });
+
+                var auditLogSettings = new RegisterAuditLogSettings();
+                ApplicationConfiguration.Bind("RegisterAuditLogSettings", auditLogSettings);
+                services.AddSingleton(auditLogSettings);
 
                 IMvcBuilder mvcBuilder;
                 if (_env.IsDevelopment())

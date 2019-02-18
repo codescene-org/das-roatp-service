@@ -75,9 +75,10 @@ BEGIN
 	(6, 'Live', 'Internal error', 'System', SYSDATETIME()),
 	(7, 'Live', 'Merger', 'System', SYSDATETIME()),
 	(8, 'Live', 'Minimum standards not met', 'System', SYSDATETIME()),
-	(9, 'Live', 'Provider error', 'System', SYSDATETIME()),
-	(10, 'Live', 'Provider request', 'System', SYSDATETIME()),
-	(11, 'Live', 'Other', 'System', SYSDATETIME())
+	(9, 'Live', 'Non-direct delivery in 12 month period', 'System', SYSDATETIME()),
+	(10, 'Live', 'Provider error', 'System', SYSDATETIME()),
+	(11, 'Live', 'Provider request', 'System', SYSDATETIME()),
+	(12, 'Live', 'Other', 'System', SYSDATETIME())
 
 	SET IDENTITY_INSERT dbo.InactiveReasons OFF
 	

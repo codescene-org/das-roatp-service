@@ -5,13 +5,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CompareNETObjects" Version="4.57.0" />
     <PackageReference Include="MediatR" Version="4.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.1.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SFA.DAS.RoATPService.Api.Types\SFA.DAS.RoATPService.Api.Types.csproj" />
     <ProjectReference Include="..\SFA.DAS.RoATPService.Domain\SFA.DAS.RoATPService.Domain.csproj" />
+    <ProjectReference Include="..\SFA.DAS.RoATPService.Settings\SFA.DAS.RoATPService.Settings.csproj" />
   </ItemGroup>
 
 </Project>

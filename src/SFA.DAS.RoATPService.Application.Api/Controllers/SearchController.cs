@@ -1,5 +1,4 @@
-﻿
-namespace SFA.DAS.RoATPService.Application.Api.Controllers
+﻿namespace SFA.DAS.RoATPService.Application.Api.Controllers
 {
     using System.Collections.Generic;
     using System.Net;

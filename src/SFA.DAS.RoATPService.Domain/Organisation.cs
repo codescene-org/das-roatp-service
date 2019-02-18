@@ -5,14 +5,12 @@
     public class Organisation : BaseEntity
     {
         public Guid Id { get; set; }
-        public string Status { get; set; }
-        public int ApplicationRouteId { get; set; }
-        public int OrganisationTypeId { get; set; }
+        public ApplicationRoute ApplicationRoute { get; set; }
+        public OrganisationType OrganisationType{ get; set; }
         public long UKPRN { get; set; }
         public string LegalName { get; set; }
         public string TradingName { get; set; }
-        public DateTime RegisterStartDate { get; set; }
-        public DateTime? RegisterEndDate { get; set; }
+        public DateTime StatusDate { get; set; }
         public OrganisationData OrganisationData { get; set; }
     }
 }
