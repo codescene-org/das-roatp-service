@@ -64,11 +64,11 @@
   <ItemGroup>
     <Build Include="Tables\OrganisationTypes.sql" />
     <Build Include="Tables\Organisations.sql" />
-    <Build Include="Tables\ProviderTypeOrganisationTypes.sql" />
-    <Build Include="Tables\RemovedReasons.sql" />
     <Build Include="Tables\Audit.sql" />
     <Build Include="Tables\ProviderTypes.sql" />
     <Build Include="Tables\OrganisationStatus.sql" />
+    <Build Include="Tables\ProviderTypeOrganisationTypes.sql" />
+    <Build Include="Tables\RemovedReasons.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Script.PostDeployment1.sql" />
