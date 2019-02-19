@@ -56,6 +56,28 @@
             result.Entries[0].FinancialTrackRecord.Should().Be(true);
         }
 
+        [TestCase("30/01/2018")]
+        [TestCase("30-01-2018")]
+        public void Parser_handles_different_datetime_formats(string testDate)
+        {
+            csvFile += "1,10002222,Legal Name,Trading Name,0,true,true,0," + testDate + ",";
+
+            var stream = CreateStreamForCsv(csvFile);
+
+            var result = _parser.ParseCsvFile(new StreamReader(stream));
+
+            result.ErrorLog.Count.Should().Be(0);
+            result.Entries.Count.Should().Be(1);
+
+            result.Entries[0].UKPRN.Should().Be(10002222);
+            result.Entries[0].ProviderTypeId.Should().Be(1);
+            result.Entries[0].LegalName.Should().Be("Legal Name");
+            result.Entries[0].TradingName.Should().Be("Trading Name");
+            result.Entries[0].OrganisationTypeId.Should().Be(0);
+            result.Entries[0].ParentCompanyGuarantee.Should().Be(true);
+            result.Entries[0].FinancialTrackRecord.Should().Be(true);
+        }
+
         private Stream CreateStreamForCsv(string csvFile)
         {
             byte[] csvBytes = Encoding.UTF8.GetBytes(csvFile);

@@ -1,6 +1,7 @@
 ﻿namespace SFA.DAS.RoATPService.Importer
 {
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
     using CsvHelper;
     using CsvHelper.TypeConversion;
@@ -14,6 +15,7 @@
 
             using (var csvReader = new CsvReader(csvFileReader))
             {
+                csvReader.Configuration.CultureInfo = CultureInfo.CreateSpecificCulture("en-GB");
                 int rowNumber = 1;
                 while (csvReader.Read())
                 {
