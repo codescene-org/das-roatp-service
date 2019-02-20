@@ -34,7 +34,6 @@
 
             if (result.Success)
             {
-
                 return Ok(result);
             }
 
