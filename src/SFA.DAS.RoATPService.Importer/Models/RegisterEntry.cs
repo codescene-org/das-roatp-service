@@ -1,4 +1,4 @@
-﻿namespace SFA.DAS.RoATPService.Importer
+﻿namespace SFA.DAS.RoATPService.Importer.Models
 {
     using System;
 

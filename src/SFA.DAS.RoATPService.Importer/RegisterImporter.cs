@@ -6,6 +6,8 @@
     using System.Data.SqlClient;
     using System.Threading.Tasks;
     using Dapper;
+    using SFA.DAS.RoATPService.Importer.Exceptions;
+    using SFA.DAS.RoATPService.Importer.Models;
 
     public class RegisterImporter
     {
@@ -28,7 +30,10 @@
                 }
                 catch (SqlException sqlException)
                 {
-                    throw new RegisterImportException {UKPRN = entry.UKPRN, ImportErrorMessage = sqlException.Message};
+                    throw new RegisterImportException("Unable to import register data", sqlException)
+                    {
+                        UKPRN = entry.UKPRN, ImportErrorMessage = "SQL operation failed"
+                    };
                 }
             }
 
@@ -44,8 +49,7 @@
                 
                 string sql = "DELETE FROM [dbo].[Organisations]";
 
-                var organisationsCreated = await connection.ExecuteAsync(sql);
-                
+                await connection.ExecuteAsync(sql);
             }
 
         }

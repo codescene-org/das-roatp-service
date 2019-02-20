@@ -1,5 +1,6 @@
 ﻿namespace SFA.DAS.RoATPService.Importer
 {
+    using SFA.DAS.RoATPService.Importer.Models;
     using System;
     using System.Collections.Generic;
 

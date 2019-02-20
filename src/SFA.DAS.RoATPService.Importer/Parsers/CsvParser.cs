@@ -1,10 +1,12 @@
-﻿namespace SFA.DAS.RoATPService.Importer
+﻿namespace SFA.DAS.RoATPService.Importer.Parsers
 {
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
     using CsvHelper;
     using CsvHelper.TypeConversion;
+    using Exceptions;
+    using SFA.DAS.RoATPService.Importer.Models;
 
     public class CsvParser
     {
@@ -25,7 +27,7 @@
 
                         RegisterEntryValidator validator = new RegisterEntryValidator();
                         RegisterEntryValidationResult validationResult = validator.ValidateRegisterEntry(record);
-                        
+
                         if (!validationResult.IsValid)
                         {
                             errorLog.Add("Error on row " + rowNumber);
@@ -41,10 +43,17 @@
                         entries.Add(record);
                         rowNumber++;
                     }
-                    catch (TypeConverterException ex)
+                    catch (TypeConverterException typeConverterException)
                     {
-                        errorLog.Add("Error on row " + ex.ReadingContext.Row);
-                        errorLog.Add("Invalid data:" + ex.ReadingContext.RawRecord);
+                        errorLog.Add("Error on row " + typeConverterException.ReadingContext.Row);
+                        errorLog.Add("Invalid data:" + typeConverterException.ReadingContext.RawRecord);
+                    }
+                    catch (HeaderValidationException headerValidationException)
+                    {
+                        throw new RegisterImportException(headerValidationException.Message)
+                        {
+                            ImportErrorMessage = $"Invalid header at index {headerValidationException.HeaderNameIndex}"
+                        };
                     }
                 }
             }

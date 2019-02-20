@@ -4,6 +4,7 @@
     using System.Text;
     using FluentAssertions;
     using NUnit.Framework;
+    using SFA.DAS.RoATPService.Importer.Parsers;
 
     [TestFixture]
     public class CsvParserTests
@@ -82,9 +83,10 @@
         {
             byte[] csvBytes = Encoding.UTF8.GetBytes(csvFile);
 
-            MemoryStream stream = new MemoryStream(csvBytes);
-
-            stream.Position = 0;
+            MemoryStream stream = new MemoryStream(csvBytes)
+            {
+                Position = 0
+            };
 
             return stream;
         }

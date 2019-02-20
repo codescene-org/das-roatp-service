@@ -1,6 +1,9 @@
 ﻿namespace SFA.DAS.RoATPService.Importer
 {
     using Microsoft.Extensions.Configuration;
+    using SFA.DAS.RoATPService.Importer.Exceptions;
+    using SFA.DAS.RoATPService.Importer.Models;
+    using SFA.DAS.RoATPService.Importer.Parsers;
     using SFA.DAS.RoATPService.Settings;
     using System;
     using System.Diagnostics;

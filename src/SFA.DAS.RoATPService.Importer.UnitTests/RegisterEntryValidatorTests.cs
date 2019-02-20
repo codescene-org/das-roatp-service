@@ -1,8 +1,8 @@
-
 namespace SFA.DAS.RoATPService.Importer.UnitTests
 {
     using FluentAssertions;
     using NUnit.Framework;
+    using SFA.DAS.RoATPService.Importer.Models;
 
     public class RegisterEntryValidatorTests
     {
