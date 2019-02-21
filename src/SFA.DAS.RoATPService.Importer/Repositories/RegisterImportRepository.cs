@@ -6,6 +6,7 @@
     using System.IO;
     using System.Threading.Tasks;
     using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Logging;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Auth;
     using Microsoft.WindowsAzure.Storage.Blob;
@@ -21,10 +22,21 @@
 
         private IWebConfiguration WebConfiguration { get; }
 
-        public RegisterImportRepository(IConfiguration appConfiguration, IWebConfiguration webConfiguration)
+        private ICsvParser CsvParser { get; }
+
+        private ILogger<RegisterImportRepository> Logger { get; }
+
+        private IRegisterImporter Importer { get; }
+
+        public RegisterImportRepository(IConfiguration appConfiguration, IWebConfiguration webConfiguration, 
+                                        ICsvParser csvParser, ILogger<RegisterImportRepository> logger,
+                                        IRegisterImporter importer)
         {
             AppConfiguration = appConfiguration;
             WebConfiguration = webConfiguration;
+            CsvParser = csvParser;
+            Logger = logger;
+            Importer = importer;
         }
 
         public async Task<RegisterImportResultsResponse> ImportRegisterData(RegisterImportRequest importRequest)
@@ -63,21 +75,21 @@
 
             using (var reader = new StreamReader(blobStream))
             {
-                CsvParser parser = new CsvParser();
-                CsvImportResult results = parser.ParseCsvFile(reader);
+                CsvImportResult results = CsvParser.ParseCsvFile(reader);
 
                 if (results.ErrorLog.Count == 0)
                 {
-                    RegisterImporter importer = new RegisterImporter(WebConfiguration.SqlConnectionString);
-
                     try
                     {
-                        importer.ImportRegisterEntries(results.Entries).GetAwaiter().GetResult();
+                        Importer.ImportRegisterEntries(WebConfiguration.SqlConnectionString, results.Entries).GetAwaiter().GetResult();
                     }
                     catch (RegisterImportException importException)
                     {
-                        importResults.ErrorMessages.Add("Unexpected error when importing organisation " + importException.UKPRN);
+                        string organisationImportError = $"Unexpected error when importing organisation {importException.UKPRN}";
+                        
+                        importResults.ErrorMessages.Add(organisationImportError);
                         importResults.ErrorMessages.Add(importException.ImportErrorMessage);
+                        Logger.LogError($"{organisationImportError} : {importException.ImportErrorMessage}");
                         return await Task.FromResult(importResults);
                     }
 
@@ -93,6 +105,9 @@
                 }
 
                 importResults.ElapsedTimeMs = stopWatch.ElapsedMilliseconds;
+                
+                Logger.LogInformation($"Register import completed in {importResults.ElapsedTimeMs} ms");
+
                 return await Task.FromResult(importResults);
             }
         }

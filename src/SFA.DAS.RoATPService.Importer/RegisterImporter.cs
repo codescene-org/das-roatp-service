@@ -6,30 +6,37 @@
     using System.Data.SqlClient;
     using System.Threading.Tasks;
     using Dapper;
+    using Microsoft.Extensions.Logging;
     using SFA.DAS.RoATPService.Importer.Exceptions;
     using SFA.DAS.RoATPService.Importer.Models;
 
-    public class RegisterImporter
+    public class RegisterImporter : IRegisterImporter
     {
-        private string ConnectionString { get; }
+        private string ConnectionString { get; set; }
 
-        public RegisterImporter(string connectionString)
+        private ILogger<RegisterImporter> Logger { get; }
+
+        public RegisterImporter(ILogger<RegisterImporter> logger)
         {
-            ConnectionString = connectionString;
+            Logger = logger;
         }
 
-        public async Task<bool> ImportRegisterEntries(List<RegisterEntry> registerEntries)
+        public async Task<bool> ImportRegisterEntries(string connectionString, List<RegisterEntry> registerEntries)
         {
-            TruncateRegisterTable();
+            ConnectionString = connectionString;
+
+            var connection = await TruncateRegisterTable();
 
             foreach (RegisterEntry entry in registerEntries)
             {
                 try
                 {
-                    await ImportRegisterEntry(entry);
+                    await ImportRegisterEntry(connection, entry);
                 }
                 catch (SqlException sqlException)
                 {
+                    string databaseErrorMessage = $"Unable to import register data for UKPRN {entry.UKPRN} : SQL operation failed";
+                    Logger.LogError(sqlException, databaseErrorMessage);
                     throw new RegisterImportException("Unable to import register data", sqlException)
                     {
                         UKPRN = entry.UKPRN, ImportErrorMessage = "SQL operation failed"
@@ -40,68 +47,63 @@
             return true;
         }
 
-        private async void TruncateRegisterTable()
+        private async Task<IDbConnection> TruncateRegisterTable()
         {
-            using (var connection = new SqlConnection(ConnectionString))
-            {
-                if (connection.State != ConnectionState.Open)
-                    await connection.OpenAsync();
-                
-                string sql = "DELETE FROM [dbo].[Organisations]";
+            var connection = new SqlConnection(ConnectionString);
+            
+            if (connection.State != ConnectionState.Open)
+                await connection.OpenAsync();
+            
+            string sql = "DELETE FROM [dbo].[Organisations]";
 
-                await connection.ExecuteAsync(sql);
-            }
+            await connection.ExecuteAsync(sql);
 
+            return connection;
         }
 
-        private async Task<bool> ImportRegisterEntry(RegisterEntry registerEntry)
+        private async Task<bool> ImportRegisterEntry(IDbConnection connection, RegisterEntry registerEntry)
         {
-            using (var connection = new SqlConnection(ConnectionString))
-            {
-                if (connection.State != ConnectionState.Open)
-                    await connection.OpenAsync();
+            Guid organisationId = Guid.NewGuid();
+            DateTime createdAt = DateTime.Now;
+            string createdBy = "Register Import";
 
-                Guid organisationId = Guid.NewGuid();
-                DateTime createdAt = DateTime.Now;
-                string createdBy = "Register Import";
+            string sql = $"INSERT INTO [dbo].[Organisations] " +
+                         " ([Id] " +
+                         ",[CreatedAt] " +
+                         ",[CreatedBy] " +
+                         ",[StatusId] " +
+                         ",[ProviderTypeId] " +
+                         ",[OrganisationTypeId] " +
+                         ",[UKPRN] " +
+                         ",[LegalName] " +
+                         ",[TradingName] " +
+                         ",[StatusDate] " +
+                         ",[OrganisationData]) " +
+                         "VALUES " +
+                         "(@organisationId, @createdAt, @createdBy, @statusId, @applicationRouteId, @organisationTypeId," +
+                         " @ukprn, @legalName, @tradingName, @statusDate, @organisationData)";
 
-                string sql = $"INSERT INTO [dbo].[Organisations] " +
-                             " ([Id] " +
-                             ",[CreatedAt] " +
-                             ",[CreatedBy] " +
-                             ",[StatusId] " +
-                             ",[ProviderTypeId] " +
-                             ",[OrganisationTypeId] " +
-                             ",[UKPRN] " +
-                             ",[LegalName] " +
-                             ",[TradingName] " +
-                             ",[StatusDate] " +
-                             ",[OrganisationData]) " +
-                             "VALUES " +
-                             "(@organisationId, @createdAt, @createdBy, @statusId, @applicationRouteId, @organisationTypeId," +
-                             " @ukprn, @legalName, @tradingName, @statusDate, @organisationData)";
+            var statusId = registerEntry.Status;
+            DateTime statusDate = DateTime.Now;
+            var organisationData = "{}";
 
-                var statusId = registerEntry.Status;
-                DateTime statusDate = DateTime.Now;
-                var organisationData = "{}";
+            var organisationsCreated = await connection.ExecuteAsync(sql,
+                new
+                {
+                    organisationId,
+                    createdAt,
+                    createdBy,
+                    statusId,
+                    ApplicationRouteId = registerEntry.ProviderTypeId,
+                    registerEntry.OrganisationTypeId,
+                    registerEntry.UKPRN,
+                    registerEntry.LegalName,
+                    registerEntry.TradingName,
+                    statusDate,
+                    organisationData
+                });
 
-                var organisationsCreated = await connection.ExecuteAsync(sql,
-                    new
-                    {
-                        organisationId,
-                        createdAt,
-                        createdBy,
-                        statusId,
-                        ApplicationRouteId = registerEntry.ProviderTypeId,
-                        registerEntry.OrganisationTypeId,
-                        registerEntry.UKPRN,
-                        registerEntry.LegalName,
-                        registerEntry.TradingName,
-                        statusDate,
-                        organisationData
-                    });
-                return await Task.FromResult(organisationsCreated > 0);
-            }
+            return await Task.FromResult(organisationsCreated > 0);
         }
     }
 }

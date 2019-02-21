@@ -8,6 +8,8 @@
     using System;
     using System.Diagnostics;
     using System.IO;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Logging.Abstractions;
 
     class Program
     {
@@ -37,16 +39,16 @@
 
             using (var reader = new StreamReader(csvFilePath))
             {
-                CsvParser parser = new CsvParser();
+                CsvParser parser = new CsvParser(new Logger<CsvParser>(NullLoggerFactory.Instance));
                 CsvImportResult results = parser.ParseCsvFile(reader);
 
                 if (results.ErrorLog.Count == 0)
                 {
-                    RegisterImporter importer = new RegisterImporter(ApplicationConfiguration.SqlConnectionString);
+                    RegisterImporter importer = new RegisterImporter(new Logger<RegisterImporter>(NullLoggerFactory.Instance));
 
                     try
                     {
-                        importer.ImportRegisterEntries(results.Entries).GetAwaiter().GetResult();
+                        importer.ImportRegisterEntries(ApplicationConfiguration.SqlConnectionString, results.Entries).GetAwaiter().GetResult();
                     }
                     catch (RegisterImportException importException)
                     {

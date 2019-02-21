@@ -3,6 +3,8 @@
     using System.IO;
     using System.Text;
     using FluentAssertions;
+    using Microsoft.Extensions.Logging;
+    using Moq;
     using NUnit.Framework;
     using SFA.DAS.RoATPService.Importer.Parsers;
 
@@ -10,12 +12,14 @@
     public class CsvParserTests
     {
         private CsvParser _parser;
+        private Mock<ILogger<CsvParser>> _logger;
         private string csvFile;
 
         [SetUp]
         public void Before_each_test()
         {
-            _parser = new CsvParser();
+            _logger = new Mock<ILogger<CsvParser>>();
+            _parser = new CsvParser(_logger.Object);
             csvFile = "ProviderTypeId,UKPRN,LegalName,TradingName,OrganisationTypeId,ParentCompanyGuarantee,FinancialTrackRecord,Status,StatusDate,EndReasonId\n";
         }
 
