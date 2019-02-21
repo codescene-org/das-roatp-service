@@ -7,6 +7,7 @@
     using System.Threading.Tasks;
     using Microsoft.Extensions.Configuration;
     using Microsoft.WindowsAzure.Storage;
+    using Microsoft.WindowsAzure.Storage.Auth;
     using Microsoft.WindowsAzure.Storage.Blob;
     using Settings;
     using SFA.DAS.RoATPService.Api.Types.Models;
@@ -26,7 +27,7 @@
             WebConfiguration = webConfiguration;
         }
 
-        public async Task<RegisterImportResultsResponse> ImportRegisterData(string containerName, string blobReference)
+        public async Task<RegisterImportResultsResponse> ImportRegisterData(RegisterImportRequest importRequest)
         {
             var stopWatch = Stopwatch.StartNew();
             
@@ -38,18 +39,20 @@
                 ElapsedTimeMs = 0
             };
 
-            if (String.IsNullOrWhiteSpace(containerName) || String.IsNullOrWhiteSpace(blobReference))
+            if (String.IsNullOrWhiteSpace(importRequest.ContainerName) || String.IsNullOrWhiteSpace(importRequest.BlobReference)
+                || String.IsNullOrWhiteSpace(importRequest.SASToken) || String.IsNullOrWhiteSpace(importRequest.AccountName)
+                || String.IsNullOrWhiteSpace(importRequest.EndpointSuffix))
             {
                 return await Task.FromResult(importResults);
             }
 
-            CloudStorageAccount storageAccount = null;
-            CloudStorageAccount.TryParse(AppConfiguration["ConfigurationStorageConnectionString"], out storageAccount);
-                
-            CloudBlobClient cloudBlobClient = storageAccount.CreateCloudBlobClient();
-            CloudBlobContainer container = cloudBlobClient.GetContainerReference(containerName);
+            StorageCredentials credentials = new StorageCredentials(importRequest.SASToken);
+            CloudStorageAccount storageAccount = new CloudStorageAccount(credentials, importRequest.AccountName, importRequest.EndpointSuffix, true);
 
-            CloudBlob blob = container.GetBlobReference(blobReference);
+            CloudBlobClient cloudBlobClient = storageAccount.CreateCloudBlobClient();
+            CloudBlobContainer container = cloudBlobClient.GetContainerReference(importRequest.ContainerName);
+
+            CloudBlob blob = container.GetBlobReference(importRequest.BlobReference);
 
             var blobStream = new MemoryStream();
             Task downloadTask = blob.DownloadToStreamAsync(blobStream);

@@ -5,6 +5,6 @@
 
     public interface IRegisterImportRepository
     {
-        Task<RegisterImportResultsResponse> ImportRegisterData(string containerName, string blobReference);
+        Task<RegisterImportResultsResponse> ImportRegisterData(RegisterImportRequest importRequest);
     }
 }

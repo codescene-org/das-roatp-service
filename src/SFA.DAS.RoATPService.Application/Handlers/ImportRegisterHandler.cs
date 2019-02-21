@@ -24,7 +24,7 @@
         {
             try
             {
-                return await _repository.ImportRegisterData(request.ContainerName, request.BlobReference);
+                return await _repository.ImportRegisterData(request);
             }
             catch (RegisterImportException importException)
             {

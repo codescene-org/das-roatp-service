@@ -47,7 +47,7 @@
                 Success = true
             };
 
-            _repository.Setup(x => x.ImportRegisterData(It.IsAny<string>(), It.IsAny<string>()))
+            _repository.Setup(x => x.ImportRegisterData(It.IsAny<RegisterImportRequest>()))
                 .ReturnsAsync(successfulResult);
 
             var response = _handler.Handle(_request, new CancellationToken()).GetAwaiter().GetResult();
@@ -72,7 +72,7 @@
                 Success = false
             };
 
-            _repository.Setup(x => x.ImportRegisterData(It.IsAny<string>(), It.IsAny<string>()))
+            _repository.Setup(x => x.ImportRegisterData(It.IsAny<RegisterImportRequest>()))
                 .ReturnsAsync(successfulResult);
 
             var response = _handler.Handle(_request, new CancellationToken()).GetAwaiter().GetResult();
@@ -86,7 +86,7 @@
         [Test]
         public void Import_register_throws_exception()
         {
-            _repository.Setup(x => x.ImportRegisterData(It.IsAny<string>(), It.IsAny<string>()))
+            _repository.Setup(x => x.ImportRegisterData(It.IsAny<RegisterImportRequest>()))
                 .Throws(new RegisterImportException("Import error")
                 {
                     UKPRN = 10001111,
