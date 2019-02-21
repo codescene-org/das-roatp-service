@@ -31,7 +31,7 @@
             return WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
                 .UseApplicationInsights()
-                .UseKestrel(o => { o.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(5); })
+                .UseKestrel()
                 .UseNLog();
         }
     }
