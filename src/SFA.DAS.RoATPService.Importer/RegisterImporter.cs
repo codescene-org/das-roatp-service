@@ -25,25 +25,27 @@
         {
             ConnectionString = connectionString;
 
-            var connection = await TruncateRegisterTable();
-
-            foreach (RegisterEntry entry in registerEntries)
+            using (var connection = await TruncateRegisterTable())
             {
-                try
+                foreach (RegisterEntry entry in registerEntries)
                 {
-                    await ImportRegisterEntry(connection, entry);
-                }
-                catch (SqlException sqlException)
-                {
-                    string databaseErrorMessage = $"Unable to import register data for UKPRN {entry.UKPRN} : SQL operation failed";
-                    Logger.LogError(sqlException, databaseErrorMessage);
-                    throw new RegisterImportException("Unable to import register data", sqlException)
+                    try
                     {
-                        UKPRN = entry.UKPRN, ImportErrorMessage = "SQL operation failed"
-                    };
+                        await ImportRegisterEntry(connection, entry);
+                    }
+                    catch (SqlException sqlException)
+                    {
+                        string databaseErrorMessage =
+                            $"Unable to import register data for UKPRN {entry.UKPRN} : SQL operation failed";
+                        Logger.LogError(sqlException, databaseErrorMessage);
+                        throw new RegisterImportException("Unable to import register data", sqlException)
+                        {
+                            UKPRN = entry.UKPRN,
+                            ImportErrorMessage = "SQL operation failed"
+                        };
+                    }
                 }
             }
-
             return true;
         }
 
