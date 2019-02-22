@@ -27,13 +27,13 @@
             using (var csvReader = new CsvReader(csvFileReader))
             {
                 csvReader.Configuration.CultureInfo = CultureInfo.CreateSpecificCulture("en-GB");
-                int rowNumber = 1;
+                int rowNumber = 1; // include the header
                 while (csvReader.Read())
                 {
                     try
                     {
                         var record = csvReader.GetRecord<RegisterEntry>();
-
+                        rowNumber++;
                         RegisterEntryValidator validator = new RegisterEntryValidator();
                         RegisterEntryValidationResult validationResult = validator.ValidateRegisterEntry(record);
 
@@ -52,7 +52,6 @@
                         }
 
                         entries.Add(record);
-                        rowNumber++;
                     }
                     catch (TypeConverterException typeConverterException)
                     {
