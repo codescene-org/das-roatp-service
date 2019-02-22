@@ -6,6 +6,7 @@
     using System.Data.SqlClient;
     using System.Threading.Tasks;
     using Dapper;
+    using Loggers;
     using Microsoft.Extensions.Logging;
     using SFA.DAS.RoATPService.Importer.Exceptions;
     using SFA.DAS.RoATPService.Importer.Models;
@@ -60,6 +61,8 @@
 
             await connection.ExecuteAsync(sql);
 
+            RegisterImportLogger.Instance.LogStatement(sql);
+
             return connection;
         }
 
@@ -82,7 +85,7 @@
                          ",[StatusDate] " +
                          ",[OrganisationData]) " +
                          "VALUES " +
-                         "(@organisationId, @createdAt, @createdBy, @statusId, @applicationRouteId, @organisationTypeId," +
+                         "(@organisationId, @createdAt, @createdBy, @statusId, @providerTypeId, @organisationTypeId," +
                          " @ukprn, @legalName, @tradingName, @statusDate, @organisationData)";
 
             var statusId = registerEntry.Status;
@@ -96,7 +99,7 @@
                     createdAt,
                     createdBy,
                     statusId,
-                    ApplicationRouteId = registerEntry.ProviderTypeId,
+                    registerEntry.ProviderTypeId,
                     registerEntry.OrganisationTypeId,
                     registerEntry.UKPRN,
                     registerEntry.LegalName,
@@ -104,6 +107,9 @@
                     statusDate,
                     organisationData
                 });
+
+            RegisterImportLogger.Instance.LogInsertStatement(sql, registerEntry, organisationId, createdAt, 
+                                                             createdBy, statusId, statusDate, organisationData);
 
             return await Task.FromResult(organisationsCreated > 0);
         }

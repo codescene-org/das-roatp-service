@@ -8,6 +8,7 @@
     using System;
     using System.Diagnostics;
     using System.IO;
+    using Loggers;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Logging.Abstractions;
 
@@ -23,13 +24,19 @@
             var stopWatch = Stopwatch.StartNew();
             Console.WriteLine("ESFA RoATP Data Importer");
 
-            if (args.Length != 1)
+            if (args.Length < 1 || args.Length > 2)
             {
-                Console.WriteLine("Usage: dotnet RoATPImporter.dll [path to CSV file]");
+                Console.WriteLine("Usage: dotnet RoATPImporter.dll CSV file path [log file path]");
                 Environment.Exit(-1);
             }
 
             string csvFilePath = args[0];
+
+            if (args.Length == 2)
+            {
+                string logFilePath = args[1];
+                RegisterImportLogger.Instance.LogFileName = logFilePath;
+            }
 
             Configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", true, true)
@@ -67,6 +74,14 @@
                     }
                 }
                 Console.WriteLine("Completed in " + stopWatch.ElapsedMilliseconds + "ms");
+
+                if (RegisterImportLogger.Instance.LogEnabled)
+                {
+                    RegisterImportLogger.Instance.Close();
+                    Console.WriteLine("SQL output logged to " + RegisterImportLogger.Instance.LogFileName);
+                }
+
+                Console.ReadLine();
             }
         }
     }
