@@ -32,8 +32,8 @@
                 {
                     try
                     {
-                        var record = csvReader.GetRecord<RegisterEntry>();
                         rowNumber++;
+                        var record = csvReader.GetRecord<RegisterEntry>();
                         RegisterEntryValidator validator = new RegisterEntryValidator();
                         RegisterEntryValidationResult validationResult = validator.ValidateRegisterEntry(record);
 
