@@ -36,9 +36,7 @@
 
                 foreach (AuditLogEntry logEntry in auditLogEntries)
                 {
-                    string sql = $"INSERT INTO Audit " +
-                                 "([OrganisationId], [UpdatedBy], [UpdatedAt], [FieldChanged], [PreviousValue], [NewValue]) " +
-                                 "VALUES(@organisationId, @updatedBy, @updatedAt, @fieldChanged, @previousValue, @newValue)";
+                    string sql = $"EXECUTE [dbo].[RoATP_Audit_Field_Change] @organisationId, @updatedBy, @updatedAt, @fieldChanged, @previousValue, @newValue";
 
                     var updatedAt = DateTime.Now;
 
