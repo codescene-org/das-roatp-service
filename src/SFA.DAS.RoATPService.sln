@@ -21,6 +21,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.RoATPService.Settin
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.RoATPService.Application.UnitTests", "SFA.DAS.RoATPService.Application.UnitTests\SFA.DAS.RoATPService.Application.UnitTests.csproj", "{1AB6600C-1B47-42ED-9C76-8B14D9B10BBB}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.RoATPService.Importer", "SFA.DAS.RoATPService.Importer\SFA.DAS.RoATPService.Importer.csproj", "{AC0ED35D-9A01-40BF-BC59-62423EE1B6DC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.RoATPService.Importer.UnitTests", "SFA.DAS.RoATPService.Importer.UnitTests\SFA.DAS.RoATPService.Importer.UnitTests.csproj", "{C1A091FB-13EA-44E1-A873-685C9D2355FB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,12 +65,21 @@ Global
 		{1AB6600C-1B47-42ED-9C76-8B14D9B10BBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1AB6600C-1B47-42ED-9C76-8B14D9B10BBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1AB6600C-1B47-42ED-9C76-8B14D9B10BBB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC0ED35D-9A01-40BF-BC59-62423EE1B6DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC0ED35D-9A01-40BF-BC59-62423EE1B6DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC0ED35D-9A01-40BF-BC59-62423EE1B6DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC0ED35D-9A01-40BF-BC59-62423EE1B6DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1A091FB-13EA-44E1-A873-685C9D2355FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1A091FB-13EA-44E1-A873-685C9D2355FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1A091FB-13EA-44E1-A873-685C9D2355FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1A091FB-13EA-44E1-A873-685C9D2355FB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{1AB6600C-1B47-42ED-9C76-8B14D9B10BBB} = {A41E0780-CADF-4AEC-B37C-D37DAB8A79E5}
+		{C1A091FB-13EA-44E1-A873-685C9D2355FB} = {A41E0780-CADF-4AEC-B37C-D37DAB8A79E5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C5B677B2-0D72-4629-A5FD-F94B00EC858B}
