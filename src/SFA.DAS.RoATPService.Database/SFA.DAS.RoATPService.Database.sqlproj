@@ -72,7 +72,6 @@
     <Build Include="Tables\RemovedReasons.sql" />
     <Build Include="StoredProcedures\RoATP_Audit_History.sql" />
     <Build Include="StoredProcedures\RoATP_Complete_Register.sql" />
-    <Build Include="StoredProcedures\RoATP_Audit_Field_Change.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Script.PostDeployment1.sql" />

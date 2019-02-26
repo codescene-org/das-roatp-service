@@ -6,6 +6,5 @@
     [UpdatedAt] DATETIME2 NOT NULL, 
     [FieldChanged] NVARCHAR(50) NOT NULL, 
     [PreviousValue] NVARCHAR(MAX) NOT NULL, 
-    [NewValue] NVARCHAR(MAX) NOT NULL,
-	[PreviousStatusDate] DATETIME2 NULL
+    [NewValue] NVARCHAR(MAX) NOT NULL
 )
