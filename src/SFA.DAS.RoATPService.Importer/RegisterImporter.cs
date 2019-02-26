@@ -89,7 +89,6 @@
                          " @ukprn, @legalName, @tradingName, @statusDate, @organisationData)";
 
             var statusId = registerEntry.Status;
-            DateTime statusDate = DateTime.Now;
             var organisationData = "{}";
 
             var organisationsCreated = await connection.ExecuteAsync(sql,
@@ -104,12 +103,12 @@
                     registerEntry.UKPRN,
                     registerEntry.LegalName,
                     registerEntry.TradingName,
-                    statusDate,
+                    registerEntry.StatusDate,
                     organisationData
                 });
 
             RegisterImportLogger.Instance.LogInsertStatement(sql, registerEntry, organisationId, createdAt, 
-                                                             createdBy, statusId, statusDate, organisationData);
+                                                             createdBy, statusId, organisationData);
 
             return await Task.FromResult(organisationsCreated > 0);
         }
