@@ -4,10 +4,13 @@
     using System.Collections.Generic;
     using System.Data;
     using System.Data.SqlClient;
+    using System.Linq;
     using System.Threading.Tasks;
     using Dapper;
+    using Domain;
     using Loggers;
     using Microsoft.Extensions.Logging;
+    using Newtonsoft.Json;
     using SFA.DAS.RoATPService.Importer.Exceptions;
     using SFA.DAS.RoATPService.Importer.Models;
 
@@ -17,6 +20,8 @@
 
         private ILogger<RegisterImporter> Logger { get; }
 
+        private IEnumerable<RemovedReason> RemovedReasons { get; set; }
+
         public RegisterImporter(ILogger<RegisterImporter> logger)
         {
             Logger = logger;
@@ -25,6 +30,8 @@
         public async Task<bool> ImportRegisterEntries(string connectionString, List<RegisterEntry> registerEntries)
         {
             ConnectionString = connectionString;
+
+            await LoadRemovedReasons();
 
             using (var connection = await TruncateRegisterTable())
             {
@@ -72,6 +79,13 @@
             DateTime createdAt = DateTime.Now;
             string createdBy = "Register Import";
 
+            var organisationDataImport = new OrganisationData();
+
+            if (registerEntry.EndReasonId.HasValue)
+            {
+                organisationDataImport.RemovedReason = RemovedReasons.FirstOrDefault(x => x.Id == registerEntry.EndReasonId.Value);
+            }
+
             string sql = $"INSERT INTO [dbo].[Organisations] " +
                          " ([Id] " +
                          ",[CreatedAt] " +
@@ -89,8 +103,7 @@
                          " @ukprn, @legalName, @tradingName, @statusDate, @organisationData)";
 
             var statusId = registerEntry.Status;
-            DateTime statusDate = DateTime.Now;
-            var organisationData = "{}";
+            var organisationData = JsonConvert.SerializeObject(organisationDataImport);
 
             var organisationsCreated = await connection.ExecuteAsync(sql,
                 new
@@ -104,14 +117,28 @@
                     registerEntry.UKPRN,
                     registerEntry.LegalName,
                     registerEntry.TradingName,
-                    statusDate,
+                    registerEntry.StatusDate,
                     organisationData
                 });
 
             RegisterImportLogger.Instance.LogInsertStatement(sql, registerEntry, organisationId, createdAt, 
-                                                             createdBy, statusId, statusDate, organisationData);
+                                                             createdBy, statusId, organisationData);
 
             return await Task.FromResult(organisationsCreated > 0);
+        }
+
+        private async Task<bool> LoadRemovedReasons()
+        {
+            var connection = new SqlConnection(ConnectionString);
+
+            if (connection.State != ConnectionState.Open)
+                await connection.OpenAsync();
+
+            string sql = "SELECT Id, Status, RemovedReason AS [Reason], Description, CreatedAt, CreatedBy, UpdatedAt, UpdatedBy FROM dbo.RemovedReasons";
+
+            RemovedReasons = connection.QueryAsync<RemovedReason>(sql).GetAwaiter().GetResult();
+
+            return await Task.FromResult(true);
         }
     }
 }

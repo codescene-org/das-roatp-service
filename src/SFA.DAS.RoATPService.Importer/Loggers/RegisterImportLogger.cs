@@ -59,7 +59,7 @@
             _logWriter.WriteLine($"{sql}\n");
         }
 
-        public void LogInsertStatement(string sql, RegisterEntry registerEntry, Guid organisationId, DateTime createdAt, string createdBy, string statusId, DateTime statusDate, string organisationData)
+        public void LogInsertStatement(string sql, RegisterEntry registerEntry, Guid organisationId, DateTime createdAt, string createdBy, string statusId, string organisationData)
         {
             if (!LogEnabled)
             {
@@ -69,7 +69,7 @@
             registerEntry.LegalName = registerEntry.LegalName.Replace("'", "''");
             registerEntry.TradingName = registerEntry.TradingName.Replace("'", "''");
             
-            string formattedSql = $"exec sp_executesql N'{sql}',N'@organisationId uniqueidentifier,@createdAt datetime,@createdBy nvarchar(4000),@statusId nvarchar(4000),@providerTypeId int,@OrganisationTypeId int,@UKPRN bigint,@LegalName nvarchar(4000),@TradingName nvarchar(4000),@statusDate datetime,@organisationData nvarchar(4000)',@organisationId='{organisationId}',@createdAt='{createdAt.ToString("yyyyMMdd HH:mm:ss")}',@createdBy=N'{createdBy}',@statusId=N'{statusId}',@ProviderTypeId={registerEntry.ProviderTypeId},@OrganisationTypeId={registerEntry.OrganisationTypeId},@UKPRN={registerEntry.UKPRN},@LegalName=N'{registerEntry.LegalName}',@TradingName=N'{registerEntry.TradingName}',@statusDate='{statusDate.ToString("yyyyMMdd HH:mm:ss")}',@organisationData=N'{organisationData}'";
+            string formattedSql = $"exec sp_executesql N'{sql}',N'@organisationId uniqueidentifier,@createdAt datetime,@createdBy nvarchar(4000),@statusId nvarchar(4000),@providerTypeId int,@OrganisationTypeId int,@UKPRN bigint,@LegalName nvarchar(4000),@TradingName nvarchar(4000),@statusDate datetime,@organisationData nvarchar(4000)',@organisationId='{organisationId}',@createdAt='{createdAt.ToString("yyyyMMdd HH:mm:ss")}',@createdBy=N'{createdBy}',@statusId=N'{statusId}',@ProviderTypeId={registerEntry.ProviderTypeId},@OrganisationTypeId={registerEntry.OrganisationTypeId},@UKPRN={registerEntry.UKPRN},@LegalName=N'{registerEntry.LegalName}',@TradingName=N'{registerEntry.TradingName}',@statusDate='{registerEntry.StatusDate.Value.ToString("yyyyMMdd HH:mm:ss")}',@organisationData=N'{organisationData}'";
 
             _logWriter.WriteLine($"{formattedSql}\n");
         }
