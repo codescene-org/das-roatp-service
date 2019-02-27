@@ -5,6 +5,17 @@ JSON_VALUE([OrganisationData],'$.CompanyNumber') CompanyNumber,
 JSON_VALUE([OrganisationData],'$.CharityNumber') CharityNumber
 FROM  [Organisations] WHERE JSON_VALUE([OrganisationData],'$.CompanyNumber') IS NOT NULL
 OR JSON_VALUE([OrganisationData],'$.CharityNumber') IS NOT NULL
+
+-- check duplicates
+SELECT JSON_VALUE([OrganisationData],'$.CompanyNumber') CompanyNumber
+FROM [Organisations] WHERE JSON_VALUE([OrganisationData],'$.CompanyNumber') IS NOT NULL
+GROUP BY JSON_VALUE([OrganisationData],'$.CompanyNumber') 
+HAVING COUNT(*) > 1
+
+SELECT JSON_VALUE([OrganisationData],'$.CharityNumber') CharityNumber
+FROM [Organisations] WHERE JSON_VALUE([OrganisationData],'$.CharityNumber') IS NOT NULL
+GROUP BY JSON_VALUE([OrganisationData],'$.CharityNumber') 
+HAVING COUNT(*) > 1
 */
 
 UPDATE [Organisations] SET [OrganisationData] = JSON_MODIFY([OrganisationData],'strict $.CompanyNumber', null ) 
