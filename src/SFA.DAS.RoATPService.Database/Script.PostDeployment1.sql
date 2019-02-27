@@ -124,3 +124,6 @@ IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES
 BEGIN
    DROP TABLE dbo.ApplicationRoutes
 END
+
+-- load the Company House and Charity Numbers (assumes Register has already been imported)
+:r SaveCompanyandCharityNumber.sql
