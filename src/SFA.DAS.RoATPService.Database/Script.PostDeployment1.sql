@@ -43,7 +43,7 @@ END
 
 -- Set up lookup data for organisation types
 
-IF NOT EXISTS (SELECT 1 FROM dbo.ProviderTypes) 
+IF NOT EXISTS (SELECT 1 FROM dbo.OrganisationTypes) 
 BEGIN
 	SET IDENTITY_INSERT dbo.OrganisationTypes ON
 
@@ -79,7 +79,7 @@ END
 
 -- Map provider types to available organisation types
 
-IF NOT EXISTS (SELECT 1 FROM dbo.ProviderTypes) 
+IF NOT EXISTS (SELECT 1 FROM dbo.ProviderTypeOrganisationTypes) 
 BEGIN
 	SET IDENTITY_INSERT dbo.ProviderTypeOrganisationTypes ON
 
