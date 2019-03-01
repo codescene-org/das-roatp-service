@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "SFA.DAS.RoATPService.Importer": {
-      "commandName": "Project",
-      "commandLineArgs": "\"d:\\esfa\\testdata\\import-1102.csv\" \"D:\\esfa\\testdata\\import-register.sql\""
-    }
-  }
-}
