@@ -29,9 +29,7 @@
         {
             var request = new GetProviderTypesRequest();
 
-            IEnumerable<ProviderType> providerTypes = await _mediator.Send(request);
-
-            return Ok(providerTypes);
+            return Ok(await _mediator.Send(request));
         }
 
         [Route("organisationTypes")]
@@ -39,9 +37,7 @@
         {
             var request = new GetOrganisationTypesRequest { ProviderTypeId = providerTypeId };
 
-            IEnumerable<OrganisationType> organisationTypes = await _mediator.Send(request);
-
-            return Ok(organisationTypes);
+            return Ok(await _mediator.Send(request));
         }
     }
 }
