@@ -17,5 +17,5 @@ AS
 		FROM [Audit] au1
 		LEFT JOIN Organisations og1 ON og1.Id = au1.OrganisationId
 	) ab1
-	ORDER BY LegalName, UpdatedAt 
+	ORDER BY LegalName, ab1.Updatedat desc 
 GO
