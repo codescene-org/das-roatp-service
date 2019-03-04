@@ -39,7 +39,7 @@
                     string sql = $"INSERT INTO Audit " +
                                  "([OrganisationId], [UpdatedBy], [UpdatedAt], [FieldChanged], [PreviousValue], [NewValue]) " +
                                  "VALUES(@organisationId, @updatedBy, @updatedAt, @fieldChanged, @previousValue, @newValue)";
-
+                    
                     var updatedAt = DateTime.Now;
 
                     var recordsAffected = await connection.ExecuteAsync(sql,
