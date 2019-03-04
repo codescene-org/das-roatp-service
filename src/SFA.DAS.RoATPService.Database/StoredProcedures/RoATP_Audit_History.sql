@@ -2,13 +2,13 @@
 AS
 	SELECT
 	  UKPRN,
-	  LegalName AS [Legal Name]
+	  LegalName AS [Legal name]
 	  ,[FieldChanged] AS [Field of change]
-	  ,[PreviousValue] AS [Old Value]
-	  ,CASE WHEN [newPreviousStatusDate] = '0' THEN CreatedAT ELSE [newPreviousStatusDate] END AS [Old Status Date]
-	  ,[NewValue] AS [New Value]
+	  ,[PreviousValue] AS [Old value]
+	  ,CASE WHEN [newPreviousStatusDate] = '0' THEN CreatedAT ELSE [newPreviousStatusDate] END AS [Old status date]
+	  ,[NewValue] AS [New value]
       ,[UpdatedAt] AS [Change date time]
-      ,[UpdatedBy] AS [Operator name]
+      ,[UpdatedBy] AS [Who]
 	FROM (
 	SELECT 
 		au1.*, og1.LegalName, og1.UKPRN
