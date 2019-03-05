@@ -5,6 +5,7 @@
     using System.Diagnostics;
     using System.IO;
     using System.Threading.Tasks;
+    using Factories;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
     using Microsoft.WindowsAzure.Storage;
@@ -28,15 +29,18 @@
 
         private IRegisterImporter Importer { get; }
 
+        private ICloudStorageAccountFactory StorageAccountFactory { get; }
+
         public RegisterImportRepository(IConfiguration appConfiguration, IWebConfiguration webConfiguration, 
                                         ICsvParser csvParser, ILogger<RegisterImportRepository> logger,
-                                        IRegisterImporter importer)
+                                        IRegisterImporter importer, ICloudStorageAccountFactory storageAccountFactory)
         {
             AppConfiguration = appConfiguration;
             WebConfiguration = webConfiguration;
             CsvParser = csvParser;
             Logger = logger;
             Importer = importer;
+            StorageAccountFactory = storageAccountFactory;
         }
 
         public async Task<RegisterImportResultsResponse> ImportRegisterData(RegisterImportRequest importRequest)
@@ -51,15 +55,18 @@
                 ElapsedTimeMs = 0
             };
 
-            if (String.IsNullOrWhiteSpace(importRequest.ContainerName) || String.IsNullOrWhiteSpace(importRequest.BlobReference)
-                || String.IsNullOrWhiteSpace(importRequest.SASToken) || String.IsNullOrWhiteSpace(importRequest.AccountName)
-                || String.IsNullOrWhiteSpace(importRequest.EndpointSuffix))
+            if (String.IsNullOrWhiteSpace(importRequest.ContainerName) || String.IsNullOrWhiteSpace(importRequest.BlobReference))
             {
                 return await Task.FromResult(importResults);
             }
 
-            StorageCredentials credentials = new StorageCredentials(importRequest.SASToken);
-            CloudStorageAccount storageAccount = new CloudStorageAccount(credentials, importRequest.AccountName, importRequest.EndpointSuffix, true);
+            CloudStorageAccount storageAccount = StorageAccountFactory.GetStorageAccount(importRequest.SASToken,
+                                                                                         importRequest.AccountName,
+                                                                                         importRequest.EndpointSuffix);
+            if (storageAccount == null)
+            {
+                return await Task.FromResult(importResults);
+            }
 
             CloudBlobClient cloudBlobClient = storageAccount.CreateCloudBlobClient();
             CloudBlobContainer container = cloudBlobClient.GetContainerReference(importRequest.ContainerName);
