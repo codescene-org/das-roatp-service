@@ -60,22 +60,6 @@ BEGIN
 	
 	SET IDENTITY_INSERT dbo.OrganisationTypes OFF
 END
-ELSE
-BEGIN
-	SET IDENTITY_INSERT dbo.OrganisationTypes ON
-
-	INSERT INTO dbo.OrganisationTypes
-	([Id], [Type], [CreatedBy], [CreatedAt], [Status])
-	VALUES
-	(1, 'Education', 'System', SYSDATETIME(), 'Live'),
-	(2, 'Public sector body', 'System', SYSDATETIME(), 'Live'),
-	(3, 'Training organisation or agency', 'System', SYSDATETIME(), 'Live'),
-	(4, 'Training apprentices in own organisation', 'System', SYSDATETIME(), 'Live'),
-	(5, 'Training apprentices in connected companies', 'System', SYSDATETIME(), 'Live'),
-	(6, 'Training appentices in own and connected companies', 'System', SYSDATETIME(), 'Live')
-	
-	SET IDENTITY_INSERT dbo.OrganisationTypes OFF
-END
 
 -- Map provider types to available organisation types
 
@@ -89,25 +73,6 @@ BEGIN
 	(1, 1, 0, 'System', SYSDATETIME(), 'Live'),
 	(2, 2, 0, 'System', SYSDATETIME(), 'Live'),
 	(3, 3, 0, 'System', SYSDATETIME(), 'Live'),
-	(4, 1, 1, 'System', SYSDATETIME(), 'Live'),
-	(5, 3, 1, 'System', SYSDATETIME(), 'Live'),
-	(6, 1, 2, 'System', SYSDATETIME(), 'Live'),
-	(7, 3, 2, 'System', SYSDATETIME(), 'Live'),
-	(8, 1, 3, 'System', SYSDATETIME(), 'Live'),
-	(9, 3, 3, 'System', SYSDATETIME(), 'Live'),
-	(10, 2, 4, 'System', SYSDATETIME(), 'Live'),
-	(11, 2, 5, 'System', SYSDATETIME(), 'Live'),
-	(12, 2, 6, 'System', SYSDATETIME(), 'Live')
-
-	SET IDENTITY_INSERT dbo.ProviderTypeOrganisationTypes OFF
-END
-ELSE
-BEGIN 
-SET IDENTITY_INSERT dbo.ProviderTypeOrganisationTypes ON
-
-	INSERT INTO dbo.ProviderTypeOrganisationTypes
-	([Id], [ProviderTypeId], [OrganisationTypeId], [CreatedBy], [CreatedAt], [Status])
-	VALUES
 	(4, 1, 1, 'System', SYSDATETIME(), 'Live'),
 	(5, 3, 1, 'System', SYSDATETIME(), 'Live'),
 	(6, 1, 2, 'System', SYSDATETIME(), 'Live'),
