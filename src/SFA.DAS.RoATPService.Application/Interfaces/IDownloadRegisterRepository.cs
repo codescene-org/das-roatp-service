@@ -1,4 +1,4 @@
-﻿namespace SFA.DAS.RoATPService.Data
+﻿namespace SFA.DAS.RoATPService.Application.Interfaces
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
