@@ -153,3 +153,4 @@ END
 
 -- load the Company House and Charity Numbers (assumes Register has already been imported)
 :r SaveCompanyandCharityNumber.sql
+:r UpdateStartDateForUkprns.sql
