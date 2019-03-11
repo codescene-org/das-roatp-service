@@ -86,6 +86,8 @@
                 organisationDataImport.RemovedReason = RemovedReasons.FirstOrDefault(x => x.Id == registerEntry.EndReasonId.Value);
             }
 
+            organisationDataImport.StartDate = registerEntry.StartDate;
+
             string sql = $"INSERT INTO [dbo].[Organisations] " +
                          " ([Id] " +
                          ",[CreatedAt] " +
