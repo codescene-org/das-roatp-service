@@ -8,7 +8,7 @@
     using MediatR;
     using Microsoft.Extensions.Logging;
 
-    public class DuplicateUKPRNCheckHandler : IRequestHandler<DuplicateUKPRNCheckRequest, bool>
+    public class DuplicateUKPRNCheckHandler : IRequestHandler<DuplicateUKPRNCheckRequest, DuplicateCheckResponse>
     {
         private ILogger<DuplicateUKPRNCheckHandler> _logger;
 
@@ -21,7 +21,7 @@
             _repository = repository;
         }
 
-        public async Task<bool> Handle(DuplicateUKPRNCheckRequest request, CancellationToken cancellationToken)
+        public async Task<DuplicateCheckResponse> Handle(DuplicateUKPRNCheckRequest request, CancellationToken cancellationToken)
         {
             try
             {

@@ -8,7 +8,7 @@
     using MediatR;
     using Microsoft.Extensions.Logging;
 
-    public class DuplicateCompanyNumberCheckHandler : IRequestHandler<DuplicateCompanyNumberCheckRequest, bool>
+    public class DuplicateCompanyNumberCheckHandler : IRequestHandler<DuplicateCompanyNumberCheckRequest, DuplicateCheckResponse>
     {
         private ILogger<DuplicateCompanyNumberCheckHandler> _logger;
 
@@ -21,7 +21,7 @@
             _repository = repository;
         }
 
-        public async Task<bool> Handle(DuplicateCompanyNumberCheckRequest request, CancellationToken cancellationToken)
+        public async Task<DuplicateCheckResponse> Handle(DuplicateCompanyNumberCheckRequest request, CancellationToken cancellationToken)
         {
             try
             {

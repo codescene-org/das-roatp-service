@@ -3,7 +3,7 @@
     using System;
     using MediatR;
 
-    public class DuplicateCharityNumberCheckRequest : IRequest<bool>
+    public class DuplicateCharityNumberCheckRequest : IRequest<DuplicateCheckResponse>
     {
         public Guid OrganisationId { get; set; }
         public string CharityNumber { get; set; }

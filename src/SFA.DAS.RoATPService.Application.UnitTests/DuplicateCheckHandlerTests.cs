@@ -26,7 +26,12 @@
         [Test]
         public void Duplicate_UKPRN_check_returns_match()
         {
-            _repository.Setup(x => x.DuplicateUKPRNExists(It.IsAny<Guid>(), It.IsAny<long>())).ReturnsAsync(true);
+            var response = new DuplicateCheckResponse
+            {
+                DuplicateFound = true, DuplicateOrganisationName = "Legal Name"
+            };
+
+            _repository.Setup(x => x.DuplicateUKPRNExists(It.IsAny<Guid>(), It.IsAny<long>())).ReturnsAsync(response);
 
             var logger = new Mock<ILogger<DuplicateUKPRNCheckHandler>>();
             var handler = new DuplicateUKPRNCheckHandler(logger.Object, _repository.Object);
@@ -38,13 +43,19 @@
             };
             var result = handler.Handle(request, new CancellationToken()).GetAwaiter().GetResult();
 
-            result.Should().BeTrue();
+            result.DuplicateFound.Should().BeTrue();
         }
 
         [Test]
         public void Duplicate_UKPRN_check_returns_no_match()
         {
-            _repository.Setup(x => x.DuplicateUKPRNExists(It.IsAny<Guid>(), It.IsAny<long>())).ReturnsAsync(false);
+            var response = new DuplicateCheckResponse
+            {
+                DuplicateFound = false,
+                DuplicateOrganisationName = null
+            };
+
+            _repository.Setup(x => x.DuplicateUKPRNExists(It.IsAny<Guid>(), It.IsAny<long>())).ReturnsAsync(response);
 
             var logger = new Mock<ILogger<DuplicateUKPRNCheckHandler>>();
             var handler = new DuplicateUKPRNCheckHandler(logger.Object, _repository.Object);
@@ -56,7 +67,7 @@
             };
             var result = handler.Handle(request, new CancellationToken()).GetAwaiter().GetResult();
 
-            result.Should().BeFalse();
+            result.DuplicateFound.Should().BeFalse();
         }
 
         [Test]
@@ -82,7 +93,13 @@
         [Test]
         public void Duplicate_company_number_check_returns_match()
         {
-            _repository.Setup(x => x.DuplicateCompanyNumberExists(It.IsAny<Guid>(), It.IsAny<string>())).ReturnsAsync(true);
+            var response = new DuplicateCheckResponse
+            {
+                DuplicateFound = true,
+                DuplicateOrganisationName = "Legal Name"
+            };
+
+            _repository.Setup(x => x.DuplicateCompanyNumberExists(It.IsAny<Guid>(), It.IsAny<string>())).ReturnsAsync(response);
 
             var logger = new Mock<ILogger<DuplicateCompanyNumberCheckHandler>>();
             var handler = new DuplicateCompanyNumberCheckHandler(logger.Object, _repository.Object);
@@ -94,13 +111,18 @@
             };
             var result = handler.Handle(request, new CancellationToken()).GetAwaiter().GetResult();
 
-            result.Should().BeTrue();
+            result.DuplicateFound.Should().BeTrue();
         }
 
         [Test]
         public void Duplicate_company_number_check_returns_no_match()
         {
-            _repository.Setup(x => x.DuplicateCompanyNumberExists(It.IsAny<Guid>(), It.IsAny<string>())).ReturnsAsync(false);
+            var response = new DuplicateCheckResponse
+            {
+                DuplicateFound = false,
+                DuplicateOrganisationName = null
+            };
+            _repository.Setup(x => x.DuplicateCompanyNumberExists(It.IsAny<Guid>(), It.IsAny<string>())).ReturnsAsync(response);
 
             var logger = new Mock<ILogger<DuplicateCompanyNumberCheckHandler>>();
             var handler = new DuplicateCompanyNumberCheckHandler(logger.Object, _repository.Object);
@@ -112,7 +134,7 @@
             };
             var result = handler.Handle(request, new CancellationToken()).GetAwaiter().GetResult();
 
-            result.Should().BeFalse();
+            result.DuplicateFound.Should().BeFalse();
         }
 
         [Test]
@@ -138,7 +160,13 @@
         [Test]
         public void Duplicate_charity_number_check_returns_match()
         {
-            _repository.Setup(x => x.DuplicateCharityNumberExists(It.IsAny<Guid>(), It.IsAny<string>())).ReturnsAsync(true);
+            var response = new DuplicateCheckResponse
+            {
+                DuplicateFound = true,
+                DuplicateOrganisationName = "Legal Name"
+            };
+
+            _repository.Setup(x => x.DuplicateCharityNumberExists(It.IsAny<Guid>(), It.IsAny<string>())).ReturnsAsync(response);
 
             var logger = new Mock<ILogger<DuplicateCharityNumberCheckHandler>>();
             var handler = new DuplicateCharityNumberCheckHandler(logger.Object, _repository.Object);
@@ -150,13 +178,19 @@
             };
             var result = handler.Handle(request, new CancellationToken()).GetAwaiter().GetResult();
 
-            result.Should().BeTrue();
+            result.DuplicateFound.Should().BeTrue();
         }
 
         [Test]
         public void Duplicate_charity_number_check_returns_no_match()
         {
-            _repository.Setup(x => x.DuplicateCharityNumberExists(It.IsAny<Guid>(), It.IsAny<string>())).ReturnsAsync(false);
+            var response = new DuplicateCheckResponse
+            {
+                DuplicateFound = false,
+                DuplicateOrganisationName = null
+            };
+
+            _repository.Setup(x => x.DuplicateCharityNumberExists(It.IsAny<Guid>(), It.IsAny<string>())).ReturnsAsync(response);
 
             var logger = new Mock<ILogger<DuplicateCharityNumberCheckHandler>>();
             var handler = new DuplicateCharityNumberCheckHandler(logger.Object, _repository.Object);
@@ -168,7 +202,7 @@
             };
             var result = handler.Handle(request, new CancellationToken()).GetAwaiter().GetResult();
 
-            result.Should().BeFalse();
+            result.DuplicateFound.Should().BeFalse();
         }
 
         [Test]
