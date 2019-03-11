@@ -65,5 +65,25 @@ namespace SFA.DAS.RoATPService.Application.Api.Controllers
                 return NoContent();
             }
         }
+
+
+        [HttpGet("roatp-summary")]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(IEnumerable<IDictionary<string, object>>))]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, typeof(IDictionary<string, string>))]
+        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
+        public async Task<IActionResult> RoatpSummary()
+        {
+            _logger.LogInformation($"Received request to download complete register");
+
+            try
+            {
+                return Ok(await _repository.GetRoatpCsvSummary());
+            }
+            catch (SqlException sqlEx)
+            {
+                _logger.LogInformation($"Could not generate data for roatp summary due to : {sqlEx.Message}");
+                return NoContent();
+            }
+        }
     }
 }

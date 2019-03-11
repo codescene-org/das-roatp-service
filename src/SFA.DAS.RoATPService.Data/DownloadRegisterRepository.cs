@@ -13,6 +13,7 @@
         private IWebConfiguration _configuration;
         private const string CompleteRegisterStoredProcedure = "[dbo].[RoATP_Complete_Register]";
         private const string AuditHistoryStoredProcedure = "[dbo].[RoATP_Audit_History]";
+        private const string RoatpCsvSummary = "[dbo].[RoATP_CSV_SUMMARY]";
 
         private SqlConnection _connection;
 
@@ -34,6 +35,12 @@
         public async Task<IEnumerable<IDictionary<string, object>>> GetAuditHistory()
         {
             return (await _connection.QueryAsync(AuditHistoryStoredProcedure, commandType: CommandType.StoredProcedure)).OfType<IDictionary<string, object>>().ToList();
+        }
+
+        public async Task<IEnumerable<IDictionary<string, object>>> GetRoatpCsvSummary()
+        {
+            return (await _connection.QueryAsync(RoatpCsvSummary, commandType: CommandType.StoredProcedure)).OfType<IDictionary<string, object>>().ToList();
+
         }
     }
 }
