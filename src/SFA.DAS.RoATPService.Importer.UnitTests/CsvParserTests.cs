@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.RoATPService.Importer.UnitTests
+﻿using System;
+
+namespace SFA.DAS.RoATPService.Importer.UnitTests
 {
     using System.IO;
     using System.Text;
@@ -20,14 +22,14 @@
         {
             _logger = new Mock<ILogger<CsvParser>>();
             _parser = new CsvParser(_logger.Object);
-            csvFile = "ProviderTypeId,UKPRN,LegalName,TradingName,OrganisationTypeId,ParentCompanyGuarantee,FinancialTrackRecord,Status,StatusDate,EndReasonId\n";
+            csvFile = "ProviderTypeId,UKPRN,LegalName,TradingName,OrganisationTypeId,ParentCompanyGuarantee,FinancialTrackRecord,Status,StatusDate,EndReasonId,StartDate\n";
         }
 
-        [TestCase(",10002222,Legal Name,Trading Name,0,false,false,0,30/01/2018,")]
-        [TestCase("1,,Legal Name,Trading Name,0,false,false,0,30/01/2018,")]
-        [TestCase("1,10002222,,Trading Name,0,false,false,0,30/01/2018,")]
-        [TestCase("2,10002222,Legal Name,Trading Name,,false,false,0,30/01/2018,")]
-        [TestCase("2,10002222,Legal Name,Trading Name,0,false,false,,30/01/2018,")]
+        [TestCase(",10002222,Legal Name,Trading Name,0,false,false,0,30/01/2018,,03/03/2018")]
+        [TestCase("1,,Legal Name,Trading Name,0,false,false,0,30/01/2018,,03/03/2018")]
+        [TestCase("1,10002222,,Trading Name,0,false,false,0,30/01/2018,,03/03/2018")]
+        [TestCase("2,10002222,Legal Name,Trading Name,,false,false,0,30/01/2018,,03/03/2018")]
+        [TestCase("2,10002222,Legal Name,Trading Name,0,false,false,,30/01/2018,,03/03/2018")]
         public void Parser_handles_missing_fields(string csvLine)
         {
             csvFile += csvLine;
@@ -43,7 +45,7 @@
         [Test]
         public void Parser_handles_valid_records()
         {
-            csvFile += "1,10002222,Legal Name,Trading Name,0,true,true,0,30/01/2018,";
+            csvFile += "1,10002222,Legal Name,Trading Name,0,true,true,0,30/01/2018,,03/03/2018";
 
             var stream = CreateStreamForCsv(csvFile);
 
@@ -59,13 +61,14 @@
             result.Entries[0].OrganisationTypeId.Should().Be(0);
             result.Entries[0].ParentCompanyGuarantee.Should().Be(true);
             result.Entries[0].FinancialTrackRecord.Should().Be(true);
+            result.Entries[0].StartDate.Should().Be(new DateTime(2018,03,03));
         }
 
         [TestCase("30/01/2018")]
         [TestCase("30-01-2018")]
         public void Parser_handles_different_datetime_formats(string testDate)
         {
-            csvFile += "1,10002222,Legal Name,Trading Name,0,true,true,0," + testDate + ",";
+            csvFile += "1,10002222,Legal Name,Trading Name,0,true,true,0," + testDate + ",,"+ testDate;
 
             var stream = CreateStreamForCsv(csvFile);
 
