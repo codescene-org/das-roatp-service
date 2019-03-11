@@ -14,5 +14,6 @@
         public string Status { get; set; }
         public DateTime? StatusDate { get; set; }
         public int? EndReasonId { get; set; }
+        public DateTime? StartDate { get; set; }
     }
 }
