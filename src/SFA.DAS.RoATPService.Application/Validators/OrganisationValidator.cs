@@ -46,6 +46,11 @@
 
         public bool IsValidTradingName(string tradingName)
         {
+            if (String.IsNullOrWhiteSpace(tradingName))
+            {
+                return true;
+            }
+
             return tradingName.Length <= 200;
         }
 
