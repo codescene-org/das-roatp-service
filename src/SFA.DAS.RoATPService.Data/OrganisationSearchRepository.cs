@@ -48,7 +48,7 @@
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();
 
-                var organisations = await connection.QueryAsync<Organisation>($"select * from [Organisations] where LegalName LIKE @organisationNameFilter OR TradingName LIKE @organisationNameFilter", new { organisationNameFilter });
+                var organisations = await connection.QueryAsync<Organisation>($"select * from [Organisations] where LegalName LIKE @organisationNameFilter", new { organisationNameFilter });
                 return await Task.FromResult(organisations);
             }
         }
