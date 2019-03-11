@@ -1,5 +1,6 @@
 ﻿namespace SFA.DAS.RoATPService.Application.Api.Controllers
 {
+    using System;
     using System.Collections.Generic;
     using System.Net;
     using System.Threading.Tasks;
@@ -25,32 +26,32 @@
             _mediator = mediator;
         }
 
-        [HttpPost]
+        [HttpGet]
         [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(bool))]
         [SwaggerResponse((int)HttpStatusCode.BadRequest, typeof(IDictionary<string, string>))]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
         [Route("ukprn")]
-        public async Task<IActionResult> UKPRN([FromBody]DuplicateUKPRNCheckRequest request)
+        public async Task<IActionResult> UKPRN(DuplicateUKPRNCheckRequest request)
         {
             return Ok(await _mediator.Send(request));
         }
 
-        [HttpPost]
+        [HttpGet]
         [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(bool))]
         [SwaggerResponse((int)HttpStatusCode.BadRequest, typeof(IDictionary<string, string>))]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
         [Route("companyNumber")]
-        public async Task<IActionResult> CompanyNumber([FromBody] DuplicateCompanyNumberCheckRequest request)
+        public async Task<IActionResult> CompanyNumber(DuplicateCompanyNumberCheckRequest request)
         {
             return Ok(await _mediator.Send(request));
         }
 
-        [HttpPost]
+        [HttpGet]
         [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(bool))]
         [SwaggerResponse((int)HttpStatusCode.BadRequest, typeof(IDictionary<string, string>))]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
         [Route("charityNumber")]
-        public async Task<IActionResult> CharityNumber([FromBody] DuplicateCharityNumberCheckRequest request)
+        public async Task<IActionResult> CharityNumber(DuplicateCharityNumberCheckRequest request)
         {
             return Ok(await _mediator.Send(request));
         }
