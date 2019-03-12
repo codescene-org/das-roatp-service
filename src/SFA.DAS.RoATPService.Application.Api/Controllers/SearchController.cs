@@ -26,16 +26,13 @@
             _mediator = mediator;
         }
 
-        [HttpPost]
+        [HttpGet]
         [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(List<OrganisationSearchRequest>))]
         [SwaggerResponse((int)HttpStatusCode.BadRequest, typeof(IDictionary<string, string>))]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
-        public async Task<IActionResult> Index([FromBody] OrganisationSearchRequest searchQuery)
+        public async Task<IActionResult> Index(OrganisationSearchRequest searchQuery)
         {
-            IEnumerable<Organisation> searchResult = await _mediator.Send(searchQuery);
-            var searchResponse = Mapper.Map<IEnumerable<OrganisationSearchResult>>(searchResult);
-
-            return Ok(searchResponse);
+            return Ok(await _mediator.Send(searchQuery));
         }
     }
 }
