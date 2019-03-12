@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.RoATPService.Domain
+﻿using System;
+
+namespace SFA.DAS.RoATPService.Domain
 {
     public class OrganisationData
     {
@@ -8,5 +10,6 @@
         public bool ParentCompanyGuarantee { get; set; }
         public bool FinancialTrackRecord { get; set; }
         public bool NonLevyContract { get; set; }
+        public DateTime? StartDate { get; set; }
     }
 }

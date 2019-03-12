@@ -60,6 +60,7 @@
                 int providerTypeId = organisation.ProviderType.Id;
                 int organisationTypeId = organisation.OrganisationType.Id;
                 int statusId = organisation.OrganisationStatus.Id;
+                organisation.OrganisationData.StartDate = DateTime.Today;
 
                 string sql = $"INSERT INTO [dbo].[Organisations] " +
                     " ([Id] " +
