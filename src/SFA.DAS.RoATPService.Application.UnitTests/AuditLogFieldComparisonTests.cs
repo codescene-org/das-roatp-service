@@ -5,8 +5,6 @@
     using System.Linq;
     using Domain;
     using FluentAssertions;
-    using Microsoft.Extensions.Configuration;
-    using Moq;
     using NUnit.Framework;
     using Settings;
 

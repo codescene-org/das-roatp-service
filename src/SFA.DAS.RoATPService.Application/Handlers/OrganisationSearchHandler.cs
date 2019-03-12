@@ -1,6 +1,5 @@
 ﻿namespace SFA.DAS.RoATPService.Application.Handlers
 {
-    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Api.Types.Models;
@@ -37,7 +36,7 @@
 
             if (_organisationSearchValidator.IsValidUKPRN(request.SearchTerm))
             {
-                var searchResults = await _organisationSearchRepository.OrganisationSearchByUkPrn(request.SearchTerm);
+                OrganisationSearchResults searchResults = await _organisationSearchRepository.OrganisationSearchByUkPrn(request.SearchTerm);
                 if (searchResults.TotalCount > 0)
                 {
                     return searchResults;
