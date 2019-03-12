@@ -82,7 +82,7 @@ namespace SFA.DAS.RoATPService.Application.Api.Controllers
 
             try
             {
-                return Ok(await _repository.GetRoatpCsvSummary());
+                return Ok(await _repository.GetRoatpSummary());
             }
             catch (SqlException sqlEx)
             {
@@ -102,16 +102,13 @@ namespace SFA.DAS.RoATPService.Application.Api.Controllers
 
             try
             {
-                var resultsSummary = await _repository.GetRoatpCsvSummary();
-
+                var resultsSummary = await _repository.GetRoatpSummary();
                 using (var package = new ExcelPackage())
                 {
                     var worksheetToAdd = package.Workbook.Worksheets.Add("RoATP");
-                    var dt = _dataTableHelper.ToDataTable(resultsSummary);
-                    worksheetToAdd.Cells.LoadFromDataTable(dt, true);
+                    worksheetToAdd.Cells.LoadFromDataTable(_dataTableHelper.ToDataTable(resultsSummary), true);
                     return File(package.GetAsByteArray(), "application/excel", $"roatp.xlsx");
-                }
-               
+                }        
             }
             catch (SqlException sqlEx)
             {
@@ -119,7 +116,5 @@ namespace SFA.DAS.RoATPService.Application.Api.Controllers
                 return NoContent();
             }
         }
-
-       
     }
 }

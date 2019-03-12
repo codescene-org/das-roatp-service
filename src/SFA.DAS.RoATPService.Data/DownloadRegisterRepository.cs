@@ -15,7 +15,7 @@
         private const string AuditHistoryStoredProcedure = "[dbo].[RoATP_Audit_History]";
         private const string RoatpCsvSummary = "[dbo].[RoATP_CSV_SUMMARY]";
 
-        private SqlConnection _connection;
+        private readonly SqlConnection _connection;
 
         public DownloadRegisterRepository(IWebConfiguration configuration)
         {
@@ -37,10 +37,9 @@
             return (await _connection.QueryAsync(AuditHistoryStoredProcedure, commandType: CommandType.StoredProcedure)).OfType<IDictionary<string, object>>().ToList();
         }
 
-        public async Task<IEnumerable<IDictionary<string, object>>> GetRoatpCsvSummary()
+        public async Task<IEnumerable<IDictionary<string, object>>> GetRoatpSummary()
         {
             return (await _connection.QueryAsync(RoatpCsvSummary, commandType: CommandType.StoredProcedure)).OfType<IDictionary<string, object>>().ToList();
-
         }
     }
 }
