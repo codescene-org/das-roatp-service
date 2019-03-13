@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using SFA.DAS.RoatpService.Data.IntegrationTests.Models;
@@ -23,18 +20,6 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Services
                 SqlConnectionString = Configuration.GetConnectionString("SqlConnectionStringTest")
             };
         }
-
-        //public AssessorDbContext TestContext
-        //{
-        //    get
-        //    {
-        //        var sqlConnectionStringTest = Configuration.GetConnectionString("SqlConnectionStringTest");
-        //        var option = new DbContextOptionsBuilder<AssessorDbContext>();   <=== this will be wrong
-        //        option.UseSqlServer(sqlConnectionStringTest, options => options.EnableRetryOnFailure(3));
-        //        return new AssessorDbContext(option.Options);
-        //    }
-        //}
-
 
         public IConfiguration Configuration { get; }
         public TestWebConfiguration WebConfiguration;
@@ -82,7 +67,6 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Services
             }
         }
 
-
         public object ExecuteScalar(string sql)
         {
             using (var connection = new SqlConnection(Configuration.GetConnectionString("SqlConnectionStringTest")))
@@ -95,8 +79,7 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Services
                 return result;
             }
         }
-
-
+        
         public void Execute(string sql, TestModel model)
         {
             using (var connection = new SqlConnection(Configuration.GetConnectionString("SqlConnectionStringTest")))
