@@ -54,12 +54,14 @@
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();
 
-                Guid organisationId = Guid.NewGuid();
-                DateTime createdAt = DateTime.Now;
-                string createdBy = username;
-                int providerTypeId = organisation.ProviderType.Id;
-                int organisationTypeId = organisation.OrganisationType.Id;
-                int statusId = organisation.OrganisationStatus.Id;
+                var organisationId = Guid.NewGuid();
+                var createdAt = DateTime.Now;
+                var createdBy = username;
+                var providerTypeId = organisation.ProviderType.Id;
+                var organisationTypeId = organisation.OrganisationType.Id;
+                var statusId = organisation.OrganisationStatus.Id;
+                if (organisation.OrganisationData==null)
+                    organisation.OrganisationData = new OrganisationData();
                 organisation.OrganisationData.StartDate = DateTime.Today;
 
                 string sql = $"INSERT INTO [dbo].[Organisations] " +

@@ -32,7 +32,13 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Handlers
 
         public static OrganisationModel GetOrganisationFromId(Guid organisationId)
         {
-            var organisationModel = DatabaseService.Get<OrganisationModel>($@"select * from Organisations where Id = '{organisationId}'");
+            var organisationModel = DatabaseService.Get<OrganisationModel>($@"select top 1 * from Organisations where Id = '{organisationId}'");
+            return organisationModel;
+        }
+
+        public static OrganisationModel GetOrganisationFromukprn(long ukprn)
+        {
+            var organisationModel = DatabaseService.Get<OrganisationModel>($@"select top 1 * from Organisations where UKPRN = {ukprn}");
             return organisationModel;
         }
 
