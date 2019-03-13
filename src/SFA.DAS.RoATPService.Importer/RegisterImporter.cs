@@ -80,12 +80,13 @@
             string createdBy = "Register Import";
 
             var organisationDataImport = new OrganisationData();
+            organisationDataImport.StartDate = registerEntry.StartDate;
 
             if (registerEntry.EndReasonId.HasValue)
             {
                 organisationDataImport.RemovedReason = RemovedReasons.FirstOrDefault(x => x.Id == registerEntry.EndReasonId.Value);
             }
-
+ 
             string sql = $"INSERT INTO [dbo].[Organisations] " +
                          " ([Id] " +
                          ",[CreatedAt] " +
