@@ -4,11 +4,9 @@ AS
 SET NOCOUNT ON
 
   select ukprn AS UKPRN, 
- LegalName + 
+ upper(LegalName) + 
 	 case isnull(tradingName,'') when '' then ''
-	 else ' T/A ' + 
-	 (select STRING_AGG((Upper(substring(value,1,1))+lower(substring(value,2,len(value)-1))), ' ') as Name
-	 from STRING_SPLIT(TradingName,' '))
+	 else ' T/A ' + upper(tradingName)
 	 END AS 'Organisation Name',
  pt.ProviderType AS 'Provider Type',
  CASE Json_value(OrganisationData,'$.NonLevyContract')
