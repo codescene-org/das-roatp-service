@@ -20,5 +20,4 @@ SET NOCOUNT ON
  CASE StatusId WHEN 2 THEN convert(varchar(10),StatusDate,103) ELSE NULL END AS 'Provider not currently starting new apprentices'
  from organisations o 
  left outer join providerTypes pt on o.ProviderTypeId = pt.Id
-  where status = 'Live'
   order by LegalName
