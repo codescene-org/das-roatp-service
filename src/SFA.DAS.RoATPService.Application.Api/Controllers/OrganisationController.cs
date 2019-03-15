@@ -41,13 +41,13 @@
         }
 
         [HttpPost]
-        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(bool))]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(Guid?))]
         [SwaggerResponse((int)HttpStatusCode.BadRequest, typeof(IDictionary<string, string>))]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
         [Route("create")]
         public async Task<IActionResult> Create([FromBody] CreateOrganisationRequest createOrganisationRequest)
         {
-            bool result = await _mediator.Send(createOrganisationRequest);
+            var result = await _mediator.Send(createOrganisationRequest);
 
             return Ok(result);
         }

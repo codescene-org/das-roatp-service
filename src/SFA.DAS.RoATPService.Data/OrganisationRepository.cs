@@ -49,7 +49,7 @@ namespace SFA.DAS.RoATPService.Data
             }
         }
 
-        public async Task<bool> CreateOrganisation(CreateOrganisationCommand command)
+        public async Task<Guid?> CreateOrganisation(CreateOrganisationCommand command)
         {
             using (var connection = new SqlConnection(_configuration.SqlConnectionString))
             {
@@ -97,7 +97,13 @@ namespace SFA.DAS.RoATPService.Data
                         command.LegalName, command.TradingName, command.StatusDate,
                         organisationData
                     });
-                return await Task.FromResult(organisationsCreated > 0);
+                var success = await Task.FromResult(organisationsCreated > 0);
+
+                if (success)
+                    return organisationId;
+                
+                    return null;
+
             }
         }
 

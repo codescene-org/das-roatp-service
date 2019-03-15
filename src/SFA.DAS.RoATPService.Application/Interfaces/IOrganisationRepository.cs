@@ -8,7 +8,7 @@ namespace SFA.DAS.RoATPService.Application.Interfaces
 
     public interface IOrganisationRepository
     {
-        Task<bool> CreateOrganisation(CreateOrganisationCommand command);
+        Task<Guid?> CreateOrganisation(CreateOrganisationCommand command);
         Task<bool> UpdateOrganisation(Organisation organisation, string username);
         Task<Organisation> GetOrganisation(Guid organisationId);
     }

@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using SFA.DAS.RoATPService.Application.commands;
 
 namespace SFA.DAS.RoATPService.Application.Handlers
@@ -6,14 +7,13 @@ namespace SFA.DAS.RoATPService.Application.Handlers
     using System.Threading;
     using System.Threading.Tasks;
     using Api.Types.Models;
-    using Domain;
     using Exceptions;
     using Interfaces;
     using MediatR;
     using Microsoft.Extensions.Logging;
     using Validators;
 
-    public class CreateOrganisationHandler : IRequestHandler<CreateOrganisationRequest, bool>
+    public class CreateOrganisationHandler : IRequestHandler<CreateOrganisationRequest, Guid?>
     {
         private readonly IOrganisationRepository _organisationRepository;
         private readonly ILogger<CreateOrganisationHandler> _logger;
@@ -27,7 +27,7 @@ namespace SFA.DAS.RoATPService.Application.Handlers
             _organisationValidator = organisationValidator;
         }
 
-        public Task<bool> Handle(CreateOrganisationRequest request, CancellationToken cancellationToken)
+        public Task<Guid?> Handle(CreateOrganisationRequest request, CancellationToken cancellationToken)
         {
             if (!IsValidCreateOrganisation(request))
             {
