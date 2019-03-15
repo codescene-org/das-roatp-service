@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.RoATPService.Data
+﻿using SFA.DAS.RoATPService.Application.commands;
+
+namespace SFA.DAS.RoATPService.Data
 {
     using System;
     using System.Data;
@@ -47,19 +49,36 @@
             }
         }
 
-        public async Task<bool> CreateOrganisation(Organisation organisation, string username)
+        public async Task<bool> CreateOrganisation(CreateOrganisationCommand command)
         {
             using (var connection = new SqlConnection(_configuration.SqlConnectionString))
             {
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();
 
-                Guid organisationId = Guid.NewGuid();
-                DateTime createdAt = DateTime.Now;
-                string createdBy = username;
-                int providerTypeId = organisation.ProviderType.Id;
-                int organisationTypeId = organisation.OrganisationType.Id;
-                int statusId = organisation.OrganisationStatus.Id;
+                var startDate = (DateTime?)null;
+                if (command.StartDate != null)
+                    startDate = command.StartDate;
+                else
+                {
+                    startDate = DateTime.Today;
+                }
+
+                var organisationId = Guid.NewGuid();
+                var createdAt = DateTime.Now;
+                var createdBy = command.Username;
+                var providerTypeId = command.ProviderTypeId;
+                var organisationTypeId = command.OrganisationTypeId;
+                var statusId = command.OrganisationStatusId;
+                var organisationData = new OrganisationData
+                {
+                    CompanyNumber = command.CompanyNumber,
+                    CharityNumber = command.CharityNumber,
+                    ParentCompanyGuarantee = command.ParentCompanyGuarantee,
+                    FinancialTrackRecord = command.FinancialTrackRecord,
+                    NonLevyContract = command.NonLevyContract,
+                    StartDate = startDate
+                };
 
                 string sql = $"INSERT INTO [dbo].[Organisations] " +
                     " ([Id] " +
@@ -81,9 +100,9 @@
                     new
                     {
                         organisationId, createdAt, createdBy, statusId,
-                        providerTypeId, organisationTypeId, organisation.UKPRN,
-                        organisation.LegalName, organisation.TradingName, organisation.StatusDate,
-                        organisation.OrganisationData
+                        providerTypeId, organisationTypeId, command.Ukprn,
+                        command.LegalName, command.TradingName, command.StatusDate,
+                        organisationData
                     });
                 return await Task.FromResult(organisationsCreated > 0);
             }
