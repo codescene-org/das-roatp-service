@@ -56,14 +56,7 @@ namespace SFA.DAS.RoATPService.Data
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();
 
-                var startDate = (DateTime?)null;
-                if (command.StartDate != null)
-                    startDate = command.StartDate;
-                else
-                {
-                    startDate = DateTime.Today;
-                }
-
+                var startDate = command.StartDate ?? DateTime.Today;
                 var organisationId = Guid.NewGuid();
                 var createdAt = DateTime.Now;
                 var createdBy = command.Username;
