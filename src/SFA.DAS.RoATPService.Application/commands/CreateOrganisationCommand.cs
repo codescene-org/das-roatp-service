@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SFA.DAS.RoATPService.Application.commands
+namespace SFA.DAS.RoATPService.Application.Commands
 {
     public class CreateOrganisationCommand
     {
