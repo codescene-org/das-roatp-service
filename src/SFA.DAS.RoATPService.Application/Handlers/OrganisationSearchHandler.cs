@@ -36,11 +36,7 @@
 
             if (_organisationSearchValidator.IsValidUKPRN(request.SearchTerm))
             {
-                OrganisationSearchResults searchResults = await _organisationSearchRepository.OrganisationSearchByUkPrn(request.SearchTerm);
-                if (searchResults.TotalCount > 0)
-                {
-                    return searchResults;
-                }
+                return await _organisationSearchRepository.OrganisationSearchByUkPrn(request.SearchTerm);
             }
 
             return await _organisationSearchRepository.OrganisationSearchByName(request.SearchTerm);

@@ -182,7 +182,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         }
 
         [Test]
-        public void Organisation_search_will_search_by_name_if_valid_UKPRN_but_no_match_found()
+        public void Organisation_search_will_not_search_by_legal_name_if_valid_UKPRN_but_no_match_found()
         {
             _validator.Setup(x => x.IsValidUKPRN(It.IsAny<string>())).Returns(true);
             
@@ -202,7 +202,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             searchResults.Result.SearchResults.Count().Should().Be(0);
             searchResults.Result.TotalCount.Should().Be(0);
 
-            _repository.Verify(x => x.OrganisationSearchByName(It.IsAny<string>()), Times.Once);
+            _repository.Verify(x => x.OrganisationSearchByName(It.IsAny<string>()), Times.Never);
             _repository.Verify(x => x.OrganisationSearchByUkPrn(It.IsAny<string>()), Times.Once);
         }
     }
