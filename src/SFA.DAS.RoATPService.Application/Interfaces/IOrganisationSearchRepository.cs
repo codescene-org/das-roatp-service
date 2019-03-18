@@ -1,12 +1,11 @@
 ﻿namespace SFA.DAS.RoATPService.Application.Interfaces
 {
-    using System.Collections.Generic;
     using System.Threading.Tasks;
-    using Domain;
+    using SFA.DAS.RoATPService.Api.Types.Models;
 
     public interface IOrganisationSearchRepository
     {
-        Task<IEnumerable<Organisation>> OrganisationSearchByUkPrn(string ukPrn);
-        Task<IEnumerable<Organisation>> OrganisationSearchByName(string organisationName);
+        Task<OrganisationSearchResults> OrganisationSearchByUkPrn(string ukPrn);
+        Task<OrganisationSearchResults> OrganisationSearchByName(string organisationName);
     }
 }
