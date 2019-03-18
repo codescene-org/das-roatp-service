@@ -1,4 +1,4 @@
-﻿using SFA.DAS.RoATPService.Application.commands;
+﻿using SFA.DAS.RoATPService.Application.Commands;
 
 namespace SFA.DAS.RoATPService.Data
 {

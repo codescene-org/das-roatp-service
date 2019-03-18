@@ -47,7 +47,7 @@
         [Route("create")]
         public async Task<IActionResult> Create([FromBody] CreateOrganisationRequest createOrganisationRequest)
         {
-            return Ok(await _mediator.Send(createOrganisationRequest);
+            return Ok(await _mediator.Send(createOrganisationRequest));
         }
 
         [HttpPost]
