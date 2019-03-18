@@ -1,14 +1,12 @@
 ﻿namespace SFA.DAS.RoATPService.Application.Api.Controllers
 {
-    using System.Collections.Generic;
     using System.Threading.Tasks;
     using MediatR;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
     using RoATPService.Api.Types.Models;
-    using SFA.DAS.RoATPService.Domain;
-
+ 
     [Authorize(Roles = "RoATPServiceInternalAPI")]
     [Route("api/v1/lookupData")]
     [ApiController]

@@ -18,13 +18,15 @@ namespace SFA.DAS.RoATPService.Application.Handlers
         private readonly IOrganisationRepository _organisationRepository;
         private readonly ILogger<CreateOrganisationHandler> _logger;
         private readonly IOrganisationValidator _organisationValidator;
+        private readonly IProviderTypeValidator _providerTypeValidator;
 
         public CreateOrganisationHandler(IOrganisationRepository repository, ILogger<CreateOrganisationHandler> logger, 
-                                         IOrganisationValidator organisationValidator)
+                                         IOrganisationValidator organisationValidator, IProviderTypeValidator providerTypeValidator)
         {
             _organisationRepository = repository;
             _logger = logger;
             _organisationValidator = organisationValidator;
+            _providerTypeValidator = providerTypeValidator;
         }
 
         public Task<Guid?> Handle(CreateOrganisationRequest request, CancellationToken cancellationToken)
@@ -62,10 +64,15 @@ namespace SFA.DAS.RoATPService.Application.Handlers
         private bool IsValidCreateOrganisation(CreateOrganisationRequest request)
         {
             return (_organisationValidator.IsValidLegalName(request.LegalName)
-                    && _organisationValidator.IsValidProviderTypeId(request.ProviderTypeId)
-                    && _organisationValidator.IsValidStatus(request.OrganisationStatusId)
+                    && _organisationValidator.IsValidTradingName(request.TradingName)
+                    && _providerTypeValidator.IsValidProviderTypeId(request.ProviderTypeId)        
+                    && _organisationValidator.IsValidOrganisationTypeId(request.OrganisationTypeId)   
+                    && _organisationValidator.IsValidStatusId(request.OrganisationStatusId)  
                     && _organisationValidator.IsValidStatusDate(request.StatusDate)
-                    && _organisationValidator.IsValidUKPRN(request.Ukprn));
+                    && _organisationValidator.IsValidUKPRN(request.Ukprn)  
+                    && _organisationValidator.IsValidCompanyNumber(request.CompanyNumber)  
+                    && _organisationValidator.IsValidCharityNumber(request.CharityNumber)); 
+
         }
     }
 }
