@@ -11,7 +11,7 @@ namespace SFA.DAS.RoATPService.Application.Api.Controllers
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
     using SFA.DAS.RoATPService.Application.Api.Middleware;
-    using SFA.DAS.RoATPService.Data;
+    using SFA.DAS.RoATPService.Application.Interfaces;
     using Swashbuckle.AspNetCore.SwaggerGen;
 
     [Authorize(Roles = "RoATPServiceInternalAPI")]

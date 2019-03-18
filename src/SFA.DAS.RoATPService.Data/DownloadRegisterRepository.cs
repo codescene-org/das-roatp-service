@@ -7,6 +7,7 @@
     using System.Threading.Tasks;
     using Dapper;
     using Settings;
+    using SFA.DAS.RoATPService.Application.Interfaces;
 
     public class DownloadRegisterRepository : IDownloadRegisterRepository
     {
