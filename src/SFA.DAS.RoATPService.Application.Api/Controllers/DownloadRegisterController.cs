@@ -1,4 +1,6 @@
-﻿
+﻿using OfficeOpenXml;
+using SFA.DAS.RoATPService.Application.Api.Helpers;
+
 namespace SFA.DAS.RoATPService.Application.Api.Controllers
 {
     using System.Collections.Generic;
@@ -9,27 +11,29 @@ namespace SFA.DAS.RoATPService.Application.Api.Controllers
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
     using SFA.DAS.RoATPService.Application.Api.Middleware;
-    using SFA.DAS.RoATPService.Data;
+    using SFA.DAS.RoATPService.Application.Interfaces;
     using Swashbuckle.AspNetCore.SwaggerGen;
 
     [Authorize(Roles = "RoATPServiceInternalAPI")]
     [Route("api/v1/download")]
     public class DownloadRegisterController : Controller
     {
-        private ILogger<DownloadRegisterController> _logger;
-        private IDownloadRegisterRepository _repository;
+        private readonly ILogger<DownloadRegisterController> _logger;
+        private readonly IDownloadRegisterRepository _repository;
+        private readonly IDataTableHelper _dataTableHelper;
 
         public DownloadRegisterController(ILogger<DownloadRegisterController> logger,
-                                          IDownloadRegisterRepository repository)
+            IDownloadRegisterRepository repository, IDataTableHelper dataTableHelper)
         {
             _logger = logger;
             _repository = repository;
+            _dataTableHelper = dataTableHelper;
         }
 
         [HttpGet("complete")]
-        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(IEnumerable<IDictionary<string, object>>))]
-        [SwaggerResponse((int)HttpStatusCode.BadRequest, typeof(IDictionary<string, string>))]
-        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
+        [SwaggerResponse((int) HttpStatusCode.OK, Type = typeof(IEnumerable<IDictionary<string, object>>))]
+        [SwaggerResponse((int) HttpStatusCode.BadRequest, typeof(IDictionary<string, string>))]
+        [SwaggerResponse((int) HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
         public async Task<IActionResult> CompleteRegister()
         {
             _logger.LogInformation($"Received request to download complete register");
@@ -41,15 +45,16 @@ namespace SFA.DAS.RoATPService.Application.Api.Controllers
             }
             catch (SqlException sqlEx)
             {
-                _logger.LogInformation($"Could not generate data for complete register download due to : {sqlEx.Message}");
+                _logger.LogInformation(
+                    $"Could not generate data for complete register download due to : {sqlEx.Message}");
                 return NoContent();
             }
         }
 
         [HttpGet("audit")]
-        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(IEnumerable<IDictionary<string, object>>))]
-        [SwaggerResponse((int)HttpStatusCode.BadRequest, typeof(IDictionary<string, string>))]
-        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
+        [SwaggerResponse((int) HttpStatusCode.OK, Type = typeof(IEnumerable<IDictionary<string, object>>))]
+        [SwaggerResponse((int) HttpStatusCode.BadRequest, typeof(IDictionary<string, string>))]
+        [SwaggerResponse((int) HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
         public async Task<IActionResult> AuditHistory()
         {
             _logger.LogInformation($"Received request to download register audit history");
@@ -62,6 +67,52 @@ namespace SFA.DAS.RoATPService.Application.Api.Controllers
             catch (SqlException sqlEx)
             {
                 _logger.LogInformation($"Could not generate data for register audit history due to : {sqlEx.Message}");
+                return NoContent();
+            }
+        }
+
+
+        [HttpGet("roatp-summary")]
+        [SwaggerResponse((int) HttpStatusCode.OK, Type = typeof(IEnumerable<IDictionary<string, object>>))]
+        [SwaggerResponse((int) HttpStatusCode.BadRequest, typeof(IDictionary<string, string>))]
+        [SwaggerResponse((int) HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
+        public async Task<IActionResult> RoatpSummary()
+        {
+            _logger.LogInformation($"Received request to download complete register");
+
+            try
+            {
+                return Ok(await _repository.GetRoatpSummary());
+            }
+            catch (SqlException sqlEx)
+            {
+                _logger.LogInformation($"Could not generate data for roatp summary due to : {sqlEx.Message}");
+                return NoContent();
+            }
+        }
+
+
+        [HttpGet("roatp-summary-xlsx")]
+        [SwaggerResponse((int) HttpStatusCode.OK, Type = typeof(IEnumerable<IDictionary<string, object>>))]
+        [SwaggerResponse((int) HttpStatusCode.BadRequest, typeof(IDictionary<string, string>))]
+        [SwaggerResponse((int) HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
+        public async Task<IActionResult> RoatpSummaryExcel()
+        {
+            _logger.LogInformation($"Received request to download complete register xlsx");
+
+            try
+            {
+                var resultsSummary = await _repository.GetRoatpSummary();
+                using (var package = new ExcelPackage())
+                {
+                    var worksheetToAdd = package.Workbook.Worksheets.Add("RoATP");
+                    worksheetToAdd.Cells.LoadFromDataTable(_dataTableHelper.ToDataTable(resultsSummary), true);
+                    return File(package.GetAsByteArray(), "application/excel", $"roatp.xlsx");
+                }        
+            }
+            catch (SqlException sqlEx)
+            {
+                _logger.LogInformation($"Could not generate data for roatp summary due to : {sqlEx.Message}");
                 return NoContent();
             }
         }

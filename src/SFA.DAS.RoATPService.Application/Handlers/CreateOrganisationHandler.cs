@@ -41,10 +41,16 @@
         private bool IsValidCreateOrganisation(Organisation requestOrganisation)
         {
             return (_organisationValidator.IsValidLegalName(requestOrganisation.LegalName)
-                    && _organisationValidator.IsValidProviderTypeId(requestOrganisation.ProviderType.Id)
-                    && _organisationValidator.IsValidStatus(requestOrganisation.OrganisationStatus.Id)
+                    && _organisationValidator.IsValidTradingName(requestOrganisation.TradingName)
+                    && _organisationValidator.IsValidProviderType(requestOrganisation.ProviderType)
+                    && _organisationValidator.IsValidOrganisationType(requestOrganisation.OrganisationType)
+                    && _organisationValidator.IsValidStatus(requestOrganisation.OrganisationStatus)
                     && _organisationValidator.IsValidStatusDate(requestOrganisation.StatusDate)
-                    && _organisationValidator.IsValidUKPRN(requestOrganisation.UKPRN));
+                    && _organisationValidator.IsValidUKPRN(requestOrganisation.UKPRN)
+                    && requestOrganisation.OrganisationData != null
+                    && _organisationValidator.IsValidCompanyNumber(requestOrganisation.OrganisationData.CompanyNumber)
+                    && _organisationValidator.IsValidCharityNumber(requestOrganisation.OrganisationData.CharityNumber));
+
         }
     }
 }
