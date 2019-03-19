@@ -6,6 +6,6 @@
 
     public interface IAuditLogRepository
     {
-        Task<bool> WriteFieldChangesToAuditLog(IEnumerable<AuditLogEntry> auditLogEntries);
+        Task<bool> WriteFieldChangesToAuditLog(AuditData auditFieldChanges);
     }
 }

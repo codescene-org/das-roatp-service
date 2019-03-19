@@ -6,6 +6,6 @@
 
     public interface IAuditLogFieldComparison
     {
-        Task<IEnumerable<AuditLogEntry>> BuildListOfFieldsChanged(Organisation originalOrganisation, Organisation updatedOrganisation);
+        Task<AuditData> BuildListOfFieldsChanged(Organisation originalOrganisation, Organisation updatedOrganisation);
     }
 }
