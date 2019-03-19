@@ -34,7 +34,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _logger = new Mock<ILogger<CreateOrganisationHandler>>();
             _handler = new CreateOrganisationHandler(_repository.Object, _logger.Object, new OrganisationValidator(), new ProviderTypeValidator());
             _request = new CreateOrganisationRequest
-            {
+            {                                                                       
                 LegalName = "Legal Name",
                 TradingName = "TradingName",
                 ProviderTypeId = 1,

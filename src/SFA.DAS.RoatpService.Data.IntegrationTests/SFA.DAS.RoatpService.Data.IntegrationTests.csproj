@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <ApplicationIcon />
+    <StartupObject />
+    <AssemblyName>SFA.DAS.RoatpService.Data.IntegrationTests</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="1.50.5" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.1.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.1" />
+    <PackageReference Include="NUnit" Version="3.10.1" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SFA.DAS.RoATPService.Data\SFA.DAS.RoATPService.Data.csproj" />
+    <ProjectReference Include="..\SFA.DAS.RoATPService.Domain\SFA.DAS.RoATPService.Domain.csproj" />
+    <ProjectReference Include="..\SFA.DAS.RoATPService.Settings\SFA.DAS.RoATPService.Settings.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="connectionStrings.Local.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
