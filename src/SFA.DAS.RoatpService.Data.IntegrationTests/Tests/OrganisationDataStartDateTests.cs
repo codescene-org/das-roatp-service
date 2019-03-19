@@ -5,6 +5,7 @@ using SFA.DAS.AssessorService.Data.DapperTypeHandlers;
 using SFA.DAS.RoatpService.Data.IntegrationTests.Handlers;
 using SFA.DAS.RoatpService.Data.IntegrationTests.Models;
 using SFA.DAS.RoatpService.Data.IntegrationTests.Services;
+using SFA.DAS.RoATPService.Application.Commands;
 using SFA.DAS.RoATPService.Data;
 using SFA.DAS.RoATPService.Domain;
 
@@ -41,20 +42,19 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
         {
             const long organisationUkprn = 12344321;
 
-            var organisation = new Organisation
+            var command = new CreateOrganisationCommand
             {
-                UKPRN = organisationUkprn,
-                OrganisationType = new OrganisationType {Id = _organisationTypeId1},
-                ProviderType = new ProviderType {Id = _providerTypeId1},
-                OrganisationStatus = new OrganisationStatus {Id = _organisationStatusId1},
-                OrganisationData = new OrganisationData(),
-                CreatedAt = DateTime.Now,
-                CreatedBy = "TestSystem",
+                Ukprn = organisationUkprn,
+                OrganisationTypeId = _organisationTypeId1,
+                ProviderTypeId = _providerTypeId1,
+                OrganisationStatusId =  _organisationStatusId1,
                 StatusDate = DateTime.Today.AddDays(5),
-                LegalName = "Legal McLegal"
+                LegalName = "Legal McLegal",
+                Username = "Tester McTestface"
+       
             };
 
-            var orgPlaceholder = _repository.CreateOrganisation(organisation, "Tester McTestFace").Result;
+            var orgPlaceholder = _repository.CreateOrganisation(command).Result;
 
             var organisationDetails = OrganisationHandler.GetOrganisationFromukprn(organisationUkprn);
             var organisationData = new OrganisationDataHandler().Parse(organisationDetails.OrganisationData);
