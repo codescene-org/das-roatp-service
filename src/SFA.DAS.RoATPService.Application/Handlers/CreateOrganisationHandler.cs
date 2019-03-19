@@ -34,6 +34,33 @@ namespace SFA.DAS.RoATPService.Application.Handlers
             if (!IsValidCreateOrganisation(request))
             {
                 string invalidOrganisationError = $@"Invalid Organisation data";
+                if (!_organisationValidator.IsValidLegalName(request.LegalName))
+                    invalidOrganisationError = $"{invalidOrganisationError}: Invalid Legal Name [{request.LegalName}]";
+
+                if (!_organisationValidator.IsValidTradingName(request.TradingName))
+                    invalidOrganisationError = $"{invalidOrganisationError}: Invalid Trading Name [{request.TradingName}]";
+
+                if (!_providerTypeValidator.IsValidProviderTypeId(request.ProviderTypeId))
+                    invalidOrganisationError = $"{invalidOrganisationError}: Invalid Provider Type Id [{request.ProviderTypeId}]";
+
+                if (!_organisationValidator.IsValidOrganisationTypeId(request.OrganisationTypeId))
+                    invalidOrganisationError = $"{invalidOrganisationError}: Invalid Organisation Type Id [{request.OrganisationTypeId}]";
+
+                if (!_organisationValidator.IsValidStatusId(request.OrganisationStatusId))
+                    invalidOrganisationError = $"{invalidOrganisationError}: Invalid Organisation Status Id [{request.OrganisationStatusId}]";
+
+                if (!_organisationValidator.IsValidStatusDate(request.StatusDate))
+                    invalidOrganisationError = $"{invalidOrganisationError}: Invalid Status Date [{request.StatusDate}]";
+
+                if (!_organisationValidator.IsValidUKPRN(request.Ukprn))
+                    invalidOrganisationError = $"{invalidOrganisationError}: Invalid ukprn [{request.Ukprn}]";
+
+                if (!_organisationValidator.IsValidCompanyNumber(request.CompanyNumber))
+                    invalidOrganisationError = $"{invalidOrganisationError}: Invalid company number [{request.CompanyNumber}]";
+
+                if (!_organisationValidator.IsValidCharityNumber(request.CharityNumber))
+                    invalidOrganisationError = $"{invalidOrganisationError}: Invalid charity number [{request.CharityNumber}]";
+
                 _logger.LogInformation(invalidOrganisationError);
                 throw new BadRequestException(invalidOrganisationError);
             }
