@@ -9,6 +9,7 @@
     using Application.Interfaces;
     using Dapper;
     using Domain;
+    using Newtonsoft.Json;
     using Settings;
 
     public class AuditLogRepository : IAuditLogRepository
@@ -20,9 +21,9 @@
             _configuration = configuration;
         }
 
-        public async Task<bool> WriteFieldChangesToAuditLog(IEnumerable<AuditLogEntry> auditLogEntries)
+        public async Task<bool> WriteFieldChangesToAuditLog(AuditData auditFieldChanges)
         {
-            if (!auditLogEntries.Any())
+            if (!auditFieldChanges.FieldChanges.Any())
             {
                 return await Task.FromResult(false);
             }
@@ -31,31 +32,23 @@
             {
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();
+            
+                string sql = $"INSERT INTO Audit " +
+                             "([OrganisationId], [UpdatedBy], [UpdatedAt], [AuditData]) " +
+                             "VALUES(@organisationId, @updatedBy, @updatedAt, @auditData)";
                 
-                int auditLogsWritten = 0;
-
-                foreach (AuditLogEntry logEntry in auditLogEntries)
-                {
-                    string sql = $"INSERT INTO Audit " +
-                                 "([OrganisationId], [UpdatedBy], [UpdatedAt], [FieldChanged], [PreviousValue], [NewValue]) " +
-                                 "VALUES(@organisationId, @updatedBy, @updatedAt, @fieldChanged, @previousValue, @newValue)";
-                    
-                    var updatedAt = DateTime.Now;
-
-                    var recordsAffected = await connection.ExecuteAsync(sql,
-                        new
-                        {
-                            logEntry.OrganisationId,
-                            logEntry.UpdatedBy,
-                            updatedAt,
-                            logEntry.FieldChanged,
-                            logEntry.PreviousValue,
-                            logEntry.NewValue
-                        });
-                    auditLogsWritten += recordsAffected;
-                }
-
-                return await Task.FromResult(auditLogsWritten > 0);
+                var updatedAt = DateTime.Now;
+                var auditData = JsonConvert.SerializeObject(auditFieldChanges);
+                var recordsAffected = await connection.ExecuteAsync(sql,
+                    new
+                    {
+                        auditFieldChanges.OrganisationId,
+                        auditFieldChanges.UpdatedBy,
+                        updatedAt,
+                        auditData
+                    });
+                 
+                return await Task.FromResult(recordsAffected > 0);
             }
         }
     }

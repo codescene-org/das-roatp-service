@@ -112,23 +112,26 @@
             _organisationRepository.Setup(x => x.UpdateOrganisation(It.IsAny<Organisation>(), It.IsAny<string>()))
                 .ReturnsAsync(true);
 
-            List<AuditLogEntry> auditLogEntries = new List<AuditLogEntry>
+            var auditData = new AuditData
             {
-                new AuditLogEntry
+                OrganisationId = _request.Organisation.Id,
+                UpdatedAt = DateTime.Now,
+                UpdatedBy = "testuser",
+                FieldChanges = new List<AuditLogEntry>
                 {
-                    FieldChanged = "Trading Name",
-                    PreviousValue = "Trainer Trading Name",
-                    NewValue = "ANDERSON TRAINING LTD",
-                    OrganisationId = _request.Organisation.Id,
-                    UpdatedAt = DateTime.Now,
-                    UpdatedBy = "testuser"
+                    new AuditLogEntry
+                    {
+                        FieldChanged = "Trading Name",
+                        PreviousValue = "Trainer Trading Name",
+                        NewValue = "ANDERSON TRAINING LTD"
+                    }
                 }
             };
-
+            
             _fieldComparison.Setup(x => x.BuildListOfFieldsChanged(It.IsAny<Organisation>(), It.IsAny<Organisation>()))
-                .ReturnsAsync(auditLogEntries);
+                .ReturnsAsync(auditData);
 
-            _auditLogRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<IEnumerable<AuditLogEntry>>()))
+            _auditLogRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()))
                 .ReturnsAsync(true);
 
             bool updateOrganisationResult = _handler.Handle(_request, new CancellationToken()).GetAwaiter().GetResult();
@@ -147,11 +150,15 @@
                 .ReturnsAsync(false).Verifiable();
 
             List<AuditLogEntry> auditLogEntries = new List<AuditLogEntry>();
+            var auditData = new AuditData
+            {
+                FieldChanges = auditLogEntries
+            };
 
             _fieldComparison.Setup(x => x.BuildListOfFieldsChanged(It.IsAny<Organisation>(), It.IsAny<Organisation>()))
-            .ReturnsAsync(auditLogEntries);
+            .ReturnsAsync(auditData);
 
-            _auditLogRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<IEnumerable<AuditLogEntry>>()))
+            _auditLogRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()))
                 .ReturnsAsync(false).Verifiable();
 
             bool updateOrganisationResult = _handler.Handle(_request, new CancellationToken()).GetAwaiter().GetResult();
@@ -159,7 +166,7 @@
             updateOrganisationResult.Should().BeFalse();
             _organisationRepository.Verify(x => x.UpdateOrganisation(It.IsAny<Organisation>(), It.IsAny<string>()),
                 Times.Never);
-            _auditLogRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<IEnumerable<AuditLogEntry>>()),
+            _auditLogRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()),
                 Times.Never);
         }
     }

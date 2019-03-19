@@ -66,7 +66,7 @@
         {
             var comparison = new AuditLogFieldComparison(_settings);
 
-            var results = comparison.BuildListOfFieldsChanged(_firstOrganisation, _secondOrganisation).Result.ToList();
+            var results = comparison.BuildListOfFieldsChanged(_firstOrganisation, _secondOrganisation).Result.FieldChanges.ToList();
 
             results.Should().BeEmpty();
         }
@@ -81,7 +81,7 @@
             _secondOrganisation.UpdatedAt = DateTime.Now;
             _secondOrganisation.UpdatedBy = "Unit test";
 
-            var results = comparison.BuildListOfFieldsChanged(_firstOrganisation, _secondOrganisation).Result.ToList();
+            var results = comparison.BuildListOfFieldsChanged(_firstOrganisation, _secondOrganisation).Result.FieldChanges.ToList();
 
             results.Should().BeEmpty();
         }
@@ -93,15 +93,16 @@
 
             _secondOrganisation.UKPRN = 11112222;
 
-            var results = comparison.BuildListOfFieldsChanged(_firstOrganisation, _secondOrganisation).Result.ToList();
+            var auditData = comparison.BuildListOfFieldsChanged(_firstOrganisation, _secondOrganisation).Result;
+            var results = auditData.FieldChanges.ToList();
 
             results.Should().HaveCount(1);
 
             results[0].FieldChanged.Should().Be("UKPRN");
             results[0].PreviousValue.Should().Be(_firstOrganisation.UKPRN.ToString());
             results[0].NewValue.Should().Be(_secondOrganisation.UKPRN.ToString());
-            results[0].UpdatedBy.Should().Be("Test");
-            results[0].OrganisationId.Should().Be(_firstOrganisation.Id);
+            auditData.UpdatedBy.Should().Be("Test");
+            auditData.OrganisationId.Should().Be(_firstOrganisation.Id);
         }
 
         [Test]
@@ -111,15 +112,16 @@
 
             _secondOrganisation.LegalName = "New Legal Name";
 
-            var results = comparison.BuildListOfFieldsChanged(_firstOrganisation, _secondOrganisation).Result.ToList();
+            var auditData = comparison.BuildListOfFieldsChanged(_firstOrganisation, _secondOrganisation).Result;
+            var results = auditData.FieldChanges.ToList();
 
             results.Should().HaveCount(1);
 
             results[0].FieldChanged.Should().Be("Legal Name");
             results[0].PreviousValue.Should().Be("Legal Name");
             results[0].NewValue.Should().Be("New Legal Name");
-            results[0].UpdatedBy.Should().Be("Test");
-            results[0].OrganisationId.Should().Be(_firstOrganisation.Id);
+            auditData.UpdatedBy.Should().Be("Test");
+            auditData.OrganisationId.Should().Be(_firstOrganisation.Id);
         }
 
         [Test]
@@ -130,20 +132,20 @@
             _secondOrganisation.UKPRN = 11112222;
             _secondOrganisation.OrganisationData.CompanyNumber = "AB112233";
 
-            var results = comparison.BuildListOfFieldsChanged(_firstOrganisation, _secondOrganisation).Result.ToList();
+            var auditData = comparison.BuildListOfFieldsChanged(_firstOrganisation, _secondOrganisation).Result;
+             
+            var results = auditData.FieldChanges.ToList();
 
             results.Should().HaveCount(2);
 
             results[0].FieldChanged.Should().Be("UKPRN");
             results[0].PreviousValue.Should().Be(_firstOrganisation.UKPRN.ToString());
             results[0].NewValue.Should().Be(_secondOrganisation.UKPRN.ToString());
-            results[0].UpdatedBy.Should().Be("Test");
-            results[0].OrganisationId.Should().Be(_firstOrganisation.Id);
+            auditData.UpdatedBy.Should().Be("Test");
+            auditData.OrganisationId.Should().Be(_firstOrganisation.Id);
             results[1].FieldChanged.Should().Be("Company Number");
             results[1].PreviousValue.Should().Be(_firstOrganisation.OrganisationData.CompanyNumber);
             results[1].NewValue.Should().Be(_secondOrganisation.OrganisationData.CompanyNumber);
-            results[1].UpdatedBy.Should().Be("Test");
-            results[1].OrganisationId.Should().Be(_firstOrganisation.Id);
         }
 
         [Test]
@@ -154,15 +156,16 @@
             _secondOrganisation.UpdatedAt = DateTime.Now;
             _secondOrganisation.OrganisationData.CompanyNumber = "AB112233";
 
-            var results = comparison.BuildListOfFieldsChanged(_firstOrganisation, _secondOrganisation).Result.ToList();
+            var auditData = comparison.BuildListOfFieldsChanged(_firstOrganisation, _secondOrganisation).Result;
+            var results = auditData.FieldChanges.ToList();
 
             results.Should().HaveCount(1);
 
             results[0].FieldChanged.Should().Be("Company Number");
             results[0].PreviousValue.Should().Be(_firstOrganisation.OrganisationData.CompanyNumber);
             results[0].NewValue.Should().Be(_secondOrganisation.OrganisationData.CompanyNumber);
-            results[0].UpdatedBy.Should().Be("Test");
-            results[0].OrganisationId.Should().Be(_firstOrganisation.Id);
+            auditData.UpdatedBy.Should().Be("Test");
+            auditData.OrganisationId.Should().Be(_firstOrganisation.Id);
         }
 
         [Test]
@@ -175,16 +178,17 @@
             _secondOrganisation.UpdatedAt = null;
             _secondOrganisation.UpdatedBy = null;
 
-            var results = comparison.BuildListOfFieldsChanged(_firstOrganisation, _secondOrganisation).Result.ToList();
+            var auditData = comparison.BuildListOfFieldsChanged(_firstOrganisation, _secondOrganisation).Result;
+            var results = auditData.FieldChanges.ToList();
 
             results.Should().HaveCount(1);
 
             results[0].FieldChanged.Should().Be("Company Number");
             results[0].PreviousValue.Should().Be(_firstOrganisation.OrganisationData.CompanyNumber);
             results[0].NewValue.Should().Be(_secondOrganisation.OrganisationData.CompanyNumber);
-            results[0].UpdatedBy.Should().Be("System");
-            results[0].UpdatedAt.Should().BeCloseTo(DateTime.Now);
-            results[0].OrganisationId.Should().Be(_firstOrganisation.Id);
+            auditData.UpdatedBy.Should().Be("System");
+            auditData.UpdatedAt.Should().BeCloseTo(DateTime.Now);
+            auditData.OrganisationId.Should().Be(_firstOrganisation.Id);
         }
     }
 }
