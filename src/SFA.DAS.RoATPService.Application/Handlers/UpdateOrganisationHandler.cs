@@ -1,5 +1,6 @@
 ﻿namespace SFA.DAS.RoATPService.Application.Handlers
 {
+    using System;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -11,6 +12,7 @@
     using Microsoft.Extensions.Logging;
     using Validators;
 
+    [Obsolete("Use handlers invoked from UpdateOrganisationController instead")]
     public class UpdateOrganisationHandler : IRequestHandler<UpdateOrganisationRequest, bool>
     {
         private readonly IOrganisationRepository _organisationRepository;
