@@ -50,6 +50,7 @@
             return Ok(await _mediator.Send(createOrganisationRequest));
         }
 
+        [Obsolete("Use operations in UpdateOrganisationController instead")]
         [HttpPost]
         [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(bool))]
         [SwaggerResponse((int)HttpStatusCode.BadRequest, typeof(IDictionary<string, string>))]
