@@ -27,17 +27,9 @@
                 }
             );
             ComparisonResult comparisonResult = organisationComparison.Compare(originalOrganisation, updatedOrganisation);
-            var updatedAt = updatedOrganisation.UpdatedAt;
-            if (!updatedAt.HasValue)
-            {
-                updatedAt = DateTime.Now;
-            }
 
-            var updatedBy = updatedOrganisation.UpdatedBy;
-            if (String.IsNullOrWhiteSpace(updatedBy))
-            {
-                updatedBy = "System";
-            }
+            var updatedAt = updatedOrganisation.UpdatedAt ?? DateTime.Now;
+            var updatedBy = string.IsNullOrWhiteSpace(updatedOrganisation.UpdatedBy) ? "System" : updatedOrganisation.UpdatedBy;
 
             var auditData = new AuditData
             {
