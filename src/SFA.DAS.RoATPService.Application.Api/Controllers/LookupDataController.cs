@@ -22,6 +22,7 @@
             _mediator = mediator;
         }
 
+        [HttpGet]
         [Route("providerTypes")]
         public async Task<IActionResult> ProviderTypes()
         {
@@ -30,6 +31,7 @@
             return Ok(await _mediator.Send(request));
         }
 
+        [HttpGet]
         [Route("organisationTypes")]
         public async Task<IActionResult> OrganisationTypes(int providerTypeId)
         {

@@ -12,8 +12,10 @@
         bool IsValidTradingName(string tradingName);
         bool IsValidStatusDate(DateTime statusDate);
         bool IsValidStatus(OrganisationStatus status);
+        bool IsValidStatusId(int statusId);
         bool IsValidCompanyNumber(string companyNumber);
         bool IsValidCharityNumber(string charityNumber);
         bool IsValidOrganisationType(OrganisationType organisationType);
+        bool IsValidOrganisationTypeId(int organisationTypeId);
     }
 }

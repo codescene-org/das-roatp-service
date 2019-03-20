@@ -1,11 +1,8 @@
 ﻿using System;
 
-namespace SFA.DAS.RoATPService.Api.Types.Models
+namespace SFA.DAS.RoATPService.Application.Commands
 {
-    using Domain;
-    using MediatR;
-
-    public class CreateOrganisationRequest : IRequest<Guid?>
+    public class CreateOrganisationCommand
     {
         public int ProviderTypeId { get; set; }
         public int OrganisationTypeId { get; set; }
