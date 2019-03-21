@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using SFA.DAS.RoATPService.Domain;
 
 namespace SFA.DAS.RoatpService.Data.IntegrationTests.Models
 {
@@ -10,8 +11,6 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Models
         public Guid OrganisationId { get; set; }
         public string UpdatedBy { get; set; }
         public DateTime? UpdatedAt { get; set; }
-        public string FieldChanged { get; set; }
-        public string PreviousValue { get; set; }
-        public string NewValue { get; set; }
+        public AuditData AuditData { get; set; }
     }
 }

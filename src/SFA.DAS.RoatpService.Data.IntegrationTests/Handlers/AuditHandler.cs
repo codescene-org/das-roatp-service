@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Dapper;
 using SFA.DAS.RoatpService.Data.IntegrationTests.Models;
 using SFA.DAS.RoatpService.Data.IntegrationTests.Services;
+using SFA.DAS.RoATPService.Data.DapperDataHandlers;
+using SFA.DAS.RoATPService.Domain;
 
 namespace SFA.DAS.RoatpService.Data.IntegrationTests.Handlers
 {
@@ -13,8 +16,8 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Handlers
         public static void InsertRecord(AuditModel audit)
         {
             var sql =
-                @"INSERT INTO [Audit] ([OrganisationId],[UpdatedBy],[UpdatedAt],[FieldChanged],[PreviousValue],[NewValue]) VALUES " +
-                $@"(@id,@updatedBy, @updatedAt, @updatedAt, @fieldChanged, @previousChanged, @newValue); ";
+                @"set identity_insert [Audit] ON;INSERT INTO [Audit] ([Id], [OrganisationId],[UpdatedBy],[UpdatedAt],[AuditData]) VALUES " +
+                $@"(@id,@organisationId, @updatedBy, @updatedAt, @AuditData);set identity_insert [Audit] ON; ";
 
             DatabaseService.Execute(sql, audit);
         }
@@ -29,13 +32,15 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Handlers
 
         public static AuditModel GetAuditFromId(int auditId)
         {
+            SqlMapper.AddTypeHandler(typeof(AuditData), new AuditDataHandler());
             var auditModel = DatabaseService.Get<AuditModel>($@"select top 1 * from Audit where Id = {auditId}");
             return auditModel;
         }
 
         public static AuditModel GetOrganisationFromOrganisationId(Guid organisationId)
         {
-            var auditModel = DatabaseService.Get<AuditModel>($@"select top 1 * from Audit where OrganisationId = {organisationId}");
+            SqlMapper.AddTypeHandler(typeof(AuditData), new AuditDataHandler());
+            var auditModel = DatabaseService.Get<AuditModel>($@"select top 1 * from Audit where OrganisationId = '{organisationId}'");
             return auditModel;
         }
 

@@ -8,7 +8,7 @@ using SFA.DAS.RoATPService.Data;
 
 namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
 {
-    public class UpdateOrganisationLegalNameTests : TestBase
+    public class UpdateOrganisationUpdateLegalNameTests : TestBase
     {
 
         private readonly DatabaseService _databaseService = new DatabaseService();
@@ -71,8 +71,6 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
         public void Original_legal_name_is_correct()
         {
             Assert.AreEqual(_originalLegalName, _legalName);
-
-           
         }
 
         [Test]

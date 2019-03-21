@@ -25,7 +25,7 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
         private Guid _organisationId;
 
         [OneTimeSetUp]
-        public void before_the_tests_organisation_is_added()
+        public void setup_organisation_is_added()
         {
             _organisationStatusId1 = 1;
             _providerTypeId1 = 10;
