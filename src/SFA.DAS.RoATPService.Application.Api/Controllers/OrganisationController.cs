@@ -47,9 +47,7 @@
         [Route("create")]
         public async Task<IActionResult> Create([FromBody] CreateOrganisationRequest createOrganisationRequest)
         {
-            bool result = await _mediator.Send(createOrganisationRequest);
-
-            return Ok(result);
+            return Ok(await _mediator.Send(createOrganisationRequest));
         }
 
         [Obsolete("Use operations in UpdateOrganisationController instead")]

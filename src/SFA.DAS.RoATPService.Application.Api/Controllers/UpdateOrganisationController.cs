@@ -24,11 +24,11 @@
             _mediator = mediator;
         }
 
-        [HttpPost("legalName")]
+        [HttpPost]
         [SwaggerResponse((int) HttpStatusCode.OK, Type = typeof(bool))]
         [SwaggerResponse((int) HttpStatusCode.BadRequest, typeof(IDictionary<string, string>))]
         [SwaggerResponse((int) HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
-        [Route("update")]
+        [Route("legalName")]
         public async Task<IActionResult> UpdateLegalName([FromBody] UpdateOrganisationLegalNameRequest updateLegalNameRequest)
         {
             bool result = await _mediator.Send(updateLegalNameRequest);
