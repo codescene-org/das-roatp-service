@@ -66,7 +66,12 @@
                 return false;
             }
 
-            return (status.Id >= 0 && status.Id <= 2);
+            return IsValidStatusId(status.Id);
+        }
+
+        public bool IsValidStatusId(int statusId)
+        {
+            return (statusId >= 0 && statusId <= 2);
         }
 
         public bool IsValidCompanyNumber(string companyNumber)
@@ -107,12 +112,12 @@
                 return false;
             }
 
-            if (organisationType.Id < 0 || organisationType.Id > 6)
-            {
-                return false;
-            }
+            return IsValidOrganisationTypeId(organisationType.Id);
+        }
 
-            return true;
+        public bool IsValidOrganisationTypeId(int organisationTypeId)
+        {
+            return organisationTypeId >= 0 && organisationTypeId <= 6;
         }
     }
 }
