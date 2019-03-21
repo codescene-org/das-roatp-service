@@ -10,7 +10,7 @@ AS
       ,FORMAT([UpdatedAt], 'dd/MM/yyyy HH:mm:ss') AS [Change date time]
       ,[UpdatedBy] AS [Who]
 	FROM (
-	SELECT 
+	SELECT DISTINCT
 		au1.*, og1.LegalName, og1.UKPRN, jsonValue.Value AS AuditJson
 		,LAG(Convert(nvarchar, FORMAT(au1.UpdatedAt, 'dd/MM/yyyy HH:mm:ss')), 1,0) OVER (PARTITION BY au1.Organisationid ORDER BY au1.UpdatedAt ) AS newPreviousStatusDate,
 		Convert(nvarchar, FORMAT(og1.createdAt, 'dd/MM/yyyy HH:mm:ss')) createdAt
