@@ -1,0 +1,12 @@
+{
+  "ConnectionStrings": {
+    "SqlConnectionString": "Data Source={Local db server};Initial Catalog=SFA.DAS.RoatpService.Database;Integrated Security=True;",
+    "SqlConnectionStringTest": "Data Source={local db server};Initial Catalog=SFA.DAS.RoatpService.Database.Test;Integrated Security=True;"
+  }
+}
+// Instructions
+// Make a copy of this, named connectionStrings.Local.json and enter your local datasource in the placeholder
+
+// Go to the properties of this new file and set the property 'Copy to Output Directory' to 'Copy Always'
+
+// And check services/DatabaseService.cs to check direct references are correct

@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.RoATPService.Application.Interfaces
+﻿using SFA.DAS.RoATPService.Application.Commands;
+
+namespace SFA.DAS.RoATPService.Application.Interfaces
 {
     using System;
     using System.Threading.Tasks;
@@ -6,7 +8,7 @@
 
     public interface IOrganisationRepository
     {
-        Task<bool> CreateOrganisation(Organisation organisation, string username);
+        Task<Guid?> CreateOrganisation(CreateOrganisationCommand command);
         Task<bool> UpdateOrganisation(Organisation organisation, string username);
         Task<Organisation> GetOrganisation(Guid organisationId);
     }
