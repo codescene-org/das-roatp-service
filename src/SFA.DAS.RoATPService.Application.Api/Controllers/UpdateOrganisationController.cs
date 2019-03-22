@@ -24,7 +24,7 @@
             _mediator = mediator;
         }
 
-        [HttpPost]
+        [HttpPut]
         [SwaggerResponse((int) HttpStatusCode.OK, Type = typeof(bool))]
         [SwaggerResponse((int) HttpStatusCode.BadRequest, typeof(IDictionary<string, string>))]
         [SwaggerResponse((int) HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]

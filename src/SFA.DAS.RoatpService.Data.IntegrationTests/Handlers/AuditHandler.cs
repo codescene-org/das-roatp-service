@@ -17,7 +17,7 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Handlers
         {
             var sql =
                 @"set identity_insert [Audit] ON;INSERT INTO [Audit] ([Id], [OrganisationId],[UpdatedBy],[UpdatedAt],[AuditData]) VALUES " +
-                $@"(@id,@organisationId, @updatedBy, @updatedAt, @AuditData);set identity_insert [Audit] ON; ";
+                $@"(@id,@organisationId, @updatedBy, @updatedAt, @AuditData);set identity_insert [Audit] OFF; ";
 
             DatabaseService.Execute(sql, audit);
         }
