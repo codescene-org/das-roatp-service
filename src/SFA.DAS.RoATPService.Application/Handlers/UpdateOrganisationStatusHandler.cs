@@ -108,6 +108,7 @@
 
             if (organisationStatus == null)
             {
+                _logger.LogError($"Lookup failed for organisation status id {statusId}");
                 return "(undefined)";
             }
 
