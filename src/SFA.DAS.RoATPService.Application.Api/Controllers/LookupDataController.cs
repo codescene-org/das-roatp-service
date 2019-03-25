@@ -6,7 +6,7 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
     using RoATPService.Api.Types.Models;
- 
+
     [Authorize(Roles = "RoATPServiceInternalAPI")]
     [Route("api/v1/lookupData")]
     [ApiController]
@@ -35,7 +35,25 @@
         [Route("organisationTypes")]
         public async Task<IActionResult> OrganisationTypes(int providerTypeId)
         {
-            var request = new GetOrganisationTypesRequest { ProviderTypeId = providerTypeId };
+            var request = new GetOrganisationTypesRequest {ProviderTypeId = providerTypeId};
+
+            return Ok(await _mediator.Send(request));
+        }
+
+        [HttpGet]
+        [Route("organisationStatuses")]
+        public async Task<IActionResult> OrganisationStatuses()
+        {
+            var request = new GetOrganisationStatusesRequest();
+
+            return Ok(await _mediator.Send(request));
+        }
+
+        [HttpGet]
+        [Route("removedReasons")]
+        public async Task<IActionResult> RemovedReasons()
+        {
+            var request = new GetRemovedReasonsRequest();
 
             return Ok(await _mediator.Send(request));
         }
