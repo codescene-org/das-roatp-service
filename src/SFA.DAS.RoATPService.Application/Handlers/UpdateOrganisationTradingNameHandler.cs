@@ -14,16 +14,16 @@ using SFA.DAS.RoATPService.Application.Validators;
 namespace SFA.DAS.RoATPService.Application.Handlers
 {
 
-    public class UpdateOrganisatioTradingNameHandler : UpdateOrganisationHandlerBase, IRequestHandler<UpdateOrganisationTradingNameRequest, bool>
+    public class UpdateOrganisationTradingNameHandler : UpdateOrganisationHandlerBase, IRequestHandler<UpdateOrganisationTradingNameRequest, bool>
     {
-        private ILogger<UpdateOrganisatioTradingNameHandler> _logger;
+        private ILogger<UpdateOrganisationTradingNameHandler> _logger;
         private IOrganisationValidator _validator;
         private IUpdateOrganisationRepository _updateOrganisationRepository;
         private IAuditLogRepository _auditLogRepository;
 
         private const string FieldChanged = "Trading Name";
 
-        public UpdateOrganisatioTradingNameHandler(ILogger<UpdateOrganisatioTradingNameHandler> logger,
+        public UpdateOrganisationTradingNameHandler(ILogger<UpdateOrganisationTradingNameHandler> logger,
             IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository,
             IAuditLogRepository auditLogRepository)
         {
