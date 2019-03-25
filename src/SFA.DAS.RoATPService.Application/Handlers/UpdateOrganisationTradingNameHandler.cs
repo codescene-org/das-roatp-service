@@ -16,12 +16,12 @@ namespace SFA.DAS.RoATPService.Application.Handlers
 
     public class UpdateOrganisatioTradingNameHandler : UpdateOrganisationHandlerBase, IRequestHandler<UpdateOrganisationTradingNameRequest, bool>
     {
-        private ILogger<UpdateOrganisationLegalNameHandler> _logger;
+        private ILogger<UpdateOrganisatioTradingNameHandler> _logger;
         private IOrganisationValidator _validator;
         private IUpdateOrganisationRepository _updateOrganisationRepository;
         private IAuditLogRepository _auditLogRepository;
 
-        private const string FieldChanged = "Legal Name";
+        private const string FieldChanged = "Trading Name";
 
         public UpdateOrganisatioTradingNameHandler(ILogger<UpdateOrganisatioTradingNameHandler> logger,
             IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository,
