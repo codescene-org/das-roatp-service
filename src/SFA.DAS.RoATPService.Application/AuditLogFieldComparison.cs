@@ -18,7 +18,7 @@
             _settings = settings;
         }
 
-        public async Task<IEnumerable<AuditLogEntry>> BuildListOfFieldsChanged(Organisation originalOrganisation, Organisation updatedOrganisation)
+        public async Task<AuditData> BuildListOfFieldsChanged(Organisation originalOrganisation, Organisation updatedOrganisation)
         {
             CompareLogic organisationComparison = new CompareLogic(new ComparisonConfig
                 {
@@ -27,6 +27,17 @@
                 }
             );
             ComparisonResult comparisonResult = organisationComparison.Compare(originalOrganisation, updatedOrganisation);
+
+            var updatedAt = updatedOrganisation.UpdatedAt ?? DateTime.Now;
+            var updatedBy = string.IsNullOrWhiteSpace(updatedOrganisation.UpdatedBy) ? "System" : updatedOrganisation.UpdatedBy;
+
+            var auditData = new AuditData
+            {
+                OrganisationId = updatedOrganisation.Id,
+                UpdatedAt = updatedAt,
+                UpdatedBy = updatedBy
+            };
+
             List<AuditLogEntry> auditLogEntries = new List<AuditLogEntry>();
             foreach (var difference in comparisonResult.Differences)
             {
@@ -56,17 +67,16 @@
 
                 AuditLogEntry entry = new AuditLogEntry
                 {
-                    OrganisationId = updatedOrganisation.Id,
                     FieldChanged = propertyName,
                     PreviousValue = difference.Object1Value,
-                    NewValue = difference.Object2Value,
-                    UpdatedAt = updatedOrganisation.UpdatedAt.Value,
-                    UpdatedBy = updatedOrganisation.UpdatedBy
+                    NewValue = difference.Object2Value
                 };
                 auditLogEntries.Add(entry);
-            }
 
-            return await Task.FromResult(auditLogEntries);
+            }
+            auditData.FieldChanges = auditLogEntries;
+
+            return await Task.FromResult(auditData);
         }
     }
 }

@@ -44,16 +44,16 @@
 
             Organisation existingOrganisation = await _organisationRepository.GetOrganisation(request.Organisation.Id);
 
-            var auditLogEntries = await _auditLogFieldComparison
+            var auditData = await _auditLogFieldComparison
                 .BuildListOfFieldsChanged(existingOrganisation, request.Organisation);
 
-            if (auditLogEntries.Any())
+            if (auditData.FieldChanges.Any())
             { 
                 bool updateSuccess = await _organisationRepository.UpdateOrganisation(request.Organisation, request.Username);
 
                 if (updateSuccess)
                 {
-                    return await _auditLogRepository.WriteFieldChangesToAuditLog(auditLogEntries);
+                    return await _auditLogRepository.WriteFieldChangesToAuditLog(auditData);
                 }
             }
             
