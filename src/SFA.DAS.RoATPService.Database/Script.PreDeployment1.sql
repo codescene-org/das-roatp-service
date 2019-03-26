@@ -20,9 +20,15 @@ BEGIN
 END
 
 IF EXISTS (
-	SELECT 1 FROM dbo.Organisations WHERE OrganisationTypeId NOT IN (0)
-	)
+    SELECT 1 from INFORMATION_SCHEMA.COLUMNS
+    WHERE TABLE_NAME = 'Organisations'
+)
 BEGIN
-	UPDATE dbo.Organisations
-	SET OrganisationTypeId = 0
+	IF EXISTS (
+		SELECT 1 FROM dbo.Organisations WHERE OrganisationTypeId NOT IN (0)
+		)
+	BEGIN
+		UPDATE dbo.Organisations
+		SET OrganisationTypeId = 0
+	END
 END
