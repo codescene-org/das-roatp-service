@@ -1,7 +1,6 @@
-﻿namespace SFA.DAS.AssessorService.Data.DapperTypeHandlers
+﻿namespace SFA.DAS.RoatpService.Data.DapperTypeHandlers
 {
     using System.Data;
-    using System.Runtime.Serialization;
     using Dapper;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Converters;
