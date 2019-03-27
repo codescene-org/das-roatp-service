@@ -10,9 +10,12 @@
     using System.Threading.Tasks;
     using Domain;
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Converters;
 
     public class UpdateOrganisationRepository : IUpdateOrganisationRepository
     {
+        private const string RoatpDateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
         private IWebConfiguration _configuration;
 
         public UpdateOrganisationRepository(IWebConfiguration configuration)
@@ -78,7 +81,7 @@
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();
 
-                var sql = "select JSON_VALUE(OrganisationData, '$.RemovedReason') FROM [Organisations] " +
+                var sql = "select JSON_QUERY(OrganisationData, '$.RemovedReason') FROM [Organisations] " +
                           "WHERE Id = @organisationId";
                 var results = await connection.QueryAsync<string>(sql, new { organisationId });
                 var resultJson = results.FirstOrDefault();
@@ -96,7 +99,7 @@
         {
             var connectionString = _configuration.SqlConnectionString;
 
-            string startDateValue = startDate.ToString();
+            string startDateValue = startDate.ToString(RoatpDateTimeFormat);
 
             using (var connection = new SqlConnection(connectionString))
             {
@@ -148,12 +151,13 @@
                 var reason = await connection.QueryAsync<RemovedReason>(sql, new { removedReasonId });
                 var removedReason = reason.FirstOrDefault();
 
-                var reasonJson = JsonConvert.SerializeObject(removedReason);
+                var reasonJson = JsonConvert.SerializeObject(removedReason,
+                    new IsoDateTimeConverter() { DateTimeFormat = RoatpDateTimeFormat });
 
                 var updatedAt = DateTime.Now;
 
                 var updateSql =
-                    "update [Organisations] set OrganisationData = JSON_MODIFY(OrganisationData, '$.RemovedReason', @reasonJson), " +
+                    "update [Organisations] set OrganisationData = JSON_MODIFY(OrganisationData, '$.RemovedReason', JSON_QUERY(@reasonJson)), " +
                     "StatusId = @organisationStatusId, UpdatedBy = @updatedBy, UpdatedAt = @updatedAt " +
                     "WHERE Id = @organisationId";
 
