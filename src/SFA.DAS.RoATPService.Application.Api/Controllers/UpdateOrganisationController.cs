@@ -83,9 +83,7 @@ namespace SFA.DAS.RoATPService.Application.Api.Controllers
         [Route("providerType")]
         public async Task<IActionResult> UpdateProviderType([FromBody] UpdateOrganisationProviderTypeRequest updateProviderTypeRequest)
         {
-            bool result = await _mediator.Send(updateProviderTypeRequest);
-
-            return Ok(result);
+            return Ok(await _mediator.Send(updateProviderTypeRequest));
         }
 
     }
