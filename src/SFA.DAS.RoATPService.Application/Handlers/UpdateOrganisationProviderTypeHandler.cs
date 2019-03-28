@@ -53,13 +53,17 @@
                     GetProviderType(previousProviderTypeId).Result, 
                     GetProviderType(request.ProviderTypeId).Result
                     );
-                AddAuditEntry(
-                    auditData, 
-                    "Organisation Type", 
-                    GetOrganisationType(previousOrganisationTypeId, previousProviderTypeId).Result, 
-                    GetOrganisationType(request.OrganisationTypeId, request.ProviderTypeId).Result
-                    );
 
+                if (previousOrganisationTypeId != request.OrganisationTypeId)
+                {
+                    AddAuditEntry(
+                        auditData,
+                        "Organisation Type",
+                        GetOrganisationType(previousOrganisationTypeId, previousProviderTypeId).Result,
+                        GetOrganisationType(request.OrganisationTypeId, request.ProviderTypeId).Result
+                    );
+                }
+                
                 return await _auditLogRepository.WriteFieldChangesToAuditLog(auditData);
             }
 
