@@ -76,5 +76,17 @@ namespace SFA.DAS.RoATPService.Application.Api.Controllers
             return Ok(await _mediator.Send(request));
         }
 
+        [HttpPut]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(bool))]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, typeof(IDictionary<string, string>))]
+        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
+        [Route("providerType")]
+        public async Task<IActionResult> UpdateProviderType([FromBody] UpdateOrganisationProviderTypeRequest updateProviderTypeRequest)
+        {
+            bool result = await _mediator.Send(updateProviderTypeRequest);
+
+            return Ok(result);
+        }
+
     }
 }

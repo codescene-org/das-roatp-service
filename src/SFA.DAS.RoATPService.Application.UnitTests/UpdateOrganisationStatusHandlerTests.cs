@@ -102,7 +102,7 @@
         }
 
         [Test]
-        public void Handle_accepts_change_from_not_taking_on_apprentices_to_active()
+        public void Handler_accepts_change_from_not_taking_on_apprentices_to_active()
         {
             _repository.Setup(x => x.GetStatus(It.IsAny<Guid>())).ReturnsAsync(OrganisationStatus.ActiveNotTakingOnApprentices);
 

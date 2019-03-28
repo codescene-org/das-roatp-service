@@ -23,6 +23,7 @@
         private Mock<IOrganisationRepository> _organisationRepository;
         private Mock<IAuditLogFieldComparison> _fieldComparison;
         private Mock<IAuditLogRepository> _auditLogRepository;
+        private Mock<ILookupDataRepository> _lookupDataRepository;
 
         [SetUp]
         public void Before_each_test()
@@ -49,7 +50,8 @@
             Mock<ILogger<UpdateOrganisationHandler>> logger = new Mock<ILogger<UpdateOrganisationHandler>>();
             _fieldComparison = new Mock<IAuditLogFieldComparison>();
             _auditLogRepository = new Mock<IAuditLogRepository>();
-            _handler = new UpdateOrganisationHandler(_organisationRepository.Object, logger.Object, new OrganisationValidator(),
+            _lookupDataRepository = new Mock<ILookupDataRepository>();
+            _handler = new UpdateOrganisationHandler(_organisationRepository.Object, logger.Object, new OrganisationValidator(_lookupDataRepository.Object),
                                                      _fieldComparison.Object, _auditLogRepository.Object);
         }
 

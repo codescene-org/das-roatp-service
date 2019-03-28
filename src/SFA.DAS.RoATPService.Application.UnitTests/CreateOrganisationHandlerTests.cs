@@ -23,7 +23,9 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         private CreateOrganisationHandler _handler;
         private Mock<IOrganisationRepository> _repository;
         private Mock<ILogger<CreateOrganisationHandler>> _logger;
+        private Mock<ILookupDataRepository> _lookupDataRepository;
         private Guid _organisationId;
+
         [SetUp]
         public void Before_each_test()
         {
@@ -32,7 +34,8 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _repository.Setup(x => x.CreateOrganisation(It.IsAny<CreateOrganisationCommand>()))
                 .ReturnsAsync(_organisationId);
             _logger = new Mock<ILogger<CreateOrganisationHandler>>();
-            _handler = new CreateOrganisationHandler(_repository.Object, _logger.Object, new OrganisationValidator(), new ProviderTypeValidator());
+            _lookupDataRepository = new Mock<ILookupDataRepository>();
+            _handler = new CreateOrganisationHandler(_repository.Object, _logger.Object, new OrganisationValidator(_lookupDataRepository.Object), new ProviderTypeValidator());
             _request = new CreateOrganisationRequest
             {                                                                       
                 LegalName = "Legal Name",

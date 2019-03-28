@@ -2,12 +2,22 @@
 {
     using SFA.DAS.RoATPService.Domain;
     using System;
+    using System.Linq;
     using System.Text.RegularExpressions;
+    using Interfaces;
+    using System.Threading.Tasks;
 
     public class OrganisationValidator : IOrganisationValidator
     {
         private const string CompaniesHouseNumberRegex = "[A-Za-z0-9]{2}[0-9]{6}";
         private const string CharityNumberInvalidCharactersRegex = "[^a-zA-Z0-9\\-]";
+
+        private ILookupDataRepository _lookupDataRepository;
+
+        public OrganisationValidator(ILookupDataRepository lookupDataRepository)
+        {
+            _lookupDataRepository = lookupDataRepository;
+        }
 
         public bool IsValidOrganisationId(Guid organisationId)
         {
@@ -26,7 +36,12 @@
                 return false;
             }
 
-            return (providerType.Id >= 1 && providerType.Id <= 3);
+            return IsValidProviderTypeId(providerType.Id);
+        }
+
+        public bool IsValidProviderTypeId(int providerTypeId)
+        {
+            return (providerTypeId >= 1 && providerTypeId <= 3);
         }
 
         public bool IsValidUKPRN(long ukPrn)
@@ -117,7 +132,21 @@
 
         public bool IsValidOrganisationTypeId(int organisationTypeId)
         {
-            return organisationTypeId >= 0 && organisationTypeId <= 6;
+            return organisationTypeId >= 0 && organisationTypeId <= 20;
+        }
+
+        public async Task<bool> IsValidOrganisationTypeIdForProvider(int organisationTypeId, int providerTypeId)
+        {
+            if (!IsValidOrganisationTypeId(organisationTypeId))
+            {
+                return false;
+            }
+
+            var organisationTypes = await _lookupDataRepository.GetOrganisationTypes(providerTypeId);
+
+            var organisationType = organisationTypes.FirstOrDefault(x => x.Id == organisationTypeId);
+
+            return (organisationType != null);
         }
     }
 }
