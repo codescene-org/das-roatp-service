@@ -129,7 +129,7 @@
 
                 var sql = "update [Organisations] SET StatusId = @organisationStatusId, " + 
                           "OrganisationData = JSON_MODIFY(OrganisationData, '$.RemovedReason', null), " +
-                          "UpdatedBy = @updatedBy, UpdatedAt = @updatedAt " +
+                          "UpdatedBy = @updatedBy, UpdatedAt = @updatedAt, StatusDate = @updatedAt " +
                           "WHERE Id = @organisationId";
                 int recordsAffected = await connection.ExecuteAsync(sql, new { organisationStatusId, updatedBy, updatedAt, organisationId });
 
@@ -158,7 +158,7 @@
 
                 var updateSql =
                     "update [Organisations] set OrganisationData = JSON_MODIFY(OrganisationData, '$.RemovedReason', JSON_QUERY(@reasonJson)), " +
-                    "StatusId = @organisationStatusId, UpdatedBy = @updatedBy, UpdatedAt = @updatedAt " +
+                    "StatusId = @organisationStatusId, UpdatedBy = @updatedBy, UpdatedAt = @updatedAt, StatusDate = @updatedAt " +
                     "WHERE Id = @organisationId";
 
                 int recordsAffected = await connection.ExecuteAsync(updateSql,
