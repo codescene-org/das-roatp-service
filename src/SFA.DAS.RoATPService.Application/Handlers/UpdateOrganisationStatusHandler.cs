@@ -58,7 +58,7 @@
                     request.OrganisationId, request.OrganisationStatusId, 
                     request.RemovedReasonId.Value, request.UpdatedBy);
 
-                if (request.RemovedReasonId.Value != removedReason.Id)
+                if (removedReason == null || request.RemovedReasonId.Value != removedReason.Id)
                 {
                     AddAuditEntry(auditData, "Removed Reason", removedReason?.Reason ?? "Not set", reason.Reason);
                 }
