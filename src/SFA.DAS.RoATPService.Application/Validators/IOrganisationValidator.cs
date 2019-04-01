@@ -17,5 +17,7 @@
         bool IsValidCharityNumber(string charityNumber);
         bool IsValidOrganisationType(OrganisationType organisationType);
         bool IsValidOrganisationTypeId(int organisationTypeId);
+
+        string DuplicateUkprnInAnotherOrganisation(long ukprn, Guid organisationId);
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.RoATPService.Application.Validators
+﻿using SFA.DAS.RoATPService.Application.Interfaces;
+
+namespace SFA.DAS.RoATPService.Application.Validators
 {
     using SFA.DAS.RoATPService.Domain;
     using System;
@@ -8,6 +10,12 @@
     {
         private const string CompaniesHouseNumberRegex = "[A-Za-z0-9]{2}[0-9]{6}";
         private const string CharityNumberInvalidCharactersRegex = "[^a-zA-Z0-9\\-]";
+        private IDuplicateCheckRepository _duplicateCheckRepository;
+
+        public OrganisationValidator(IDuplicateCheckRepository duplicateCheckRepository)
+        {
+            _duplicateCheckRepository = duplicateCheckRepository;
+        }
 
         public bool IsValidOrganisationId(Guid organisationId)
         {
@@ -118,6 +126,12 @@
         public bool IsValidOrganisationTypeId(int organisationTypeId)
         {
             return organisationTypeId >= 0 && organisationTypeId <= 6;
+        }
+
+        public string DuplicateUkprnInAnotherOrganisation(long ukprn, Guid organisationId)
+        {
+            var response = _duplicateCheckRepository.DuplicateUKPRNExists(organisationId, ukprn).Result;
+            return response.DuplicateOrganisationName;
         }
     }
 }

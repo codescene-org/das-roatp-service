@@ -23,7 +23,9 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         private CreateOrganisationHandler _handler;
         private Mock<IOrganisationRepository> _repository;
         private Mock<ILogger<CreateOrganisationHandler>> _logger;
+        private Mock<IDuplicateCheckRepository> _duplicateCheckRepository;
         private Guid _organisationId;
+
         [SetUp]
         public void Before_each_test()
         {
@@ -31,8 +33,11 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _repository = new Mock<IOrganisationRepository>();
             _repository.Setup(x => x.CreateOrganisation(It.IsAny<CreateOrganisationCommand>()))
                 .ReturnsAsync(_organisationId);
+            _duplicateCheckRepository = new Mock<IDuplicateCheckRepository>();
+            _duplicateCheckRepository.Setup(x => x.DuplicateUKPRNExists(It.IsAny<Guid>(), It.IsAny<long>()))
+                .ReturnsAsync(new DuplicateCheckResponse {DuplicateOrganisationName = "",DuplicateFound = false});
             _logger = new Mock<ILogger<CreateOrganisationHandler>>();
-            _handler = new CreateOrganisationHandler(_repository.Object, _logger.Object, new OrganisationValidator(), new ProviderTypeValidator());
+            _handler = new CreateOrganisationHandler(_repository.Object, _logger.Object, new OrganisationValidator(_duplicateCheckRepository.Object), new ProviderTypeValidator());
             _request = new CreateOrganisationRequest
             {                                                                       
                 LegalName = "Legal Name",
@@ -129,6 +134,17 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         public void Create_organisation_rejects_invalid_UKPRN(long ukprn)
         {
             _request.Ukprn = ukprn;
+
+            Func<Task> result = async () => await
+                _handler.Handle(_request, new CancellationToken());
+            result.Should().Throw<BadRequestException>();
+        }
+
+        [Test]
+        public void Create_organisation_rejects_duplicate_UKPRN()
+        {
+            _duplicateCheckRepository.Setup(x => x.DuplicateUKPRNExists(It.IsAny<Guid>(), It.IsAny<long>()))
+                .ReturnsAsync(new DuplicateCheckResponse {DuplicateOrganisationName = "name", DuplicateFound = true});
 
             Func<Task> result = async () => await
                 _handler.Handle(_request, new CancellationToken());

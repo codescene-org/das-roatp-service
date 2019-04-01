@@ -50,5 +50,39 @@
                 return await Task.FromResult(recordsAffected > 0);
             }
         }
+
+        public async Task<bool> UpdateUkprn(Guid organisationId, long ukprn, string updatedBy)
+        {
+            var connectionString = _configuration.SqlConnectionString;
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                var updatedAt = DateTime.Now;
+
+                var sql = "update [Organisations] SET UKPRN = @ukprn, UpdatedBy = @updatedBy, UpdatedAt = @updatedAt " +
+                          "WHERE Id = @organisationId";
+                int recordsAffected = await connection.ExecuteAsync(sql, new { ukprn, updatedBy, updatedAt, organisationId });
+
+                return await Task.FromResult(recordsAffected > 0);
+            }
+        }
+
+        public async Task<long> GetUkprn(Guid organisationId)
+        {
+            var connectionString = _configuration.SqlConnectionString;
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                var sql = "select ukprn FROM [Organisations] " +
+                          "WHERE Id = @organisationId";
+                return await connection.ExecuteScalarAsync<long>(sql, new { organisationId });
+            }
+        }
     }
 }

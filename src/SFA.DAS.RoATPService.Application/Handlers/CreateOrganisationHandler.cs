@@ -55,6 +55,11 @@ namespace SFA.DAS.RoATPService.Application.Handlers
                 if (!_organisationValidator.IsValidUKPRN(request.Ukprn))
                     invalidOrganisationError = $"{invalidOrganisationError}: Invalid ukprn [{request.Ukprn}]";
 
+                var duplicateUkprnOrganisationName = _organisationValidator.DuplicateUkprnInAnotherOrganisation(request.Ukprn, Guid.NewGuid());
+
+                if (!string.IsNullOrEmpty(duplicateUkprnOrganisationName))
+                    invalidOrganisationError = $"{invalidOrganisationError}: Duplicate ukprn '{request.Ukprn}' already exists against [{duplicateUkprnOrganisationName}]";
+
                 if (!_organisationValidator.IsValidCompanyNumber(request.CompanyNumber))
                     invalidOrganisationError = $"{invalidOrganisationError}: Invalid company number [{request.CompanyNumber}]";
 
@@ -95,6 +100,7 @@ namespace SFA.DAS.RoATPService.Application.Handlers
                     && _providerTypeValidator.IsValidProviderTypeId(request.ProviderTypeId)        
                     && _organisationValidator.IsValidOrganisationTypeId(request.OrganisationTypeId)   
                     && _organisationValidator.IsValidStatusId(request.OrganisationStatusId)  
+                    && string.IsNullOrEmpty(_organisationValidator.DuplicateUkprnInAnotherOrganisation(request.Ukprn, Guid.NewGuid()))
                     && _organisationValidator.IsValidStatusDate(request.StatusDate)
                     && _organisationValidator.IsValidUKPRN(request.Ukprn)  
                     && _organisationValidator.IsValidCompanyNumber(request.CompanyNumber)  

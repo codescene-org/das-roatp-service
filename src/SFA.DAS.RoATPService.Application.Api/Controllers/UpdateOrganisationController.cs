@@ -35,5 +35,17 @@
 
             return Ok(result);
         }
+
+        [HttpPut]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(bool))]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, typeof(IDictionary<string, string>))]
+        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
+        [Route("ukprn")]
+        public async Task<IActionResult> UpdateUkprn([FromBody] UpdateOrganisationUkprnRequest updateUkprnRequest)
+        {
+            bool result = await _mediator.Send(updateUkprnRequest);
+
+            return Ok(result);
+        }
     }
 }
