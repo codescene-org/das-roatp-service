@@ -55,10 +55,10 @@ namespace SFA.DAS.RoATPService.Application.Handlers
                 if (!_organisationValidator.IsValidUKPRN(request.Ukprn))
                     invalidOrganisationError = $"{invalidOrganisationError}: Invalid ukprn [{request.Ukprn}]";
 
-                var duplicateUkprnOrganisationName = _organisationValidator.DuplicateUkprnInAnotherOrganisation(request.Ukprn, Guid.NewGuid());
+                var duplicateUkrnDetails = _organisationValidator.DuplicateUkprnInAnotherOrganisation(request.Ukprn, Guid.NewGuid());
 
-                if (!string.IsNullOrEmpty(duplicateUkprnOrganisationName))
-                    invalidOrganisationError = $"{invalidOrganisationError}: Duplicate ukprn '{request.Ukprn}' already exists against [{duplicateUkprnOrganisationName}]";
+                if (duplicateUkrnDetails.DuplicateFound)
+                    invalidOrganisationError = $"{invalidOrganisationError}: Duplicate ukprn '{request.Ukprn}' already exists against [{duplicateUkrnDetails}]";
 
                 if (!_organisationValidator.IsValidCompanyNumber(request.CompanyNumber))
                     invalidOrganisationError = $"{invalidOrganisationError}: Invalid company number [{request.CompanyNumber}]";
@@ -99,13 +99,12 @@ namespace SFA.DAS.RoATPService.Application.Handlers
                     && _organisationValidator.IsValidTradingName(request.TradingName)
                     && _providerTypeValidator.IsValidProviderTypeId(request.ProviderTypeId)        
                     && _organisationValidator.IsValidOrganisationTypeId(request.OrganisationTypeId)   
-                    && _organisationValidator.IsValidStatusId(request.OrganisationStatusId)  
-                    && string.IsNullOrEmpty(_organisationValidator.DuplicateUkprnInAnotherOrganisation(request.Ukprn, Guid.NewGuid()))
+                    && _organisationValidator.IsValidStatusId(request.OrganisationStatusId)
+                    && !_organisationValidator.DuplicateUkprnInAnotherOrganisation(request.Ukprn, Guid.NewGuid()).DuplicateFound
                     && _organisationValidator.IsValidStatusDate(request.StatusDate)
                     && _organisationValidator.IsValidUKPRN(request.Ukprn)  
                     && _organisationValidator.IsValidCompanyNumber(request.CompanyNumber)  
                     && _organisationValidator.IsValidCharityNumber(request.CharityNumber)); 
-
         }
     }
 }

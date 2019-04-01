@@ -31,9 +31,7 @@
         [Route("legalName")]
         public async Task<IActionResult> UpdateLegalName([FromBody] UpdateOrganisationLegalNameRequest updateLegalNameRequest)
         {
-            bool result = await _mediator.Send(updateLegalNameRequest);
-
-            return Ok(result);
+            return Ok(await _mediator.Send(updateLegalNameRequest));
         }
 
         [HttpPut]
@@ -43,9 +41,7 @@
         [Route("ukprn")]
         public async Task<IActionResult> UpdateUkprn([FromBody] UpdateOrganisationUkprnRequest updateUkprnRequest)
         {
-            bool result = await _mediator.Send(updateUkprnRequest);
-
-            return Ok(result);
+            return Ok(await _mediator.Send(updateUkprnRequest));
         }
     }
 }

@@ -17,7 +17,7 @@
         private IUpdateOrganisationRepository _updateOrganisationRepository;
         private IAuditLogRepository _auditLogRepository;
 
-        private const string FieldChanged = "Ukprn";
+        private const string FieldChanged = "UKPRN";
 
         public UpdateOrganisationUkprnHandler(ILogger<UpdateOrganisationUkprnHandler> logger,
             IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository,
@@ -38,11 +38,11 @@
                 throw new BadRequestException(invalidUkprnError);
             }
 
-            var duplicateUkprnOrganisationName = _validator.DuplicateUkprnInAnotherOrganisation(request.Ukprn, request.OrganisationId);
+            var duplicateUkprnDetails = _validator.DuplicateUkprnInAnotherOrganisation(request.Ukprn, request.OrganisationId);
             
-            if (!string.IsNullOrEmpty(duplicateUkprnOrganisationName))
+            if (duplicateUkprnDetails.DuplicateFound)
             {
-                var invalidUkprnError = $@"Ukprn '{request.Ukprn}' already used against organisation '{duplicateUkprnOrganisationName}'";
+                var invalidUkprnError = $@"Ukprn '{request.Ukprn}' already used against organisation '{duplicateUkprnDetails.DuplicateOrganisationName}'";
                 _logger.LogInformation(invalidUkprnError);
                 throw new BadRequestException(invalidUkprnError);
             }
