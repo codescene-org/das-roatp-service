@@ -17,6 +17,7 @@ IF EXISTS (
 	)
 BEGIN
 	DELETE FROM dbo.[Audit]
+
 END
 
 IF EXISTS (
@@ -31,4 +32,5 @@ BEGIN
 		UPDATE dbo.Organisations
 		SET OrganisationTypeId = 0
 	END
+
 END
