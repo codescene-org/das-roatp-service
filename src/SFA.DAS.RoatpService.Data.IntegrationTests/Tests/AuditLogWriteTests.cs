@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Dapper;
 using NUnit.Framework;
-using SFA.DAS.AssessorService.Data.DapperTypeHandlers;
 using SFA.DAS.RoatpService.Data.IntegrationTests.Handlers;
 using SFA.DAS.RoatpService.Data.IntegrationTests.Models;
 using SFA.DAS.RoatpService.Data.IntegrationTests.Services;
