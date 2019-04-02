@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.RoATPService.Application.Api.Controllers
+﻿using SFA.DAS.RoATPService.Api.Types.Models.UpdateOrganisation;
+
+namespace SFA.DAS.RoATPService.Application.Api.Controllers
 {
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
@@ -34,6 +36,16 @@
             bool result = await _mediator.Send(updateLegalNameRequest);
 
             return Ok(result);
+        }
+
+        [HttpPut]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(bool))]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, typeof(IDictionary<string, string>))]
+        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
+        [Route("tradingName")]
+        public async Task<IActionResult> UpdateTradingName([FromBody] UpdateOrganisationTradingNameRequest updateLegalNameRequest)
+        {
+            return Ok(await _mediator.Send(updateLegalNameRequest));
         }
 
         [HttpPut]
