@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using SFA.DAS.RoATPService.Domain;
-
-namespace SFA.DAS.RoatpService.Data.IntegrationTests.Models
+﻿namespace SFA.DAS.RoatpService.Data.IntegrationTests.Models
 {
-    public class AuditModel:TestModel
+    using System;
+    using SFA.DAS.RoATPService.Domain;
+
+    public class AuditModel : TestModel
     {
         public int Id { get; set; }
         public Guid OrganisationId { get; set; }

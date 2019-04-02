@@ -6,11 +6,11 @@
     using System.Linq;
     using System.Threading.Tasks;
     using Application.Interfaces;
-    using AssessorService.Data.DapperTypeHandlers;
     using Dapper;
     using Domain;
     using Microsoft.Extensions.Configuration;
     using Settings;
+    using SFA.DAS.RoatpService.Data.DapperTypeHandlers;
     using SFA.DAS.RoATPService.Api.Types.Models;
 
     public class OrganisationSearchRepository : IOrganisationSearchRepository

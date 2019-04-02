@@ -17,4 +17,20 @@ IF EXISTS (
 	)
 BEGIN
 	DELETE FROM dbo.[Audit]
+
+END
+
+IF EXISTS (
+    SELECT 1 from INFORMATION_SCHEMA.COLUMNS
+    WHERE TABLE_NAME = 'Organisations'
+)
+BEGIN
+	IF EXISTS (
+		SELECT 1 FROM dbo.Organisations WHERE OrganisationTypeId NOT IN (0)
+		)
+	BEGIN
+		UPDATE dbo.Organisations
+		SET OrganisationTypeId = 0
+	END
+
 END

@@ -8,10 +8,10 @@ namespace SFA.DAS.RoATPService.Data
     using System.Linq;
     using System.Threading.Tasks;
     using Application.Interfaces;
-    using AssessorService.Data.DapperTypeHandlers;
     using Dapper;
     using Domain;
     using Settings;
+    using SFA.DAS.RoatpService.Data.DapperTypeHandlers;
 
     public class OrganisationRepository : IOrganisationRepository
     {
