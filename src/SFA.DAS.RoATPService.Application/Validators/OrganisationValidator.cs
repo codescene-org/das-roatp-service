@@ -18,6 +18,7 @@ namespace SFA.DAS.RoATPService.Application.Validators
             _duplicateCheckRepository = duplicateCheckRepository;
         }
 
+
         public bool IsValidOrganisationId(Guid organisationId)
         {
             if (organisationId == null || organisationId == Guid.Empty)

@@ -25,5 +25,28 @@
                 }
             };
         }
+
+        protected AuditData CreateAuditData(Guid organisationId, string updatedBy)
+        {
+            return new AuditData
+            {
+                FieldChanges = new List<AuditLogEntry>(),
+                OrganisationId = organisationId,
+                UpdatedAt = DateTime.Now,
+                UpdatedBy = updatedBy
+            };
+        }
+
+        protected void AddAuditEntry(AuditData auditData, string fieldChanged, string previousValue, string newValue)
+        {
+            var entry = new AuditLogEntry
+                {
+                    FieldChanged = fieldChanged,
+                    PreviousValue = previousValue,
+                    NewValue = newValue
+                };
+
+            auditData.FieldChanges.Add(entry);
+        }
     }
 }
