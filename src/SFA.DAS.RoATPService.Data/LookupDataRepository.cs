@@ -57,5 +57,37 @@
                 return await Task.FromResult(providerTypes);
             }
         }
+        
+        public async Task<IEnumerable<OrganisationStatus>> GetOrganisationStatuses()
+        {
+            using (var connection = new SqlConnection(_configuration.SqlConnectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                string sql = $"SELECT [Id], [Status], [CreatedAt], [CreatedBy], [UpdatedAt], [UpdatedBy] " +
+                              "FROM [dbo].[OrganisationStatus] ORDER BY Id";
+
+                var organisationStatuses = await connection.QueryAsync<OrganisationStatus>(sql);
+                return await Task.FromResult(organisationStatuses);
+            }
+        }
+
+        public async Task<IEnumerable<RemovedReason>> GetRemovedReasons()
+        {
+            using (var connection = new SqlConnection(_configuration.SqlConnectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                var sql = "select Id, RemovedReason as [Reason], Status, Description, CreatedAt, " +
+                          "CreatedBy, UpdatedAt, UpdatedBy FROM [RemovedReasons] " +
+                          "ORDER BY Id";
+
+                var removedReasons = await connection.QueryAsync<RemovedReason>(sql);
+                return await Task.FromResult(removedReasons);
+            }
+        }
+
     }
 }
