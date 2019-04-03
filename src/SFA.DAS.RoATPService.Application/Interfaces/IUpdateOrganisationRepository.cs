@@ -8,6 +8,8 @@
     {
         Task<string> GetLegalName(Guid organisationId);
         Task<bool> UpdateLegalName(Guid organisationId, string legalName, string updatedBy);
+        Task<bool> GetFinancialTrackRecord(Guid organisationId);
+        Task<bool> UpdateFinancialTrackRecord(Guid organisationId, bool financialTrackRecord, string updatedBy);
         Task<bool> GetParentCompanyGuarantee(Guid organisationId);
         Task<bool> UpdateParentCompanyGuarantee(Guid organisationId, bool parentCompanyGuarantee, string updatedBy);
         Task<string> GetTradingName(Guid organisationId);

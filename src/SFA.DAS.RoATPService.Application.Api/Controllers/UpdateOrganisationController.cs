@@ -56,8 +56,6 @@ namespace SFA.DAS.RoATPService.Application.Api.Controllers
             return Ok(await _mediator.Send(updateStatusRequest));
         }
 
-
-
         [HttpPut]
         [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(bool))]
         [SwaggerResponse((int)HttpStatusCode.BadRequest, typeof(IDictionary<string, string>))]
@@ -67,5 +65,16 @@ namespace SFA.DAS.RoATPService.Application.Api.Controllers
         {
             return Ok(await _mediator.Send(request));
         }
+
+        [HttpPut]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(bool))]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, typeof(IDictionary<string, string>))]
+        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
+        [Route("financialTrackRecord")]
+        public async Task<IActionResult> UpdateFinancialTrackRecord([FromBody] UpdateOrganisationFinancialTrackRecordRequest request)
+        {
+            return Ok(await _mediator.Send(request));
+        }
+
     }
 }
