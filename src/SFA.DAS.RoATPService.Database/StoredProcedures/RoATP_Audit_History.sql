@@ -13,7 +13,7 @@ AS
 	  [newPreviousStatusDate]
 	  END
 	  ELSE ''
-	  END AS [Old status date]
+	  END AS [Old status date time]
       ,NewValue AS [New value]
      ,FORMAT([UpdatedAt], 'dd/MM/yyyy HH:mm:ss') AS [Change date time]
      ,[UpdatedBy] AS [Who]
