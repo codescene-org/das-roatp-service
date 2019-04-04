@@ -1,4 +1,5 @@
 ﻿using SFA.DAS.RoATPService.Application.Commands;
+using SFA.DAS.RoATPService.Application.Mappers;
 
 namespace SFA.DAS.RoATPService.Application.UnitTests
 {
@@ -24,6 +25,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         private Mock<IOrganisationRepository> _repository;
         private Mock<ILogger<CreateOrganisationHandler>> _logger;
         private Guid _organisationId;
+        private IMapCreateOrganisationRequestToCommand _mapper;
         [SetUp]
         public void Before_each_test()
         {
@@ -32,13 +34,13 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _repository.Setup(x => x.CreateOrganisation(It.IsAny<CreateOrganisationCommand>()))
                 .ReturnsAsync(_organisationId);
             _logger = new Mock<ILogger<CreateOrganisationHandler>>();
-            _handler = new CreateOrganisationHandler(_repository.Object, _logger.Object, new OrganisationValidator(), new ProviderTypeValidator());
+            _mapper = new MapCreateOrganisationRequestToCommand();
+            _handler = new CreateOrganisationHandler(_repository.Object, _logger.Object, new OrganisationValidator(), new ProviderTypeValidator(), _mapper);
             _request = new CreateOrganisationRequest
             {                                                                       
                 LegalName = "Legal Name",
                 TradingName = "TradingName",
                 ProviderTypeId = 1,
-                OrganisationStatusId =  1,
                 OrganisationTypeId = 0,
                 StatusDate = DateTime.Now,
                 Ukprn = 10002000,
@@ -79,17 +81,6 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             result.Should().Throw<BadRequestException>();
         }
      
-        [TestCase(-1)]
-        [TestCase(3)]
-        public void Create_organisation_rejects_invalid_organisation_status(int organisationStatusId)
-        {
-            _request.OrganisationStatusId = organisationStatusId;
-
-            Func<Task> result = async () => await
-                _handler.Handle(_request, new CancellationToken());
-            result.Should().Throw<BadRequestException>();
-        }
-
         [TestCase("")]
         [TestCase(null)]
         [TestCase(" ")]

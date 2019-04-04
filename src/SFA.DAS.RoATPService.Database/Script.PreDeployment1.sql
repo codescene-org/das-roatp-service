@@ -32,5 +32,23 @@ BEGIN
 		UPDATE dbo.Organisations
 		SET OrganisationTypeId = 0
 	END
-
 END
+
+
+ -- STORY APR-388  April 2019
+IF NOT EXISTS (SELECT 1 FROM dbo.organisationStatus WHERE id = 3) 
+	BEGIN
+		SET IDENTITY_INSERT dbo.[OrganisationStatus] ON;
+		INSERT INTO [dbo].[OrganisationStatus]
+			   ([ID]
+			   ,[Status]
+			   ,[CreatedAt]
+			   ,[CreatedBy])
+		 VALUES
+			   (3,
+			   'On-boarding'
+			   ,getdate()
+			   ,'System')
+		set identity_insert dbo.[OrganisationStatus] OFF;
+			
+	END
