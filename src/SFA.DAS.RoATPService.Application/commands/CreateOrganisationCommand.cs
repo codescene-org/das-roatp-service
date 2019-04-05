@@ -10,7 +10,7 @@ namespace SFA.DAS.RoATPService.Application.Commands
         public string LegalName { get; set; }
         public string TradingName { get; set; }
         public int OrganisationStatusId { get; set; }
-        public DateTime? StatusDate { get; set; }
+        public DateTime StatusDate { get; set; }
         public string CharityNumber { get; set; }
         public string CompanyNumber { get; set; }
         public bool ParentCompanyGuarantee { get; set; }
