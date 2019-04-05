@@ -40,6 +40,11 @@
             int previousProviderTypeId = await _updateOrganisationRepository.GetProviderType(request.OrganisationId);
             int previousOrganisationTypeId = await _updateOrganisationRepository.GetOrganisationType(request.OrganisationId);
 
+            if (previousProviderTypeId == request.ProviderTypeId)
+            {
+                return await Task.FromResult(false);
+            }
+
             bool success = await _updateOrganisationRepository.UpdateProviderType(request.OrganisationId, request.ProviderTypeId,
                 request.OrganisationTypeId, request.UpdatedBy);
 

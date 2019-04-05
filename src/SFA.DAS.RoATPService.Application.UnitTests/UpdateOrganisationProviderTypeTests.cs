@@ -87,5 +87,35 @@
             _updateOrganisationRepository.VerifyAll();
             _auditLogRepository.VerifyAll();
         }
+
+        [Test]
+        public void Handler_does_not_update_audit_history_if_provider_type_not_changed()
+        {
+            _request = new UpdateOrganisationProviderTypeRequest
+            {
+                OrganisationId = Guid.NewGuid(),
+                OrganisationTypeId = 3,
+                ProviderTypeId = 1,
+                UpdatedBy = "test"
+            };
+
+            _updateOrganisationRepository.Setup(x => x.GetProviderType(It.IsAny<Guid>())).ReturnsAsync(1);
+            _updateOrganisationRepository.Setup(x => x.GetOrganisationType(It.IsAny<Guid>())).ReturnsAsync(3);
+
+            _updateOrganisationRepository.Setup(x =>
+                    x.UpdateProviderType(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
+                .ReturnsAsync(true).Verifiable();
+
+            _auditLogRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()))
+                .ReturnsAsync(true).Verifiable();
+
+            var result = _handler.Handle(_request, new CancellationToken()).Result;
+
+            result.Should().BeFalse();
+            _updateOrganisationRepository.Verify(x => x.UpdateProviderType(It.IsAny<Guid>(), It.IsAny<int>(),
+                It.IsAny<int>(), It.IsAny<string>()), Times.Never());
+            _auditLogRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
+        }
+
     }
 }
