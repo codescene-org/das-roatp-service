@@ -3,7 +3,7 @@ AS
 
 SET NOCOUNT ON
 
-  select ukprn AS UKPRN, 
+select ukprn AS UKPRN, 
  LegalName + 
 	 case isnull(tradingName,'') when '' then ''
 	 else ' T/A ' + tradingName
@@ -20,4 +20,5 @@ SET NOCOUNT ON
  CASE StatusId WHEN 2 THEN convert(varchar(10),StatusDate,103) ELSE NULL END AS 'Provider not currently starting new apprentices'
  from organisations o 
  left outer join providerTypes pt on o.ProviderTypeId = pt.Id
-  order by LegalName
+ where o.StatusId in (0,1,2) -- exclude on-boarding
+  order by COALESCE(o.UpdatedAt, o.CreatedAt) desc
