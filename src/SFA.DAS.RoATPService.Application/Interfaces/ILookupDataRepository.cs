@@ -8,7 +8,7 @@
     {
         Task<IEnumerable<ProviderType>> GetProviderTypes();
         Task<IEnumerable<OrganisationType>> GetOrganisationTypes(int providerTypeId);
-        Task<IEnumerable<OrganisationStatus>> GetOrganisationStatuses();
+        Task<IEnumerable<OrganisationStatus>> GetOrganisationStatuses(int? providerTypeId);
         Task<IEnumerable<RemovedReason>> GetRemovedReasons();
     }
 }

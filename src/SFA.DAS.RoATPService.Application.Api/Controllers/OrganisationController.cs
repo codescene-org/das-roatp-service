@@ -13,7 +13,8 @@
     using RoATPService.Api.Types.Models;
     using Swashbuckle.AspNetCore.SwaggerGen;
 
-    [Authorize(Roles = "RoATPServiceInternalAPI")]
+    //MFCMFC
+    //[Authorize(Roles = "RoATPServiceInternalAPI")]
     [Route("api/v1/[controller]")]
     public class OrganisationController : Controller
     {

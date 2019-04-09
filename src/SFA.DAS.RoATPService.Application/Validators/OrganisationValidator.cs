@@ -71,7 +71,7 @@
 
         public bool IsValidStatusId(int statusId)
         {
-            return (statusId >= 0 && statusId <= 2);
+            return (statusId >= 0 && statusId <= 3);
         }
 
         public bool IsValidCompanyNumber(string companyNumber)

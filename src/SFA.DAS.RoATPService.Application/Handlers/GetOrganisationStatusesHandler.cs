@@ -28,7 +28,7 @@
 
             try
             {
-                return await _repository.GetOrganisationStatuses();
+                return await _repository.GetOrganisationStatuses(request.ProviderTypeId);
             }
             catch (Exception ex)
             {

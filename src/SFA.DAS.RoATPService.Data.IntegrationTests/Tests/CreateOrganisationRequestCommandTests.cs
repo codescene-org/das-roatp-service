@@ -48,20 +48,18 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
             OrganisationTypeHandler.InsertRecord(_organisationTypeModel1);
         }
 
-        [TestCase(1,3,null)]
-        [TestCase(2, 3, null)]
-        [TestCase(3, 1, "today")]
-        public void Organisation_is_created_and_start_date_is_correct(int providerType, int statusId, string startDateDescriptor)
+        [TestCase(1,3,11112222, null)]
+        [TestCase(2, 3, 22221111, null)]
+        [TestCase(3, 1, 33332222,"today")]
+        public void Organisation_is_created_and_start_date_is_correct(int providerType, int statusId, int ukprn, string startDateDescriptor)
         {
-            const long organisationUkprn = 12344321;
-
             DateTime? startDate;
 
             startDate = !string.IsNullOrEmpty(startDateDescriptor) ? (DateTime?) DateTime.Today : null;
 
             var request = new CreateOrganisationRequest
             {
-                Ukprn = organisationUkprn,
+                Ukprn = ukprn,
                 OrganisationTypeId = _organisationTypeId1,
                 ProviderTypeId = providerType,
                 StatusDate = DateTime.Today.AddDays(5),
@@ -69,12 +67,11 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
                 Username = "Tester McTestface"
             };
 
-
             var command = new MapCreateOrganisationRequestToCommand().Map(request);
 
             var orgPlaceholder = _repository.CreateOrganisation(command).Result;
 
-            var organisationDetails = OrganisationHandler.GetOrganisationFromukprn(organisationUkprn);
+            var organisationDetails = OrganisationHandler.GetOrganisationFromukprn(ukprn);
             var organisationData = new OrganisationDataHandler().Parse(organisationDetails.OrganisationData);
             Assert.AreEqual(startDate,organisationData.StartDate);
             Assert.AreEqual(statusId, organisationDetails.StatusId);
