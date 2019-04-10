@@ -85,6 +85,5 @@ namespace SFA.DAS.RoATPService.Application.Api.Controllers
         {
             return Ok(await _mediator.Send(updateProviderTypeRequest));
         }
-
     }
 }
