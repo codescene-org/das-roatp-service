@@ -287,8 +287,22 @@
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();
 
-                var sql = "SELECT ProviderTypeId FROM [Organisations] WHERE Id = @organisationId";
+                const string sql = "SELECT ProviderTypeId FROM [Organisations] WHERE Id = @organisationId";
                 return await connection.ExecuteScalarAsync<int>(sql, new { organisationId });
+            }
+        }
+
+        public async Task<DateTime?> GetStartDate(Guid organisationId)
+        {
+            var connectionString = _configuration.SqlConnectionString;
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                const string sql = "SELECT Json_value(organisationData,'$.StartDate') FROM [Organisations] WHERE Id = @organisationId";
+                return await connection.ExecuteScalarAsync<DateTime?>(sql, new { organisationId });
             }
         }
 
@@ -301,7 +315,7 @@
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();
 
-                var sql = "SELECT OrganisationTypeId FROM [Organisations] WHERE Id = @organisationId";
+                const string sql = "SELECT OrganisationTypeId FROM [Organisations] WHERE Id = @organisationId";
                 return await connection.ExecuteScalarAsync<int>(sql, new { organisationId });
             }
         }
@@ -317,7 +331,7 @@
 
                 var updatedAt = DateTime.Now;
 
-                var sql = "update [Organisations] SET ProviderTypeId = @providerTypeId, " +
+                const string sql = "update [Organisations] SET ProviderTypeId = @providerTypeId, " +
                           "OrganisationTypeId = @organisationTypeId, " +
                           "UpdatedBy = @updatedBy, UpdatedAt = @updatedAt " +
                           "WHERE Id = @organisationId";

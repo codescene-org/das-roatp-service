@@ -1,4 +1,7 @@
-﻿namespace SFA.DAS.RoATPService.Application.Handlers
+﻿using System;
+using System.Globalization;
+
+namespace SFA.DAS.RoATPService.Application.Handlers
 {
     using System.Linq;
     using System.Threading;
@@ -37,42 +40,148 @@
 
             _logger.LogInformation($@"Handling Update '{FieldChanged}' for Organisation ID [{request.OrganisationId}]");
 
-            int previousProviderTypeId = await _updateOrganisationRepository.GetProviderType(request.OrganisationId);
-            int previousOrganisationTypeId = await _updateOrganisationRepository.GetOrganisationType(request.OrganisationId);
+            var previousProviderTypeId = await _updateOrganisationRepository.GetProviderType(request.OrganisationId);
 
             if (previousProviderTypeId == request.ProviderTypeId)
             {
                 return await Task.FromResult(false);
             }
 
-            bool success = await _updateOrganisationRepository.UpdateProviderType(request.OrganisationId, request.ProviderTypeId,
+            var previousOrganisationStatusId =
+                await _updateOrganisationRepository.GetStatus(request.OrganisationId);
+
+            var changeStatusToActiveAndSetStartDate = ChangeStatustoActiveAndSetStartDate(request.ProviderTypeId, previousProviderTypeId, previousOrganisationStatusId);
+            var changeStatusToOnboarding = ChangeStatusToOnboarding(request.ProviderTypeId, previousProviderTypeId, previousOrganisationStatusId);
+
+            int previousOrganisationTypeId = await _updateOrganisationRepository.GetOrganisationType(request.OrganisationId);
+
+            
+
+            var success = await _updateOrganisationRepository.UpdateProviderType(request.OrganisationId, request.ProviderTypeId,
                 request.OrganisationTypeId, request.UpdatedBy);
 
-            if (success)
+            if (!success) return await Task.FromResult(false);
+
+            var auditData = CreateAuditData(request.OrganisationId, request.UpdatedBy);
+
+            AddAuditEntry(
+                auditData, 
+                "Provider Type", 
+                GetProviderType(previousProviderTypeId).Result, 
+                GetProviderType(request.ProviderTypeId).Result
+            );
+
+            if (previousOrganisationTypeId != request.OrganisationTypeId)
             {
-                var auditData = CreateAuditData(request.OrganisationId, request.UpdatedBy);
-
                 AddAuditEntry(
-                    auditData, 
-                    "Provider Type", 
-                    GetProviderType(previousProviderTypeId).Result, 
-                    GetProviderType(request.ProviderTypeId).Result
-                    );
-
-                if (previousOrganisationTypeId != request.OrganisationTypeId)
+                    auditData,
+                    "Organisation Type",
+                    GetOrganisationType(previousOrganisationTypeId, previousProviderTypeId).Result,
+                    GetOrganisationType(request.OrganisationTypeId, request.ProviderTypeId).Result
+                );
+            }
+             
+            if (changeStatusToActiveAndSetStartDate)
+            {
+                var organisationStatusIdActive = 1;
+                if (previousOrganisationStatusId != organisationStatusIdActive)
                 {
+                    success = await _updateOrganisationRepository.UpdateStatus(request.OrganisationId,
+                        organisationStatusIdActive, request.UpdatedBy);
+
+                    if (!success) return await Task.FromResult(false);
+
+
                     AddAuditEntry(
                         auditData,
-                        "Organisation Type",
-                        GetOrganisationType(previousOrganisationTypeId, previousProviderTypeId).Result,
-                        GetOrganisationType(request.OrganisationTypeId, request.ProviderTypeId).Result
+                        "Organisation Status",
+                        GetOrganisationStatus(previousOrganisationStatusId).Result,
+                        GetOrganisationStatus(organisationStatusIdActive).Result
                     );
                 }
-                
-                return await _auditLogRepository.WriteFieldChangesToAuditLog(auditData);
+
+                var previousStartDate = await _updateOrganisationRepository.GetStartDate(request.OrganisationId);
+
+                if (previousStartDate == null || previousStartDate.Value.Date != DateTime.Today.Date)
+                {
+                    success = await _updateOrganisationRepository.UpdateStartDate(request.OrganisationId,
+                        DateTime.Today);
+
+                    if (!success) return await Task.FromResult(false);
+
+                    AddAuditEntry(
+                        auditData,
+                        "Start Date",
+                        previousStartDate?.ToString(),
+                        DateTime.Today.ToString(CultureInfo.InvariantCulture)
+                    );
+                }
             }
 
+            if (changeStatusToOnboarding)
+            {
+                var organisationStatusIdActiveOnboarding = 3;
+                if (IsOrganisationStatusActive(previousOrganisationStatusId))
+                {
+                    success = await _updateOrganisationRepository.UpdateStatus(request.OrganisationId,
+                        organisationStatusIdActiveOnboarding, request.UpdatedBy);
+
+                    if (!success) return await Task.FromResult(false);
+
+                    AddAuditEntry(
+                        auditData,
+                        "Organisation Status",
+                        GetOrganisationStatus(previousOrganisationStatusId).Result,
+                        GetOrganisationStatus(organisationStatusIdActiveOnboarding).Result
+                    );
+                }
+            }
+            success = await _auditLogRepository.WriteFieldChangesToAuditLog(auditData);
+
+
             return await Task.FromResult(success);
+        }
+
+        private bool ChangeStatusToOnboarding(int newProviderTypeId, int previousProviderTypeId, int previousOrganisationStatusId)
+        {
+            var providerTypeIdMain = 1;
+            var providerTypeIdEmployer = 2;
+            var providerTypeIdSupporting = 3;
+
+            var isActive = IsOrganisationStatusActive(previousOrganisationStatusId);
+
+            if (isActive && previousProviderTypeId == providerTypeIdSupporting 
+                && (newProviderTypeId == providerTypeIdMain || newProviderTypeId == providerTypeIdEmployer))
+                return true;
+
+            return false;
+        }
+
+        private static bool IsOrganisationStatusActive(int previousOrganisationStatusId)
+        {
+            const int organisationStatusIdActive = 1;
+            const int organisationStatusIdActiveButnoTakingOnApprentices = 2;
+
+            return (previousOrganisationStatusId == organisationStatusIdActive 
+                    || previousOrganisationStatusId == organisationStatusIdActiveButnoTakingOnApprentices);
+        }
+
+        private bool ChangeStatustoActiveAndSetStartDate(int newProviderTypeId, int previousProviderTypeId, int previousOrganisationStatusId)
+        {
+            var organisationStatusIdOnboarding = 3;
+
+            var providerTypeIdMain = 1;
+            var providerTypeIdEmployer = 2;
+            var providerTypeIdSupporting = 3;
+
+            var isOnboarding = (previousOrganisationStatusId == organisationStatusIdOnboarding);
+            
+            if (isOnboarding && 
+                (previousProviderTypeId == providerTypeIdMain || previousProviderTypeId == providerTypeIdEmployer) &&
+                newProviderTypeId == providerTypeIdSupporting)
+                return true;
+
+            return false;
         }
 
         private void ValidateUpdateProviderTypeRequest(UpdateOrganisationProviderTypeRequest request)
@@ -113,6 +222,19 @@
             if (organisationType != null)
             {
                 return organisationType.Type;
+            }
+
+            return string.Empty;
+        }
+
+        private async Task<string> GetOrganisationStatus(int organisationStatusId)
+        {
+            var organisationStatuses = await _lookupDataRepository.GetOrganisationStatuses(null);
+
+            var organisationType = organisationStatuses.FirstOrDefault(x => x.Id == organisationStatusId);
+            if (organisationType != null)
+            {
+                return organisationType.Status;
             }
 
             return string.Empty;

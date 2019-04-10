@@ -19,6 +19,8 @@
         Task<RemovedReason> GetRemovedReason(Guid organisationId);
         Task<RemovedReason> UpdateStatusWithRemovedReason(Guid organisationId, int organisationStatusId, int removedReasonId, string updatedBy);
         Task<bool> UpdateStartDate(Guid organisationId, DateTime startDate);
+        Task<DateTime?> GetStartDate(Guid organisationId);
+
         Task<int> GetProviderType(Guid organisationId);
         Task<int> GetOrganisationType(Guid organisationId);
         Task<bool> UpdateProviderType(Guid organisationId, int providerTypeId, int organisationTypeId, string updatedBy);
