@@ -320,7 +320,7 @@
             }
         }
 
-        public async Task<bool> UpdateProviderType(Guid organisationId, int providerTypeId, int organisationTypeId, string updatedBy)
+        public async Task<bool> UpdateProviderTypeAndOrganisationType(Guid organisationId, int providerTypeId, int organisationTypeId, string updatedBy)
         {
             var connectionString = _configuration.SqlConnectionString;
 

@@ -16,11 +16,11 @@ namespace SFA.DAS.RoATPService.Application.Handlers
 
     public class UpdateOrganisationProviderTypeHandler : UpdateOrganisationHandlerBase, IRequestHandler<UpdateOrganisationProviderTypeRequest, bool>
     {
-        private ILogger<UpdateOrganisationProviderTypeHandler> _logger;
-        private IOrganisationValidator _validator;
-        private IUpdateOrganisationRepository _updateOrganisationRepository;
-        private IAuditLogRepository _auditLogRepository;
-        private ILookupDataRepository _lookupDataRepository;
+        private readonly ILogger<UpdateOrganisationProviderTypeHandler> _logger;
+        private readonly IOrganisationValidator _validator;
+        private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
+        private readonly IAuditLogRepository _auditLogRepository;
+        private readonly ILookupDataRepository _lookupDataRepository;
 
         private const string FieldChanged = "Provider Type";
 
@@ -48,12 +48,18 @@ namespace SFA.DAS.RoATPService.Application.Handlers
             {
                 return await Task.FromResult(false);
             }
-            var auditData = CreateAuditData(request.OrganisationId, request.UpdatedBy);
-            var success = await UpdateAndAuditProviderType(request, auditData, previousProviderTypeId);
+               var success = await _updateOrganisationRepository.UpdateProviderTypeAndOrganisationType(request.OrganisationId, request.ProviderTypeId, request.OrganisationTypeId, request.UpdatedBy);
             if (!success) return await Task.FromResult(false);
 
-            await UpdateAndAuditOrganisationType(request, auditData, previousProviderTypeId);
-   
+            var auditData = CreateAuditData(request.OrganisationId, request.UpdatedBy);
+
+            auditData.FieldChanges.Add(AuditProviderType(request.ProviderTypeId, previousProviderTypeId));
+            var previousOrganisationTypeId = await _updateOrganisationRepository.GetOrganisationType(request.OrganisationId);
+
+            var auditLog = AuditOrganisationType(request.OrganisationTypeId, previousOrganisationTypeId, request.ProviderTypeId, previousProviderTypeId);
+            if (auditLog.IsValid)
+                auditData.FieldChanges.Add(auditLog);
+
             success = await ProcessOrganisationsDetailsAndUpdateAuditStatusAndStartDate(request.OrganisationId, request.UpdatedBy, request.ProviderTypeId, 
                                                                             previousProviderTypeId, previousOrganisationStatusId, previousStartDate, auditData);
             if (!success) return await Task.FromResult(false);
@@ -132,26 +138,36 @@ namespace SFA.DAS.RoATPService.Application.Handlers
             return true;
         }
 
-        private async Task<bool> UpdateAndAuditProviderType(UpdateOrganisationProviderTypeRequest request, AuditData auditData, int previousProviderTypeId)
-        {
-            var success =  await _updateOrganisationRepository.UpdateProviderType(request.OrganisationId, request.ProviderTypeId,request.OrganisationTypeId, request.UpdatedBy);
-            if (!success) return false;
-            AddAuditEntry(auditData, "Provider Type", GetProviderType(previousProviderTypeId).Result,
-                GetProviderType(request.ProviderTypeId).Result);
-            return true;
+        private AuditLogEntry AuditProviderType(int providerTypeId, int previousProviderTypeId)
+        {;
+            var entry = new AuditLogEntry
+            {
+                FieldChanged = "Provider Type",
+                PreviousValue = GetProviderType(previousProviderTypeId).Result,
+                NewValue = GetProviderType(providerTypeId).Result
+            };
+
+            return entry;
         }
 
-        private async Task UpdateAndAuditOrganisationType(UpdateOrganisationProviderTypeRequest request, AuditData auditData,
-            int previousProviderTypeId)
+
+        private AuditLogEntry AuditOrganisationType(int organisationTypeId, int previousOrganisationTypeId, int providerTypeId, int previousProviderTypeId)
         {
-            var previousOrganisationTypeId = await _updateOrganisationRepository.GetOrganisationType(request.OrganisationId);
-            if (previousOrganisationTypeId != request.OrganisationTypeId)
+            var entry = new AuditLogEntry();
+
+            if (previousOrganisationTypeId != organisationTypeId)
             {
-                AddAuditEntry(auditData, "Organisation Type",
-                    GetOrganisationType(previousOrganisationTypeId, previousProviderTypeId).Result,
-                    GetOrganisationType(request.OrganisationTypeId, request.ProviderTypeId).Result);
+                entry = new AuditLogEntry
+                {
+                    FieldChanged = "Organisation Type",
+                    PreviousValue = GetOrganisationType(previousOrganisationTypeId, previousProviderTypeId).Result,
+                    NewValue = GetOrganisationType(organisationTypeId, providerTypeId).Result
+                };
             }
+
+            return entry;
         }
+
 
         private bool ChangeStatusToOnboarding(int newProviderTypeId, int previousProviderTypeId, int previousOrganisationStatusId)
         {
