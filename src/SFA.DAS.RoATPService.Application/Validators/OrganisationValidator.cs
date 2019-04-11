@@ -1,5 +1,8 @@
-﻿namespace SFA.DAS.RoATPService.Application.Validators
+﻿using SFA.DAS.RoATPService.Application.Interfaces;
+
+namespace SFA.DAS.RoATPService.Application.Validators
 {
+    using SFA.DAS.RoATPService.Api.Types.Models;
     using SFA.DAS.RoATPService.Domain;
     using System;
     using System.Linq;
@@ -11,11 +14,11 @@
     {
         private const string CompaniesHouseNumberRegex = "[A-Za-z0-9]{2}[0-9]{6}";
         private const string CharityNumberInvalidCharactersRegex = "[^a-zA-Z0-9\\-]";
-
-        private ILookupDataRepository _lookupDataRepository;
-
-        public OrganisationValidator(ILookupDataRepository lookupDataRepository)
+        private readonly IDuplicateCheckRepository _duplicateCheckRepository;
+        private readonly ILookupDataRepository _lookupDataRepository;
+        public OrganisationValidator(IDuplicateCheckRepository duplicateCheckRepository, ILookupDataRepository lookupDataRepository)
         {
+            _duplicateCheckRepository = duplicateCheckRepository;
             _lookupDataRepository = lookupDataRepository;
         }
 
@@ -147,6 +150,17 @@
             var organisationType = organisationTypes.FirstOrDefault(x => x.Id == organisationTypeId);
 
             return (organisationType != null);
+        }
+
+        public string DuplicateUkprnInAnotherOrganisation(long ukprn, Guid organisationId)
+        {
+            var response = _duplicateCheckRepository.DuplicateUKPRNExists(organisationId, ukprn).Result;
+            return response.DuplicateOrganisationName;
+        }
+
+        DuplicateCheckResponse IOrganisationValidator.DuplicateUkprnInAnotherOrganisation(long ukprn, Guid organisationId)
+        {
+            return _duplicateCheckRepository.DuplicateUKPRNExists(organisationId, ukprn).Result;
         }
     }
 }

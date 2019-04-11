@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.RoATPService.Application.Validators
+﻿using SFA.DAS.RoATPService.Api.Types.Models;
+
+namespace SFA.DAS.RoATPService.Application.Validators
 {
     using SFA.DAS.RoATPService.Domain;
     using System;
@@ -20,5 +22,7 @@
         bool IsValidOrganisationType(OrganisationType organisationType);
         bool IsValidOrganisationTypeId(int organisationTypeId);
         Task<bool> IsValidOrganisationTypeIdForProvider(int organisationTypeId, int providerTypeId);
+        DuplicateCheckResponse DuplicateUkprnInAnotherOrganisation(long ukprn, Guid organisationId);
+
     }
 }

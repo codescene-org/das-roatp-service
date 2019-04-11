@@ -24,6 +24,7 @@
         private Mock<IUpdateOrganisationRepository> _repository;
         private Mock<IAuditLogRepository> _auditLogRepository;
         private Mock<IOrganisationStatusRepository> _orgStatusRepository;
+        private Mock<IDuplicateCheckRepository> _duplicateRepository;
 
         [SetUp]
         public void Before_each_test()
@@ -35,12 +36,15 @@
                 UpdatedBy = "unit test",
                 RemovedReasonId = null
             };
+            _duplicateRepository = new Mock<IDuplicateCheckRepository>();
             _logger = new Mock<ILogger<UpdateOrganisationStatusHandler>>();
+
             _validator = new Mock<IOrganisationValidator>();
             _validator.Setup(x => x.IsValidProviderTypeId(It.IsAny<int>())).Returns(true);
             _validator.Setup(x => x.IsValidOrganisationTypeIdForProvider(It.IsAny<int>(), It.IsAny<int>()))
                 .ReturnsAsync(true);
             _validator.Setup(x => x.IsValidStatusId(It.IsAny<int>())).Returns(true);
+
             _repository = new Mock<IUpdateOrganisationRepository>();
             _auditLogRepository = new Mock<IAuditLogRepository>();
             _orgStatusRepository = new Mock<IOrganisationStatusRepository>();

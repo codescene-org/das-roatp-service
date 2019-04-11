@@ -1,7 +1,7 @@
 ﻿CREATE PROCEDURE dbo.RoATP_Complete_Register
 AS
 BEGIN
-	SELECT 
+SELECT 
 	pt.ProviderType AS [Provider type],
 	o.UKPRN,
 	o.LegalName AS [Legal name],
@@ -18,8 +18,12 @@ BEGIN
 	ELSE 'No'
 	END AS [Financial track record],
 	os.[Status],
-	o.StatusDate AS [Status date time],
-	JSON_VALUE(o.OrganisationData, '$.RemovedReason.Reason') AS [Reason]
+	SUBSTRING(CONVERT(VARCHAR, o.StatusDate, 103), 0, 11) AS [Status date],
+	JSON_VALUE(o.OrganisationData, '$.RemovedReason.Reason') AS [Reason],
+	SUBSTRING(JSON_VALUE(OrganisationData, '$.StartDate'), 9, 2) + '/' 
+	+ SUBSTRING(JSON_VALUE(OrganisationData, '$.StartDate'), 6, 2) + '/'
+	+ SUBSTRING(JSON_VALUE(OrganisationData, '$.StartDate'), 0, 5)
+	AS [Date joined]
 	FROM Organisations o
 	INNER JOIN ProviderTypes pt
 	ON pt.Id = o.ProviderTypeId
