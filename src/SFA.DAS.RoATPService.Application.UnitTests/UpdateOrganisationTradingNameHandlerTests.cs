@@ -1,20 +1,18 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using FluentAssertions;
-using Microsoft.Extensions.Logging;
-using Moq;
-using NUnit.Framework;
-using SFA.DAS.RoATPService.Api.Types.Models.UpdateOrganisation;
-using SFA.DAS.RoATPService.Application.Exceptions;
-using SFA.DAS.RoATPService.Application.Handlers;
-using SFA.DAS.RoATPService.Application.Interfaces;
-using SFA.DAS.RoATPService.Application.Validators;
-using SFA.DAS.RoATPService.Domain;
-
-namespace SFA.DAS.RoATPService.Application.UnitTests
+﻿namespace SFA.DAS.RoATPService.Application.UnitTests
 {
-
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using FluentAssertions;
+    using Microsoft.Extensions.Logging;
+    using Moq;
+    using NUnit.Framework;
+    using SFA.DAS.RoATPService.Api.Types.Models.UpdateOrganisation;
+    using SFA.DAS.RoATPService.Application.Exceptions;
+    using SFA.DAS.RoATPService.Application.Handlers;
+    using SFA.DAS.RoATPService.Application.Interfaces;
+    using SFA.DAS.RoATPService.Application.Validators;
+    using SFA.DAS.RoATPService.Domain;
 
     [TestFixture]
     public class UpdateOrganisationTradingNameHandlerTests
@@ -70,6 +68,30 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
                 OrganisationId = Guid.NewGuid(),
                 UpdatedBy = "unit test"
             };
+            
+            var result = _handler.Handle(request, new CancellationToken()).GetAwaiter().GetResult();
+            result.Should().BeFalse();
+
+            _repository.Verify(x => x.GetTradingName(It.IsAny<Guid>()), Times.Once);
+            _repository.Verify(x => x.UpdateTradingName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            _auditRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
+        }
+
+        [TestCase("", null)]
+        [TestCase("", " ")]
+        [TestCase(null, null)]
+        [TestCase(null, "")]
+        [TestCase(" ", null)]
+        public void Handler_does_not_update_database_if_both_existing_and_new_trading_names_are_whitespace(string existingTradingName, string updateTradingName)
+        {
+            var request = new UpdateOrganisationTradingNameRequest
+            {
+                TradingName = updateTradingName,
+                OrganisationId = Guid.NewGuid(),
+                UpdatedBy = "unit test"
+            };
+            
+            _repository.Setup(x => x.GetTradingName(It.IsAny<Guid>())).ReturnsAsync(existingTradingName).Verifiable();
 
             var result = _handler.Handle(request, new CancellationToken()).GetAwaiter().GetResult();
             result.Should().BeFalse();
