@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using SFA.DAS.RoATPService.Application.Services;
 using SFA.DAS.RoATPService.Domain;
 
 namespace SFA.DAS.RoATPService.Application.Handlers
@@ -21,18 +22,21 @@ namespace SFA.DAS.RoATPService.Application.Handlers
         private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
         private readonly IAuditLogRepository _auditLogRepository;
         private readonly ILookupDataRepository _lookupDataRepository;
+        private readonly IOrganisationStatusManager _organisationStatusManager;
 
         private const string FieldChanged = "Provider Type";
 
         public UpdateOrganisationProviderTypeHandler(ILogger<UpdateOrganisationProviderTypeHandler> logger,
             IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository,
-            IAuditLogRepository auditLogRepository, ILookupDataRepository lookupDataRepository)
+            IAuditLogRepository auditLogRepository, ILookupDataRepository lookupDataRepository, 
+            IOrganisationStatusManager organisationStatusManager)
         {
             _logger = logger;
             _validator = validator;
             _updateOrganisationRepository = updateOrganisationRepository;
             _auditLogRepository = auditLogRepository;
             _lookupDataRepository = lookupDataRepository;
+            _organisationStatusManager = organisationStatusManager;
         }
 
         public async Task<bool> Handle(UpdateOrganisationProviderTypeRequest request, CancellationToken cancellationToken)
@@ -71,18 +75,16 @@ namespace SFA.DAS.RoATPService.Application.Handlers
         private async Task<bool> ProcessOrganisationsDetailsAndUpdateAuditStatusAndStartDate(Guid organisationId, string updatedBy, int providerTypeId, int previousProviderTypeId, 
             int previousOrganisationStatusId, DateTime? previousStartDate, AuditData auditData)
         {
-            var changeStatusToActiveAndSetStartDate = ChangeStatustoActiveAndSetStartDate(providerTypeId,
-                previousProviderTypeId, previousOrganisationStatusId);
+            var changeStatusToActiveAndSetStartDate = 
+                _organisationStatusManager.ShouldChangeStatustoActiveAndSetStartDateToToday(providerTypeId, previousProviderTypeId, previousOrganisationStatusId);
 
-            bool success;
+          
             if (changeStatusToActiveAndSetStartDate)
             {
-                const int organisationStatusIdActive = 1;
-
-                if (previousOrganisationStatusId != organisationStatusIdActive)
+                if (previousOrganisationStatusId != OrganisationStatus.Active)
                 {
-                    success = await _updateOrganisationRepository.UpdateStatus(organisationId,
-                        organisationStatusIdActive, updatedBy);
+                    var success = await _updateOrganisationRepository.UpdateStatus(organisationId,
+                        OrganisationStatus.Active, updatedBy);
 
                     if (!success)
                     {
@@ -93,18 +95,15 @@ namespace SFA.DAS.RoATPService.Application.Handlers
                         auditData,
                         "Organisation Status",
                         GetOrganisationStatus(previousOrganisationStatusId).Result,
-                        GetOrganisationStatus(organisationStatusIdActive).Result
+                        GetOrganisationStatus(OrganisationStatus.Active).Result
                     );
                 }
            
                 if (previousStartDate == null || previousStartDate.Value.Date != DateTime.Today.Date)
                 {
-                    success = await _updateOrganisationRepository.UpdateStartDate(organisationId, DateTime.Today);
+                    var success = await _updateOrganisationRepository.UpdateStartDate(organisationId, DateTime.Today);
 
-                    if (!success)
-                    {
-                        return false;
-                    }
+                    if (!success) { return false;}
 
                     AddAuditEntry(
                         auditData,
@@ -115,15 +114,12 @@ namespace SFA.DAS.RoATPService.Application.Handlers
                 }
             }
 
-            var changeStatusToOnboarding = ChangeStatusToOnboarding(providerTypeId, previousProviderTypeId, previousOrganisationStatusId);
+            var changeStatusToOnboarding =  _organisationStatusManager.ShouldChangeStatusToOnboarding(providerTypeId, previousProviderTypeId, previousOrganisationStatusId);
 
-            if (changeStatusToOnboarding)
-            {
-                var organisationStatusIdActiveOnboarding = 3;
-                if (IsOrganisationStatusActive(previousOrganisationStatusId))
+            if (changeStatusToOnboarding && _organisationStatusManager.IsOrganisationStatusActive(previousOrganisationStatusId))
                 {
-                    success = await _updateOrganisationRepository.UpdateStatus(organisationId,
-                        organisationStatusIdActiveOnboarding, updatedBy);
+                    var success = await _updateOrganisationRepository.UpdateStatus(organisationId,
+                        OrganisationStatus.Onboarding, updatedBy);
 
                     if (!success) return await Task.FromResult(false);
 
@@ -131,10 +127,10 @@ namespace SFA.DAS.RoATPService.Application.Handlers
                         auditData,
                         "Organisation Status",
                         GetOrganisationStatus(previousOrganisationStatusId).Result,
-                        GetOrganisationStatus(organisationStatusIdActiveOnboarding).Result
+                        GetOrganisationStatus(OrganisationStatus.Onboarding).Result
                     );
                 }
-            }
+            
             return true;
         }
 
@@ -164,65 +160,21 @@ namespace SFA.DAS.RoATPService.Application.Handlers
                     NewValue = GetOrganisationType(organisationTypeId, providerTypeId).Result
                 };
             }
-
             return entry;
-        }
-
-
-        private bool ChangeStatusToOnboarding(int newProviderTypeId, int previousProviderTypeId, int previousOrganisationStatusId)
-        {
-            var providerTypeIdMain = 1;
-            var providerTypeIdEmployer = 2;
-            var providerTypeIdSupporting = 3;
-
-            var isActive = IsOrganisationStatusActive(previousOrganisationStatusId);
-
-            if (isActive && previousProviderTypeId == providerTypeIdSupporting 
-                && (newProviderTypeId == providerTypeIdMain || newProviderTypeId == providerTypeIdEmployer))
-                return true;
-
-            return false;
-        }
-
-        private static bool IsOrganisationStatusActive(int previousOrganisationStatusId)
-        {
-            const int organisationStatusIdActive = 1;
-            const int organisationStatusIdActiveButnoTakingOnApprentices = 2;
-
-            return (previousOrganisationStatusId == organisationStatusIdActive 
-                    || previousOrganisationStatusId == organisationStatusIdActiveButnoTakingOnApprentices);
-        }
-
-        private bool ChangeStatustoActiveAndSetStartDate(int newProviderTypeId, int previousProviderTypeId, int previousOrganisationStatusId)
-        {
-            var organisationStatusIdOnboarding = 3;
-
-            var providerTypeIdMain = 1;
-            var providerTypeIdEmployer = 2;
-            var providerTypeIdSupporting = 3;
-
-            var isOnboarding = (previousOrganisationStatusId == organisationStatusIdOnboarding);
-            
-            if (isOnboarding && 
-                (previousProviderTypeId == providerTypeIdMain || previousProviderTypeId == providerTypeIdEmployer) &&
-                newProviderTypeId == providerTypeIdSupporting)
-                return true;
-
-            return false;
         }
 
         private void ValidateUpdateProviderTypeRequest(UpdateOrganisationProviderTypeRequest request)
         {
             if (!_validator.IsValidProviderTypeId(request.ProviderTypeId))
             {
-                string invalidProviderTypeError = $@"Invalid Organisation Provider Type Id '{request.ProviderTypeId}'";
+                var invalidProviderTypeError = $@"Invalid Organisation Provider Type Id '{request.ProviderTypeId}'";
                 _logger.LogInformation(invalidProviderTypeError);
                 throw new BadRequestException(invalidProviderTypeError);
             }
 
             if (!_validator.IsValidOrganisationTypeIdForProvider(request.OrganisationTypeId, request.ProviderTypeId).Result)
             {
-                string invalidOrganisationTypeId = $@"Invalid Organisation Type Id '{request.OrganisationTypeId}'";
+                var invalidOrganisationTypeId = $@"Invalid Organisation Type Id '{request.OrganisationTypeId}'";
                 _logger.LogInformation(invalidOrganisationTypeId);
                 throw new BadRequestException(invalidOrganisationTypeId);
             }
