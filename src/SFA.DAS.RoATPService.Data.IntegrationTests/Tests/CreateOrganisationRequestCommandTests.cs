@@ -55,13 +55,11 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
         {
             const long organisationUkprn = 12344321;
 
-            DateTime? startDate;
-
-            startDate = !string.IsNullOrEmpty(startDateDescriptor) ? (DateTime?) DateTime.Today : null;
+            var startDate = !string.IsNullOrEmpty(startDateDescriptor) ? (DateTime?) DateTime.Today : null;
 
             var request = new CreateOrganisationRequest
             {
-                Ukprn = organisationUkprn,
+                Ukprn = organisationUkprn + providerType,
                 OrganisationTypeId = _organisationTypeId1,
                 ProviderTypeId = providerType,
                 StatusDate = DateTime.Today.AddDays(5),
@@ -74,7 +72,7 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
 
             var orgPlaceholder = _repository.CreateOrganisation(command).Result;
 
-            var organisationDetails = OrganisationHandler.GetOrganisationFromukprn(organisationUkprn);
+            var organisationDetails = OrganisationHandler.GetOrganisationFromukprn(organisationUkprn + providerType);
             var organisationData = new OrganisationDataHandler().Parse(organisationDetails.OrganisationData);
             Assert.AreEqual(startDate,organisationData.StartDate);
             Assert.AreEqual(statusId, organisationDetails.StatusId);
