@@ -5,7 +5,10 @@ namespace SFA.DAS.RoATPService.Application.Validators
     using SFA.DAS.RoATPService.Api.Types.Models;
     using SFA.DAS.RoATPService.Domain;
     using System;
+    using System.Linq;
     using System.Text.RegularExpressions;
+    using Interfaces;
+    using System.Threading.Tasks;
 
     public class OrganisationValidator : IOrganisationValidator
     {
@@ -18,6 +21,13 @@ namespace SFA.DAS.RoATPService.Application.Validators
             _duplicateCheckRepository = duplicateCheckRepository;
         }
 
+
+        private ILookupDataRepository _lookupDataRepository;
+
+        public OrganisationValidator(ILookupDataRepository lookupDataRepository)
+        {
+            _lookupDataRepository = lookupDataRepository;
+        }
 
         public bool IsValidOrganisationId(Guid organisationId)
         {
@@ -36,7 +46,12 @@ namespace SFA.DAS.RoATPService.Application.Validators
                 return false;
             }
 
-            return (providerType.Id >= 1 && providerType.Id <= 3);
+            return IsValidProviderTypeId(providerType.Id);
+        }
+
+        public bool IsValidProviderTypeId(int providerTypeId)
+        {
+            return (providerTypeId >= 1 && providerTypeId <= 3);
         }
 
         public bool IsValidUKPRN(long ukPrn)
@@ -127,7 +142,21 @@ namespace SFA.DAS.RoATPService.Application.Validators
 
         public bool IsValidOrganisationTypeId(int organisationTypeId)
         {
-            return organisationTypeId >= 0 && organisationTypeId <= 6;
+            return organisationTypeId >= 0 && organisationTypeId <= 20;
+        }
+
+        public async Task<bool> IsValidOrganisationTypeIdForProvider(int organisationTypeId, int providerTypeId)
+        {
+            if (!IsValidOrganisationTypeId(organisationTypeId))
+            {
+                return false;
+            }
+
+            var organisationTypes = await _lookupDataRepository.GetOrganisationTypes(providerTypeId);
+
+            var organisationType = organisationTypes.FirstOrDefault(x => x.Id == organisationTypeId);
+
+            return (organisationType != null);
         }
 
         public string DuplicateUkprnInAnotherOrganisation(long ukprn, Guid organisationId)

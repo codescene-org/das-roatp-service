@@ -42,15 +42,16 @@ namespace SFA.DAS.RoATPService.Application.Handlers
                 throw new BadRequestException(invalidLegalNameError);
             }
 
-            _logger.LogInformation($@"Handling Update '{FieldChanged}' for Organisation ID [{request.OrganisationId}]");
-
             string previousTradingName = await _updateOrganisationRepository.GetTradingName(request.OrganisationId);
 
-            if (previousTradingName == request.TradingName)
+            if ((String.IsNullOrWhiteSpace(previousTradingName) && String.IsNullOrWhiteSpace(request.TradingName)) ||
+                (previousTradingName == request.TradingName))
             {
                 return await Task.FromResult(false);
             }
 
+            _logger.LogInformation($@"Handling Update '{FieldChanged}' for Organisation ID [{request.OrganisationId}]");
+            
             var success = await _updateOrganisationRepository.UpdateTradingName(request.OrganisationId, request.TradingName, request.UpdatedBy);
 
             if (!success)
