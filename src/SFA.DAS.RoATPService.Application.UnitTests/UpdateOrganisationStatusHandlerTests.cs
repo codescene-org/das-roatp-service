@@ -24,6 +24,7 @@
         private Mock<IUpdateOrganisationRepository> _repository;
         private Mock<IAuditLogRepository> _auditLogRepository;
         private Mock<IOrganisationStatusRepository> _orgStatusRepository;
+        private Mock<IDuplicateCheckRepository> _duplicateRepository;
 
         [SetUp]
         public void Before_each_test()
@@ -35,8 +36,9 @@
                 UpdatedBy = "unit test",
                 RemovedReasonId = null
             };
+            _duplicateRepository = new Mock<IDuplicateCheckRepository>();
             _logger = new Mock<ILogger<UpdateOrganisationStatusHandler>>();
-            _validator = new Mock<OrganisationValidator>();
+            _validator = new Mock<OrganisationValidator>(_duplicateRepository.Object);
             _repository = new Mock<IUpdateOrganisationRepository>();
             _auditLogRepository = new Mock<IAuditLogRepository>();
             _orgStatusRepository = new Mock<IOrganisationStatusRepository>();
