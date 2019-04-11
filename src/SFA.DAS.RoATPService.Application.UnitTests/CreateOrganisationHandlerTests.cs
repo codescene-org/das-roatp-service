@@ -24,6 +24,8 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         private Mock<ILogger<CreateOrganisationHandler>> _logger;
         private Mock<ILookupDataRepository> _lookupDataRepository;
         private Mock<IOrganisationValidator> _validator;
+        private Mock<IDuplicateCheckRepository> _duplicateCheckRepository;
+
         private Guid _organisationId;
 
         [SetUp]
@@ -33,7 +35,11 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _repository = new Mock<IOrganisationRepository>();
             _repository.Setup(x => x.CreateOrganisation(It.IsAny<CreateOrganisationCommand>()))
                 .ReturnsAsync(_organisationId);
+            _duplicateCheckRepository = new Mock<IDuplicateCheckRepository>();
+            _duplicateCheckRepository.Setup(x => x.DuplicateUKPRNExists(It.IsAny<Guid>(), It.IsAny<long>()))
+                .ReturnsAsync(new DuplicateCheckResponse {DuplicateOrganisationName = "",DuplicateFound = false});
             _logger = new Mock<ILogger<CreateOrganisationHandler>>();
+
             _lookupDataRepository = new Mock<ILookupDataRepository>();
             _validator = new Mock<IOrganisationValidator>();
             _validator.Setup(x => x.IsValidOrganisationTypeId(It.IsAny<int>())).Returns(true);
@@ -46,7 +52,9 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _validator.Setup(x => x.IsValidUKPRN(It.IsAny<long>())).Returns(true);
             _validator.Setup(x => x.IsValidCompanyNumber(It.IsAny<string>())).Returns(true);
             _validator.Setup(x => x.IsValidCharityNumber(It.IsAny<string>())).Returns(true);
-            _handler = new CreateOrganisationHandler(_repository.Object, _logger.Object, _validator.Object, new ProviderTypeValidator());
+
+            _handler = new CreateOrganisationHandler(_repository.Object, _logger.Object, new OrganisationValidator(_duplicateCheckRepository.Object), new ProviderTypeValidator());
+
             _request = new CreateOrganisationRequest
             {                                                                       
                 LegalName = "Legal Name",
@@ -151,6 +159,17 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         {
             _validator.Setup(x => x.IsValidUKPRN(It.IsAny<long>())).Returns(false);
             _request.Ukprn = ukprn;
+
+            Func<Task> result = async () => await
+                _handler.Handle(_request, new CancellationToken());
+            result.Should().Throw<BadRequestException>();
+        }
+
+        [Test]
+        public void Create_organisation_rejects_duplicate_UKPRN()
+        {
+            _duplicateCheckRepository.Setup(x => x.DuplicateUKPRNExists(It.IsAny<Guid>(), It.IsAny<long>()))
+                .ReturnsAsync(new DuplicateCheckResponse {DuplicateOrganisationName = "name", DuplicateFound = true});
 
             Func<Task> result = async () => await
                 _handler.Handle(_request, new CancellationToken());

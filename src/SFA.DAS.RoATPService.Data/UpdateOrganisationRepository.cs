@@ -291,6 +291,23 @@
                 return await connection.ExecuteScalarAsync<int>(sql, new { organisationId });
             }
         }
+		
+		
+        public async Task<bool> UpdateUkprn(Guid organisationId, long ukprn, string updatedBy) 
+		{
+			var connectionString = _configuration.SqlConnectionString;
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+				var updatedAt = DateTime.Now;
+
+                var sql = "update [Organisations] SET UKPRN = @ukprn, UpdatedBy = @updatedBy, UpdatedAt = @updatedAt " +
+                          "WHERE Id = @organisationId";
+                int recordsAffected = await connection.ExecuteAsync(sql, new { ukprn, updatedBy, updatedAt, organisationId });
+
+                return await Task.FromResult(recordsAffected > 0);
+			}
+		}
 
         public async Task<int> GetOrganisationType(Guid organisationId)
         {
@@ -307,7 +324,7 @@
         }
 
         public async Task<bool> UpdateProviderType(Guid organisationId, int providerTypeId, int organisationTypeId, string updatedBy)
-        {
+		{
             var connectionString = _configuration.SqlConnectionString;
 
             using (var connection = new SqlConnection(connectionString))
@@ -315,15 +332,33 @@
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();
 
+
                 var updatedAt = DateTime.Now;
 
                 var sql = "update [Organisations] SET ProviderTypeId = @providerTypeId, " +
                           "OrganisationTypeId = @organisationTypeId, " +
                           "UpdatedBy = @updatedBy, UpdatedAt = @updatedAt " +
                           "WHERE Id = @organisationId";
+						  
                 int recordsAffected = await connection.ExecuteAsync(sql, new { providerTypeId, organisationTypeId, updatedBy, updatedAt, organisationId });
 
                 return await Task.FromResult(recordsAffected > 0);
+            }
+        }
+
+        public async Task<long> GetUkprn(Guid organisationId)
+        {
+            var connectionString = _configuration.SqlConnectionString;
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+                
+                var sql = "select ukprn FROM [Organisations] " +
+                          "WHERE Id = @organisationId";
+						  
+                return await connection.ExecuteScalarAsync<long>(sql, new { organisationId });
             }
         }
     }
