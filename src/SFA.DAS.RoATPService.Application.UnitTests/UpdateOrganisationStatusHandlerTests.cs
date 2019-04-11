@@ -39,7 +39,7 @@
             _duplicateRepository = new Mock<IDuplicateCheckRepository>();
             _logger = new Mock<ILogger<UpdateOrganisationStatusHandler>>();
 
-            _validator = new Mock<OrganisationValidator>(_duplicateRepository.Object);
+            _validator = new Mock<IOrganisationValidator>();
             _validator.Setup(x => x.IsValidProviderTypeId(It.IsAny<int>())).Returns(true);
             _validator.Setup(x => x.IsValidOrganisationTypeIdForProvider(It.IsAny<int>(), It.IsAny<int>()))
                 .ReturnsAsync(true);

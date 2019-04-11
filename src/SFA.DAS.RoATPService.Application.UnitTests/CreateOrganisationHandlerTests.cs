@@ -92,7 +92,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         }
 
         [TestCase(-1)]
-        [TestCase(7)]
+        [TestCase(21)]
         public void Create_organisation_rejects_invalid_organisation_type(int organisationTypeId)
         {
             _validator.Setup(x => x.IsValidOrganisationTypeId(It.IsAny<int>())).Returns(false);
