@@ -7,11 +7,11 @@ namespace SFA.DAS.RoATPService.Application.Services
 {
     public class OrganisationStatusManager: IOrganisationStatusManager
     {
-        public bool ShouldChangeStatusToOnboarding(int newProviderTypeId, int previousProviderTypeId, int previousOrganisationStatusId)
+        public bool ShouldChangeStatusToOnboarding(int newProviderTypeId, int currentProviderTypeId, int currentOrganisationStatusId)
         {
-            var isActive = IsOrganisationStatusActive(previousOrganisationStatusId);
+            var isActive = IsOrganisationStatusActive(currentOrganisationStatusId);
 
-            return isActive && previousProviderTypeId == ProviderType.SupportingProvider
+            return isActive && currentProviderTypeId == ProviderType.SupportingProvider
                    && (newProviderTypeId == ProviderType.MainProvider || newProviderTypeId == ProviderType.EmployerProvider);
         }
 
@@ -20,12 +20,12 @@ namespace SFA.DAS.RoATPService.Application.Services
             return organisationStatusId == OrganisationStatus.Active || organisationStatusId == OrganisationStatus.ActiveNotTakingOnApprentices;
         }
 
-        public bool ShouldChangeStatustoActiveAndSetStartDateToToday(int newProviderTypeId, int previousProviderTypeId, int previousOrganisationStatusId)
+        public bool ShouldChangeStatustoActiveAndSetStartDateToToday(int newProviderTypeId, int currentProviderTypeId, int currentOrganisationStatusId)
         {
-            var isOnboarding = (previousOrganisationStatusId == OrganisationStatus.Onboarding);
+            var isOnboarding = (currentOrganisationStatusId == OrganisationStatus.Onboarding);
 
             return isOnboarding &&
-                   (previousProviderTypeId == ProviderType.MainProvider || previousProviderTypeId == ProviderType.EmployerProvider) &&
+                   (currentProviderTypeId == ProviderType.MainProvider || currentProviderTypeId == ProviderType.EmployerProvider) &&
                    newProviderTypeId == ProviderType.SupportingProvider;
         }
     }

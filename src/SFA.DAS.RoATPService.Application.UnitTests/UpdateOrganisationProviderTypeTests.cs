@@ -77,7 +77,8 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _updateOrganisationRepository.Setup(x => x.GetOrganisationType(It.IsAny<Guid>())).ReturnsAsync(2);
 
             _updateOrganisationRepository.Setup(x =>
-                x.UpdateProviderTypeAndOrganisationType(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
+                    x.UpdateProviderTypeAndOrganisationType(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(),
+                        It.IsAny<string>()))
                 .ReturnsAsync(true).Verifiable();
 
             _auditLogRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()))
@@ -97,7 +98,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             {
                 OrganisationId = Guid.NewGuid(),
                 OrganisationTypeId = 3,
-                ProviderTypeId = 1,
+                ProviderTypeId = ProviderType.MainProvider,
                 UpdatedBy = "test"
             };
 

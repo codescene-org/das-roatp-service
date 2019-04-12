@@ -2,11 +2,11 @@
 {
     public interface IOrganisationStatusManager
     {
-        bool ShouldChangeStatusToOnboarding(int newProviderTypeId, int previousProviderTypeId, int previousOrganisationStatusId);
+        bool ShouldChangeStatusToOnboarding(int newProviderTypeId, int currentProviderTypeId, int currentOrganisationStatusId);
 
         bool IsOrganisationStatusActive(int organisationStatusId);
 
-        bool ShouldChangeStatustoActiveAndSetStartDateToToday(int newProviderTypeId, int previousProviderTypeId,int previousOrganisationStatusId);
+        bool ShouldChangeStatustoActiveAndSetStartDateToToday(int newProviderTypeId, int currentProviderTypeId,int currentOrganisationStatusId);
 
     }
 }

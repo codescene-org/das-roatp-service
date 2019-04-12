@@ -1,19 +1,18 @@
-﻿using System;
-using System.Globalization;
-using SFA.DAS.RoATPService.Application.Services;
-using SFA.DAS.RoATPService.Domain;
-
-namespace SFA.DAS.RoATPService.Application.Handlers
+﻿namespace SFA.DAS.RoATPService.Application.Handlers
 {
+    using System;
+    using System.Globalization;
+    using Services;
+    using Domain;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Api.Types.Models;
     using MediatR;
     using Microsoft.Extensions.Logging;
-    using SFA.DAS.RoATPService.Application.Exceptions;
-    using SFA.DAS.RoATPService.Application.Interfaces;
-    using SFA.DAS.RoATPService.Application.Validators;
+    using Exceptions;
+    using Interfaces;
+    using Validators;
 
     public class UpdateOrganisationProviderTypeHandler : UpdateOrganisationHandlerBase, IRequestHandler<UpdateOrganisationProviderTypeRequest, bool>
     {

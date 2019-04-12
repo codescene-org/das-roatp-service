@@ -9,6 +9,7 @@ using SFA.DAS.RoATPService.Api.Types.Models;
 using SFA.DAS.RoATPService.Application.Commands;
 using SFA.DAS.RoATPService.Application.Mappers;
 using SFA.DAS.RoATPService.Data;
+using SFA.DAS.RoATPService.Domain;
 
 namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
 {
@@ -18,14 +19,14 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
         private  OrganisationRepository _repository;
         private OrganisationStatusModel _statusActive;
         private OrganisationStatusModel _statusOnboarding;
-        private int _organisationStatusIdActive = 1;
-        private int _organisationStatusIdOnboarding = 3;
+        private int _organisationStatusIdActive = OrganisationStatus.Active;
+        private int _organisationStatusIdOnboarding = OrganisationStatus.Onboarding;
 
 
         private ProviderTypeModel _providerType1;
-        private int _providerTypeIdMainProvider = 1;
-        private int _providerTypeIdEmployerProvider = 2;
-        private int _providerTypeIdSupportingProvider  = 3;
+        private int _providerTypeIdMainProvider = ProviderType.MainProvider;
+        private int _providerTypeIdEmployerProvider = ProviderType.EmployerProvider;
+        private int _providerTypeIdSupportingProvider  = ProviderType.SupportingProvider;
         private OrganisationTypeModel _organisationTypeModel1;
         private int _organisationTypeId1;
         private ProviderTypeModel _providerType2;
@@ -53,9 +54,7 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
         [TestCase(3, 1, 33332222,"today")]
         public void Organisation_is_created_and_start_date_is_correct(int providerType, int statusId, int ukprn, string startDateDescriptor)
         {
-            DateTime? startDate;
-
-            startDate = !string.IsNullOrEmpty(startDateDescriptor) ? (DateTime?) DateTime.Today : null;
+            var startDate = !string.IsNullOrEmpty(startDateDescriptor) ? (DateTime?) DateTime.Today : null;
 
             var request = new CreateOrganisationRequest
             {
