@@ -42,8 +42,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
                 .ReturnsAsync(new DuplicateCheckResponse {DuplicateOrganisationName = "",DuplicateFound = false});
             _logger = new Mock<ILogger<CreateOrganisationHandler>>();
             _mapper = new MapCreateOrganisationRequestToCommand();
-           _lookupDataRepository = new Mock<ILookupDataRepository>();
-             _lookupDataRepository = new Mock<ILookupDataRepository>();
+            _lookupDataRepository = new Mock<ILookupDataRepository>();
             _validator = new Mock<IOrganisationValidator>();
             _validator.Setup(x => x.IsValidOrganisationTypeId(It.IsAny<int>())).Returns(true);
             _validator.Setup(x => x.IsValidLegalName(It.IsAny<string>())).Returns(true);

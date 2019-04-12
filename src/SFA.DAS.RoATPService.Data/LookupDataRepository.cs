@@ -73,7 +73,7 @@
                     sql =
                         $@"SELECT os.[Id], os.[Status], os.[CreatedAt], os.[CreatedBy], os.[UpdatedAt], os.[UpdatedBy] 
                             FROM [dbo].[OrganisationStatus] os
-                            inner join[ProviderTypeOrganisationStatus] ptos on os.Id = ptos.organisationStatusId
+                            inner join [ProviderTypeOrganisationStatus] ptos on os.Id = ptos.organisationStatusId
                             where ptos.providerTypeId = @providerTypeId
                             ORDER BY os.Id";
                 }
