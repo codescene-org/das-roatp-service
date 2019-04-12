@@ -18,13 +18,6 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
     public class LookupDataGetOrganisationStatusesTests : TestBase
     {
         private readonly DatabaseService _databaseService = new DatabaseService();
-        //private OrganisationRepository _repository;
-        //private OrganisationStatusModel _status1;
-        //private int _organisationStatusId1WithProviderTypeId1;
-        //private ProviderTypeModel _providerType1;
-        //private int _providerTypeId1;
-        //private OrganisationTypeModel _organisationTypeModel1;
-        //private int _organisationTypeId1;
         private LookupDataRepository _lookupRepository;
 
         private int _providerTypeId2;

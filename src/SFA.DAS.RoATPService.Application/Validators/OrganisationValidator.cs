@@ -79,17 +79,15 @@ namespace SFA.DAS.RoATPService.Application.Validators
 
         public bool IsValidStatus(OrganisationStatus status)
         {
-            if (status == null)
-            {
-                return false;
-            }
-
-            return IsValidStatusId(status.Id);
+            return status != null && IsValidStatusId(status.Id);
         }
 
         public bool IsValidStatusId(int statusId)
         {
-            return (statusId >= 0 && statusId <= 3);
+            return statusId == OrganisationStatus.Removed
+                   || statusId == OrganisationStatus.Active
+                   || statusId == OrganisationStatus.ActiveNotTakingOnApprentices
+                   || statusId == OrganisationStatus.Onboarding;
         }
 
         public bool IsValidCompanyNumber(string companyNumber)
