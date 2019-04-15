@@ -56,7 +56,7 @@ namespace SFA.DAS.RoATPService.Data
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();
 
-                var startDate = command.StartDate ?? DateTime.Today;
+                var startDate = command.StartDate;
                 var organisationId = Guid.NewGuid();
                 var createdAt = DateTime.Now;
                 var createdBy = command.Username;
@@ -103,7 +103,6 @@ namespace SFA.DAS.RoATPService.Data
                     return organisationId;
                 
                     return null;
-
             }
         }
 

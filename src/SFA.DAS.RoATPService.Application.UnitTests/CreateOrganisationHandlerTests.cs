@@ -1,4 +1,5 @@
 ﻿using SFA.DAS.RoATPService.Application.Commands;
+using SFA.DAS.RoATPService.Application.Mappers;
 
 namespace SFA.DAS.RoATPService.Application.UnitTests
 {
@@ -28,6 +29,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
 
         private Guid _organisationId;
 
+        private IMapCreateOrganisationRequestToCommand _mapper;
         [SetUp]
         public void Before_each_test()
         {
@@ -41,6 +43,8 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _logger = new Mock<ILogger<CreateOrganisationHandler>>();
 
             _lookupDataRepository = new Mock<ILookupDataRepository>();
+            _mapper = new MapCreateOrganisationRequestToCommand();
+            _handler = new CreateOrganisationHandler(_repository.Object, _logger.Object, new OrganisationValidator(_duplicateCheckRepository.Object), new ProviderTypeValidator(), _mapper);
             _validator = new Mock<IOrganisationValidator>();
             _validator.Setup(x => x.IsValidOrganisationTypeId(It.IsAny<int>())).Returns(true);
             _validator.Setup(x => x.IsValidLegalName(It.IsAny<string>())).Returns(true);
@@ -53,14 +57,13 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _validator.Setup(x => x.IsValidCompanyNumber(It.IsAny<string>())).Returns(true);
             _validator.Setup(x => x.IsValidCharityNumber(It.IsAny<string>())).Returns(true);
 
-            _handler = new CreateOrganisationHandler(_repository.Object, _logger.Object, new OrganisationValidator(_duplicateCheckRepository.Object), new ProviderTypeValidator());
+            _handler = new CreateOrganisationHandler(_repository.Object, _logger.Object, new OrganisationValidator(_duplicateCheckRepository.Object), new ProviderTypeValidator(), _mapper);
 
             _request = new CreateOrganisationRequest
             {                                                                       
                 LegalName = "Legal Name",
                 TradingName = "TradingName",
                 ProviderTypeId = 1,
-                OrganisationStatusId =  1,
                 OrganisationTypeId = 0,
                 StatusDate = DateTime.Now,
                 Ukprn = 10002000,
@@ -104,18 +107,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             result.Should().Throw<BadRequestException>();
         }
      
-        [TestCase(-1)]
-        [TestCase(3)]
-        public void Create_organisation_rejects_invalid_organisation_status(int organisationStatusId)
-        {
-            _validator.Setup(x => x.IsValidStatusId(It.IsAny<int>())).Returns(false);
-            _request.OrganisationStatusId = organisationStatusId;
-
-            Func<Task> result = async () => await
-                _handler.Handle(_request, new CancellationToken());
-            result.Should().Throw<BadRequestException>();
-        }
-
+          
         [TestCase("")]
         [TestCase(null)]
         [TestCase(" ")]

@@ -32,5 +32,4 @@ BEGIN
 		UPDATE dbo.Organisations
 		SET OrganisationTypeId = 0
 	END
-
 END

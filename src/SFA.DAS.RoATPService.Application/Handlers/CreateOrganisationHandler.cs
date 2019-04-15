@@ -19,14 +19,17 @@ namespace SFA.DAS.RoATPService.Application.Handlers
         private readonly ILogger<CreateOrganisationHandler> _logger;
         private readonly IOrganisationValidator _organisationValidator;
         private readonly IProviderTypeValidator _providerTypeValidator;
+        private readonly IMapCreateOrganisationRequestToCommand _mapper;
 
         public CreateOrganisationHandler(IOrganisationRepository repository, ILogger<CreateOrganisationHandler> logger, 
-                                         IOrganisationValidator organisationValidator, IProviderTypeValidator providerTypeValidator)
+                                         IOrganisationValidator organisationValidator, IProviderTypeValidator providerTypeValidator, 
+                                         IMapCreateOrganisationRequestToCommand mapper)
         {
             _organisationRepository = repository;
             _logger = logger;
             _organisationValidator = organisationValidator;
             _providerTypeValidator = providerTypeValidator;
+            _mapper = mapper;
         }
 
         public Task<Guid?> Handle(CreateOrganisationRequest request, CancellationToken cancellationToken)
@@ -45,9 +48,6 @@ namespace SFA.DAS.RoATPService.Application.Handlers
 
                 if (!_organisationValidator.IsValidOrganisationTypeId(request.OrganisationTypeId))
                     invalidOrganisationError = $"{invalidOrganisationError}: Invalid Organisation Type Id [{request.OrganisationTypeId}]";
-
-                if (!_organisationValidator.IsValidStatusId(request.OrganisationStatusId))
-                    invalidOrganisationError = $"{invalidOrganisationError}: Invalid Organisation Status Id [{request.OrganisationStatusId}]";
 
                 if (!_organisationValidator.IsValidStatusDate(request.StatusDate))
                     invalidOrganisationError = $"{invalidOrganisationError}: Invalid Status Date [{request.StatusDate}]";
@@ -72,24 +72,7 @@ namespace SFA.DAS.RoATPService.Application.Handlers
 
             _logger.LogInformation($@"Handling Create Organisation Search for UKPRN [{request.Ukprn}]");
 
-            var command = new CreateOrganisationCommand
-            {
-                CharityNumber = request.CharityNumber,
-                CompanyNumber = request.CompanyNumber,
-                FinancialTrackRecord = request.FinancialTrackRecord,
-                LegalName = request.LegalName,
-                NonLevyContract = request.NonLevyContract,
-                OrganisationStatusId = request.OrganisationStatusId,
-                OrganisationTypeId = request.OrganisationTypeId,
-                ParentCompanyGuarantee = request.ParentCompanyGuarantee,
-                ProviderTypeId = request.ProviderTypeId,
-                StatusDate = request.StatusDate,
-                Ukprn = request.Ukprn,
-                TradingName = request.TradingName,
-                StartDate = request.StartDate,
-                Username = request.Username
-            };
-
+            var command = _mapper.Map(request);
             return _organisationRepository.CreateOrganisation(command);
         }
 
@@ -98,8 +81,7 @@ namespace SFA.DAS.RoATPService.Application.Handlers
             return (_organisationValidator.IsValidLegalName(request.LegalName)
                     && _organisationValidator.IsValidTradingName(request.TradingName)
                     && _providerTypeValidator.IsValidProviderTypeId(request.ProviderTypeId)        
-                    && _organisationValidator.IsValidOrganisationTypeId(request.OrganisationTypeId)   
-                    && _organisationValidator.IsValidStatusId(request.OrganisationStatusId)
+                    && _organisationValidator.IsValidOrganisationTypeId(request.OrganisationTypeId)
                     && !_organisationValidator.DuplicateUkprnInAnotherOrganisation(request.Ukprn, Guid.NewGuid()).DuplicateFound
                     && _organisationValidator.IsValidStatusDate(request.StatusDate)
                     && _organisationValidator.IsValidUKPRN(request.Ukprn)  
