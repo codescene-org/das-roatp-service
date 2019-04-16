@@ -1,7 +1,7 @@
 ﻿using System;
 using MediatR;
 
-namespace SFA.DAS.RoATPService.Api.Types.Models.UpdateOrganisation
+namespace SFA.DAS.RoATPService.Api.Types.Models
 {
     public class UpdateOrganisationTradingNameRequest : IRequest<bool>
     {

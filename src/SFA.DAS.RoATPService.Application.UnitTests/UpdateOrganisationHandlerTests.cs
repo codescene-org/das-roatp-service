@@ -55,7 +55,7 @@
 
             _lookupDataRepository = new Mock<ILookupDataRepository>();
 
-            _handler = new UpdateOrganisationHandler(_organisationRepository.Object, logger.Object, new OrganisationValidator(_duplicationCheckRepository.Object),
+            _handler = new UpdateOrganisationHandler(_organisationRepository.Object, logger.Object, new OrganisationValidator(_duplicationCheckRepository.Object, _lookupDataRepository.Object),
                                                      _fieldComparison.Object, _auditLogRepository.Object);
         }
 

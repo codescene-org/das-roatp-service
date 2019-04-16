@@ -106,6 +106,8 @@
             }
         }
 
+     
+
         public async Task<RemovedReason> GetRemovedReason(Guid organisationId)
         {
             var connectionString = _configuration.SqlConnectionString;
@@ -171,6 +173,25 @@
             }
         }
 
+        public async Task<bool> UpdateType(Guid organisationId, int organisationTypeId, string updatedBy)
+        {
+            var connectionString = _configuration.SqlConnectionString;
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                var updatedAt = DateTime.Now;
+
+                var sql = "update [Organisations] SET OrganisationTypeId = @organisationTypeId, " +
+                          "UpdatedBy = @updatedBy, UpdatedAt = @updatedAt, StatusDate = @updatedAt " +
+                          "WHERE Id = @organisationId";
+                int recordsAffected = await connection.ExecuteAsync(sql, new { organisationTypeId, updatedBy, updatedAt, organisationId });
+
+                return await Task.FromResult(recordsAffected > 0);
+            }
+        }
         public async Task<RemovedReason> UpdateStatusWithRemovedReason(Guid organisationId, int organisationStatusId, int removedReasonId, string updatedBy)
         {
             var connectionString = _configuration.SqlConnectionString;

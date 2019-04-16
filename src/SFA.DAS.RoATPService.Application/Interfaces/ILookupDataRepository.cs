@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.RoATPService.Application.Interfaces
+﻿using System;
+
+namespace SFA.DAS.RoATPService.Application.Interfaces
 {
     using Domain;
     using System.Collections.Generic;
@@ -8,7 +10,11 @@
     {
         Task<IEnumerable<ProviderType>> GetProviderTypes();
         Task<IEnumerable<OrganisationType>> GetOrganisationTypes(int providerTypeId);
+
+        Task<OrganisationType> GetOrganisationType(int organisationTypeId);
         Task<IEnumerable<OrganisationStatus>> GetOrganisationStatuses();
         Task<IEnumerable<RemovedReason>> GetRemovedReasons();
+
+        Task<bool> IsOrganisationTypeValidForOrganisation(int organitionTypeId, Guid organisationId);
     }
 }

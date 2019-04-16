@@ -1,4 +1,7 @@
-﻿namespace SFA.DAS.RoATPService.Data
+﻿using System;
+using System.Linq;
+
+namespace SFA.DAS.RoATPService.Data
 {
     using System.Collections.Generic;
     using System.Data;
@@ -38,6 +41,22 @@
 
                 var organisationTypes = await connection.QueryAsync<OrganisationType>(sql, new { providerTypeId });
                 return await Task.FromResult(organisationTypes);
+            }
+        }
+
+        public async Task<OrganisationType> GetOrganisationType(int organisationTypeId)
+        {
+            using (var connection = new SqlConnection(_configuration.SqlConnectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                string sql = $"select ot.Id, ot.Type, ot.Description, ot.CreatedBy, ot.CreatedAt, ot.UpdatedBy, ot.UpdatedAt, ot.Status "
+                             + "from [OrganisationTypes] ot " +
+                             "where ot.Id = @organisationTypeId";
+
+                var organisationTypes = await connection.QueryAsync<OrganisationType>(sql, new { organisationTypeId });
+                return await Task.FromResult(organisationTypes.FirstOrDefault());
             }
         }
 
@@ -89,5 +108,23 @@
             }
         }
 
+        public async Task<bool> IsOrganisationTypeValidForOrganisation(int organisationTypeId, Guid organisationId)
+        {
+            using (var connection = new SqlConnection(_configuration.SqlConnectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                var sql = $@"SELECT case count(*)
+                            when 0 then 0 else 1 end
+                            FROM [ProviderTypeOrganisationTypes] ptot
+                                 inner join organisations o on ptot.ProviderTypeId = o.ProviderTypeId
+                            where o.Id = @organisationId
+                            and ptot.OrganisationTypeId = @organisationTypeId";
+
+                var organisationTypeValid = await connection.ExecuteScalarAsync<bool>(sql, new { organisationId, organisationTypeId });
+                return await Task.FromResult(organisationTypeValid);
+            }
+        }
     }
 }

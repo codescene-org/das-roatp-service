@@ -18,6 +18,7 @@
         Task<bool> UpdateTradingName(Guid organisationId, string tradingName, string updatedBy);
         Task<int> GetStatus(Guid organisationId);
         Task<bool> UpdateStatus(Guid organisationId, int organisationStatusId, string updatedBy);
+        Task<bool> UpdateType(Guid organisationId, int organisationTypeId, string updatedBy);
         Task<RemovedReason> GetRemovedReason(Guid organisationId);
         Task<RemovedReason> UpdateStatusWithRemovedReason(Guid organisationId, int organisationStatusId, int removedReasonId, string updatedBy);
         Task<bool> UpdateStartDate(Guid organisationId, DateTime startDate);

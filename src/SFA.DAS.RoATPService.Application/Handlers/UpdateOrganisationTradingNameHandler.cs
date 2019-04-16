@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.RoATPService.Api.Types.Models;
-using SFA.DAS.RoATPService.Api.Types.Models.UpdateOrganisation;
 using SFA.DAS.RoATPService.Application.Exceptions;
 using SFA.DAS.RoATPService.Application.Interfaces;
 using SFA.DAS.RoATPService.Application.Validators;

@@ -1,4 +1,5 @@
-﻿using SFA.DAS.RoATPService.Application.Interfaces;
+﻿using System.Xml.XPath;
+using SFA.DAS.RoATPService.Application.Interfaces;
 
 namespace SFA.DAS.RoATPService.Application.Validators
 {
@@ -15,19 +16,14 @@ namespace SFA.DAS.RoATPService.Application.Validators
         private const string CompaniesHouseNumberRegex = "[A-Za-z0-9]{2}[0-9]{6}";
         private const string CharityNumberInvalidCharactersRegex = "[^a-zA-Z0-9\\-]";
         private readonly IDuplicateCheckRepository _duplicateCheckRepository;
+        private readonly ILookupDataRepository _lookupRepository;
 
-        public OrganisationValidator(IDuplicateCheckRepository duplicateCheckRepository)
+        public OrganisationValidator(IDuplicateCheckRepository duplicateCheckRepository, ILookupDataRepository lookupRepository)
         {
             _duplicateCheckRepository = duplicateCheckRepository;
+            _lookupRepository = lookupRepository;
         }
 
-
-        private ILookupDataRepository _lookupDataRepository;
-
-        public OrganisationValidator(ILookupDataRepository lookupDataRepository)
-        {
-            _lookupDataRepository = lookupDataRepository;
-        }
 
         public bool IsValidOrganisationId(Guid organisationId)
         {
@@ -145,6 +141,11 @@ namespace SFA.DAS.RoATPService.Application.Validators
             return organisationTypeId >= 0 && organisationTypeId <= 20;
         }
 
+        public bool IsValidOrganiationTypeIdForOrganisationProvider(int organisationTypeId)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<bool> IsValidOrganisationTypeIdForProvider(int organisationTypeId, int providerTypeId)
         {
             if (!IsValidOrganisationTypeId(organisationTypeId))
@@ -152,7 +153,7 @@ namespace SFA.DAS.RoATPService.Application.Validators
                 return false;
             }
 
-            var organisationTypes = await _lookupDataRepository.GetOrganisationTypes(providerTypeId);
+            var organisationTypes = await _lookupRepository.GetOrganisationTypes(providerTypeId);
 
             var organisationType = organisationTypes.FirstOrDefault(x => x.Id == organisationTypeId);
 
@@ -168,6 +169,11 @@ namespace SFA.DAS.RoATPService.Application.Validators
         DuplicateCheckResponse IOrganisationValidator.DuplicateUkprnInAnotherOrganisation(long ukprn, Guid organisationId)
         {
             return _duplicateCheckRepository.DuplicateUKPRNExists(organisationId, ukprn).Result;
+        }
+
+        public bool IsValidOrganisationTypeIdForOrganisationProvider(int organisationTypeId, Guid organisationId)
+        {
+            return _lookupRepository.IsOrganisationTypeValidForOrganisation(organisationTypeId, organisationId).Result;
         }
     }
 }
