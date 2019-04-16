@@ -49,33 +49,6 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
             OrganisationTypeHandler.InsertRecord(_organisationTypeModel1);
         }
 
-        [TestCase(1,3,11112222, null)]
-        [TestCase(2, 3, 22221111, null)]
-        [TestCase(3, 1, 33332222,"today")]
-        public void Organisation_is_created_and_start_date_is_correct(int providerType, int statusId, int ukprn, string startDateDescriptor)
-        {
-            var startDate = !string.IsNullOrEmpty(startDateDescriptor) ? (DateTime?) DateTime.Today : null;
-
-            var request = new CreateOrganisationRequest
-            {
-                Ukprn = ukprn,
-                OrganisationTypeId = _organisationTypeId1,
-                ProviderTypeId = providerType,
-                StatusDate = DateTime.Today.AddDays(5),
-                LegalName = "Legal McLegal",
-                Username = "Tester McTestface"
-            };
-
-            var command = new MapCreateOrganisationRequestToCommand().Map(request);
-
-            var orgPlaceholder = _repository.CreateOrganisation(command).Result;
-
-            var organisationDetails = OrganisationHandler.GetOrganisationFromukprn(ukprn);
-            var organisationData = new OrganisationDataHandler().Parse(organisationDetails.OrganisationData);
-            Assert.AreEqual(startDate,organisationData.StartDate);
-            Assert.AreEqual(statusId, organisationDetails.StatusId);
-        }
-
         [OneTimeTearDown]
         public void Tear_down()
         {
