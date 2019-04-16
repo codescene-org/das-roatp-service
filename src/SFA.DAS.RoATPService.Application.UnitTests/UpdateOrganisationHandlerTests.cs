@@ -49,6 +49,7 @@
 
             _organisationRepository = new Mock<IOrganisationRepository>();
             _duplicationCheckRepository = new Mock<IDuplicateCheckRepository>();
+            _lookupDataRepository = new Mock<ILookupDataRepository>();
             Mock<ILogger<UpdateOrganisationHandler>> logger = new Mock<ILogger<UpdateOrganisationHandler>>();
             _fieldComparison = new Mock<IAuditLogFieldComparison>();
             _auditLogRepository = new Mock<IAuditLogRepository>();
@@ -95,7 +96,7 @@
             result.Should().Throw<BadRequestException>();
          }
 
-        [TestCase(3)]
+        [TestCase(9)]
         [TestCase(-1)]
         public void Update_organisation_not_performed_if_status_invalid(int status)
         {

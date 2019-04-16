@@ -42,10 +42,9 @@
 
         [HttpGet]
         [Route("organisationStatuses")]
-        public async Task<IActionResult> OrganisationStatuses()
+        public async Task<IActionResult> OrganisationStatuses(int? providerTypeId)
         {
-            var request = new GetOrganisationStatusesRequest();
-
+            var request = new GetOrganisationStatusesRequest { ProviderTypeId = providerTypeId };
             return Ok(await _mediator.Send(request));
         }
 

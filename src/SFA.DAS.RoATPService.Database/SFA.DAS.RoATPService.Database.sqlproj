@@ -73,6 +73,7 @@
     <Build Include="StoredProcedures\RoATP_Audit_History.sql" />
     <Build Include="StoredProcedures\RoATP_Complete_Register.sql" />
     <Build Include="StoredProcedures\RoATP_CSV_SUMMARY.sql" />
+    <Build Include="Tables\ProviderTypeOrganisationStatus.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Script.PostDeployment1.sql" />

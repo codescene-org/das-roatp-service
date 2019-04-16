@@ -41,7 +41,6 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _duplicateCheckRepository.Setup(x => x.DuplicateUKPRNExists(It.IsAny<Guid>(), It.IsAny<long>()))
                 .ReturnsAsync(new DuplicateCheckResponse {DuplicateOrganisationName = "",DuplicateFound = false});
             _logger = new Mock<ILogger<CreateOrganisationHandler>>();
-
             _lookupDataRepository = new Mock<ILookupDataRepository>();
             _mapper = new MapCreateOrganisationRequestToCommand();
              _validator = new Mock<IOrganisationValidator>();
@@ -83,7 +82,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
 
         [TestCase(0)]
         [TestCase(-1)]
-        [TestCase(4)]
+        [TestCase(9)]
         public void Create_organisation_rejects_invalid_provider_type(int providerTypeId)
         {
             _validator.Setup(x => x.IsValidProviderTypeId(It.IsAny<int>())).Returns(false);
@@ -99,7 +98,6 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         public void Create_organisation_rejects_invalid_organisation_type(int organisationTypeId)
         {
             _validator.Setup(x => x.IsValidOrganisationTypeId(It.IsAny<int>())).Returns(false);
-
             _request.OrganisationTypeId = organisationTypeId;
 
             Func<Task> result = async () => await
@@ -107,7 +105,6 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             result.Should().Throw<BadRequestException>();
         }
      
-          
         [TestCase("")]
         [TestCase(null)]
         [TestCase(" ")]

@@ -1,5 +1,4 @@
-﻿using System.Xml.XPath;
-using SFA.DAS.RoATPService.Application.Interfaces;
+﻿using SFA.DAS.RoATPService.Application.Interfaces;
 
 namespace SFA.DAS.RoATPService.Application.Validators
 {
@@ -17,6 +16,7 @@ namespace SFA.DAS.RoATPService.Application.Validators
         private const string CharityNumberInvalidCharactersRegex = "[^a-zA-Z0-9\\-]";
         private readonly IDuplicateCheckRepository _duplicateCheckRepository;
         private readonly ILookupDataRepository _lookupRepository;
+
 
         public OrganisationValidator(IDuplicateCheckRepository duplicateCheckRepository, ILookupDataRepository lookupRepository)
         {
@@ -82,17 +82,15 @@ namespace SFA.DAS.RoATPService.Application.Validators
 
         public bool IsValidStatus(OrganisationStatus status)
         {
-            if (status == null)
-            {
-                return false;
-            }
-
-            return IsValidStatusId(status.Id);
+            return status != null && IsValidStatusId(status.Id);
         }
 
         public bool IsValidStatusId(int statusId)
         {
-            return (statusId >= 0 && statusId <= 2);
+            return statusId == OrganisationStatus.Removed
+                   || statusId == OrganisationStatus.Active
+                   || statusId == OrganisationStatus.ActiveNotTakingOnApprentices
+                   || statusId == OrganisationStatus.Onboarding;
         }
 
         public bool IsValidCompanyNumber(string companyNumber)
@@ -139,11 +137,6 @@ namespace SFA.DAS.RoATPService.Application.Validators
         public bool IsValidOrganisationTypeId(int organisationTypeId)
         {
             return organisationTypeId >= 0 && organisationTypeId <= 20;
-        }
-
-        public bool IsValidOrganiationTypeIdForOrganisationProvider(int organisationTypeId)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task<bool> IsValidOrganisationTypeIdForProvider(int organisationTypeId, int providerTypeId)

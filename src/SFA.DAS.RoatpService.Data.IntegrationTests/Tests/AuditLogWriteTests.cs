@@ -88,6 +88,13 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
             Assert.AreEqual(_newValue, _auditRecord.AuditData.FieldChanges[0].NewValue);
         }
 
+
+        [Test]
+        public void IsValid_is_true()
+        {
+            Assert.AreEqual(true, _auditRecord.AuditData.FieldChanges[0].IsValid);
+        }
+
         [OneTimeTearDown]
         public void tear_down()
         {

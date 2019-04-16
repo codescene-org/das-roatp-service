@@ -103,6 +103,5 @@
         {
             return Ok(await _mediator.Send(updateProviderTypeRequest));
         }
-
     }
 }

@@ -93,14 +93,10 @@
 
         private bool UpdateStartDateRequired(int oldStatusId, int newStatusId)
         {
-            if (oldStatusId == OrganisationStatus.Removed && newStatusId == OrganisationStatus.Active)
+            if ((oldStatusId == OrganisationStatus.Removed || oldStatusId == OrganisationStatus.Onboarding) &&
+                (newStatusId == OrganisationStatus.Active || newStatusId == OrganisationStatus.ActiveNotTakingOnApprentices))
             {
-                return true;
-            }
-            
-            if (oldStatusId == OrganisationStatus.Removed && newStatusId == OrganisationStatus.ActiveNotTakingOnApprentices)
-            {
-                return true;
+                return true;              
             }
 
             return false;

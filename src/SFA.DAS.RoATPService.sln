@@ -23,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.RoATPService.Import
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.RoATPService.Importer.UnitTests", "SFA.DAS.RoATPService.Importer.UnitTests\SFA.DAS.RoATPService.Importer.UnitTests.csproj", "{C1A091FB-13EA-44E1-A873-685C9D2355FB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.RoatpService.Data.IntegrationTests", "SFA.DAS.RoatpService.Data.IntegrationTests\SFA.DAS.RoatpService.Data.IntegrationTests.csproj", "{FC71C892-ADA2-4AE8-B475-5DC68CDCA54F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.RoatpService.Data.IntegrationTests", "SFA.DAS.RoatpService.Data.IntegrationTests\SFA.DAS.RoatpService.Data.IntegrationTests.csproj", "{FC71C892-ADA2-4AE8-B475-5DC68CDCA54F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.RoATPService.Application.UnitTests", "SFA.DAS.RoATPService.Application.UnitTests\SFA.DAS.RoATPService.Application.UnitTests.csproj", "{4D88DF45-827C-4B87-BA0E-2CCA9F9264A2}"
 EndProject
