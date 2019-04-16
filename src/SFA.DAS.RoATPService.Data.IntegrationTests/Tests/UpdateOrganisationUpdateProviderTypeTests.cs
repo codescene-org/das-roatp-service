@@ -70,7 +70,7 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
             OrganisationHandler.InsertRecord(_organisation);
             _changedBy = "SystemChange";
 
-            _successfulUpdate = _repository.UpdateProviderType(_organisationId, _providerTypeId2, _organisationTypeId2, _changedBy).Result;
+            _successfulUpdate = _repository.UpdateProviderTypeAndOrganisationType(_organisationId, _providerTypeId2, _organisationTypeId2, _changedBy).Result;
             _newProviderType = _repository.GetProviderType(_organisationId).Result;
             _newOrganisationType = _repository.GetOrganisationType(_organisationId).Result;
         }

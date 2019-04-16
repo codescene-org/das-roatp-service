@@ -2,18 +2,12 @@
 using SFA.DAS.RoATPService.Api.Types.Models;
 using SFA.DAS.RoATPService.Application.Commands;
 using SFA.DAS.RoATPService.Application.Interfaces;
+using SFA.DAS.RoATPService.Domain;
 
 namespace SFA.DAS.RoATPService.Application.Mappers
 {
     public class MapCreateOrganisationRequestToCommand: IMapCreateOrganisationRequestToCommand
     {
-        private const int MainProviderTypeId = 1;
-        private const int EmployerProviderTypeId = 2;
-        private const int SupportingProviderTypeId = 3;
-
-        private const int OrganisationStatusActive = 1;
-        private const int OrganisationStatusOnboarding = 3;
-
         public CreateOrganisationCommand Map(CreateOrganisationRequest request)
         {     
             int organisationStatusId;
@@ -21,12 +15,12 @@ namespace SFA.DAS.RoATPService.Application.Mappers
 
             switch (request.ProviderTypeId)
             {
-                case MainProviderTypeId:
-                case EmployerProviderTypeId:
-                    organisationStatusId = OrganisationStatusOnboarding;
+                case ProviderType.MainProvider:
+                case ProviderType.EmployerProvider:
+                    organisationStatusId = OrganisationStatus.Onboarding;
                     break;
-                case SupportingProviderTypeId:
-                    organisationStatusId = OrganisationStatusActive;
+                case ProviderType.SupportingProvider:
+                    organisationStatusId = OrganisationStatus.Active;
                     startDate = DateTime.Today;
                     break;
 

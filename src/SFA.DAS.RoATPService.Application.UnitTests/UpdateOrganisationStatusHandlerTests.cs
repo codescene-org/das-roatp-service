@@ -55,6 +55,8 @@
             _orgStatusRepository.Setup(x => x.GetOrganisationStatus(0)).ReturnsAsync(removedStatus);
             var notTakingOnStatus = new OrganisationStatus { Id = 2, Status = "Active - not taking on" };
             _orgStatusRepository.Setup(x => x.GetOrganisationStatus(2)).ReturnsAsync(notTakingOnStatus);
+            var onboardingStatus = new OrganisationStatus { Id = 3, Status = "On-boarding" };
+            _orgStatusRepository.Setup(x => x.GetOrganisationStatus(3)).ReturnsAsync(onboardingStatus);
 
             RemovedReason nullReason = null;
             _repository.Setup(x => x.GetRemovedReason(It.IsAny<Guid>())).ReturnsAsync(nullReason);

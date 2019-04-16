@@ -15,17 +15,10 @@ namespace SFA.DAS.RoATPService.Application.Validators
         private const string CompaniesHouseNumberRegex = "[A-Za-z0-9]{2}[0-9]{6}";
         private const string CharityNumberInvalidCharactersRegex = "[^a-zA-Z0-9\\-]";
         private readonly IDuplicateCheckRepository _duplicateCheckRepository;
-
-        public OrganisationValidator(IDuplicateCheckRepository duplicateCheckRepository)
+        private readonly ILookupDataRepository _lookupDataRepository;
+        public OrganisationValidator(IDuplicateCheckRepository duplicateCheckRepository, ILookupDataRepository lookupDataRepository)
         {
             _duplicateCheckRepository = duplicateCheckRepository;
-        }
-
-
-        private ILookupDataRepository _lookupDataRepository;
-
-        public OrganisationValidator(ILookupDataRepository lookupDataRepository)
-        {
             _lookupDataRepository = lookupDataRepository;
         }
 
@@ -86,17 +79,15 @@ namespace SFA.DAS.RoATPService.Application.Validators
 
         public bool IsValidStatus(OrganisationStatus status)
         {
-            if (status == null)
-            {
-                return false;
-            }
-
-            return IsValidStatusId(status.Id);
+            return status != null && IsValidStatusId(status.Id);
         }
 
         public bool IsValidStatusId(int statusId)
         {
-            return (statusId >= 0 && statusId <= 2);
+            return statusId == OrganisationStatus.Removed
+                   || statusId == OrganisationStatus.Active
+                   || statusId == OrganisationStatus.ActiveNotTakingOnApprentices
+                   || statusId == OrganisationStatus.Onboarding;
         }
 
         public bool IsValidCompanyNumber(string companyNumber)
