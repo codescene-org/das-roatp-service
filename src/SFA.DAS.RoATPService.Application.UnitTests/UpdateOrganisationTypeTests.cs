@@ -64,8 +64,6 @@
             result.Should().Throw<BadRequestException>();
         }
 
-
-
         [Test]
         public void Handler_rejects_request_with_organisation_type_not_associated_with_organisation_provider_type()
         {
@@ -122,6 +120,5 @@
                 It.IsAny<string>()), Times.Never());
             _auditLogRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
         }
-
     }
 }

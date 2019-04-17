@@ -106,8 +106,6 @@
             }
         }
 
-     
-
         public async Task<RemovedReason> GetRemovedReason(Guid organisationId)
         {
             var connectionString = _configuration.SqlConnectionString;

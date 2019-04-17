@@ -1,6 +1,5 @@
 ﻿namespace SFA.DAS.RoATPService.Application.Handlers
 {
-    using System;
     using System.Threading;
     using System.Threading.Tasks;
     using Api.Types.Models;
@@ -72,7 +71,6 @@
                 _logger.LogInformation(organisationTypeUnassignedIsNotAllowed);
                 throw new BadRequestException(organisationTypeUnassignedIsNotAllowed);
             }
-
 
             if (!_validator.IsValidOrganisationTypeIdForOrganisation(request.OrganisationTypeId, request.OrganisationId))
             {
