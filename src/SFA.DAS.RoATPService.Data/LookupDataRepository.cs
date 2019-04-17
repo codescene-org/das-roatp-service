@@ -25,19 +25,26 @@ namespace SFA.DAS.RoATPService.Data
             _configuration = configuration;
         }
 
-        public async Task<IEnumerable<OrganisationType>> GetOrganisationTypes(int providerTypeId)
+        public async Task<IEnumerable<OrganisationType>> GetOrganisationTypes(int? providerTypeId)
         {
             using (var connection = new SqlConnection(_configuration.SqlConnectionString))
             {
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();
 
-                string sql = $"select ot.Id, ot.Type, ot.Description, ot.CreatedBy, ot.CreatedAt, ot.UpdatedBy, ot.UpdatedAt, ot.Status " 
-                             + "from [OrganisationTypes] ot " +
-                             "inner join [ProviderTypeOrganisationTypes] ptot " +
-                             "on ptot.OrganisationTypeId = ot.Id " +
-                             "and ptot.ProviderTypeId = @providerTypeId " +
-                             "order by ot.Id";
+                var sql = $"SELECT [Id], [Type], [CreatedAt], [CreatedBy], [UpdatedAt], [UpdatedBy], [Status] " +
+                          "FROM [dbo].[OrganisationTypes] ORDER BY Id";
+
+                if (providerTypeId != null)
+                {
+                    sql =
+                        $"select ot.Id, ot.Type, ot.Description, ot.CreatedBy, ot.CreatedAt, ot.UpdatedBy, ot.UpdatedAt, ot.Status "
+                        + "from [OrganisationTypes] ot " +
+                        "inner join [ProviderTypeOrganisationTypes] ptot " +
+                        "on ptot.OrganisationTypeId = ot.Id " +
+                        "and ptot.ProviderTypeId = @providerTypeId " +
+                        "order by ot.Id";
+                }
 
                 var organisationTypes = await connection.QueryAsync<OrganisationType>(sql, new { providerTypeId });
                 return await Task.FromResult(organisationTypes);

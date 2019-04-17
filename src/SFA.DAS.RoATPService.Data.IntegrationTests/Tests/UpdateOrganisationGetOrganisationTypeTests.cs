@@ -57,8 +57,8 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
         [Test]
         public void Organisation_type_is_returned()
         {
-            var actualOrganisationType = _repository.GetOrganisationType(_organisationId).Result;
-            Assert.AreEqual(_organisationTypeId1, actualOrganisationType);
+            var actualOrganisationTypeId = _repository.GetOrganisationType(_organisationId).Result;
+            Assert.AreEqual(_organisationTypeId1, actualOrganisationTypeId);
         }
 
         [OneTimeTearDown]

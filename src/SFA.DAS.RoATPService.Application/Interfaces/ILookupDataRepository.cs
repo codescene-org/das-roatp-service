@@ -9,7 +9,7 @@ namespace SFA.DAS.RoATPService.Application.Interfaces
     public interface ILookupDataRepository
     {
         Task<IEnumerable<ProviderType>> GetProviderTypes();
-        Task<IEnumerable<OrganisationType>> GetOrganisationTypes(int providerTypeId);
+        Task<IEnumerable<OrganisationType>> GetOrganisationTypes(int? providerTypeId);
 
         Task<IEnumerable<OrganisationStatus>> GetOrganisationStatuses(int? providerTypeId);
         Task<OrganisationType> GetOrganisationType(int organisationTypeId);
