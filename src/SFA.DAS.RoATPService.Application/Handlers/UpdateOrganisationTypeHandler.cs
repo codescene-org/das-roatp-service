@@ -13,11 +13,11 @@
 
     public class UpdateOrganisationTypeHandler : UpdateOrganisationHandlerBase, IRequestHandler<UpdateOrganisationTypeRequest, bool>
     {
-        private ILogger<UpdateOrganisationTypeHandler> _logger;
-        private IOrganisationValidator _validator;
-        private IUpdateOrganisationRepository _updateOrganisationRepository;
-        private IAuditLogRepository _auditLogRepository;
-        private ILookupDataRepository _lookupRepository;
+        private readonly ILogger<UpdateOrganisationTypeHandler> _logger;
+        private readonly IOrganisationValidator _validator;
+        private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
+        private readonly IAuditLogRepository _auditLogRepository;
+        private readonly ILookupDataRepository _lookupRepository;
 
         public UpdateOrganisationTypeHandler(ILogger<UpdateOrganisationTypeHandler> logger,
             IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository,
@@ -43,17 +43,17 @@
 
             if (existingTypeId != request.OrganisationTypeId)
             {
-                AddAuditEntry(auditData, "Organisation Type", TypeText(existingTypeId),
-                    TypeText(request.OrganisationTypeId));
+                success = await _updateOrganisationRepository.UpdateType(request.OrganisationId,
+                    request.OrganisationTypeId, request.UpdatedBy);    
             }
 
-            success = await _updateOrganisationRepository.UpdateType(request.OrganisationId,
-                request.OrganisationTypeId, request.UpdatedBy);
-
             if (success)
+            {
+                AddAuditEntry(auditData, "Organisation Type", ConvertTypeIdToText(existingTypeId),
+                    ConvertTypeIdToText(request.OrganisationTypeId));
                 success = await _auditLogRepository.WriteFieldChangesToAuditLog(auditData);
+            }
 
-         
             return await Task.FromResult(success);
         }
 
@@ -66,9 +66,7 @@
                 throw new BadRequestException(invalidOrganisationType);
             }
 
-            var organisationTypeIdUnassigned = 0;
-
-            if (request.OrganisationTypeId == organisationTypeIdUnassigned)
+            if (request.OrganisationTypeId == OrganisationType.Unassigned)
             {
                 string organisationTypeUnassignedIsNotAllowed = $@"You cannot set the organisation type to unassigned";
                 _logger.LogInformation(organisationTypeUnassignedIsNotAllowed);
@@ -76,16 +74,15 @@
             }
 
 
-            if (!_validator.IsValidOrganisationTypeIdForOrganisationProvider(request.OrganisationTypeId, request.OrganisationId))
+            if (!_validator.IsValidOrganisationTypeIdForOrganisation(request.OrganisationTypeId, request.OrganisationId))
             {
-                var organisationTypeIsNotAllowed = $@"You cannot set the organisation type {request.OrganisationTypeId} for this organisation's provider type";
+                var organisationTypeIsNotAllowed = $@"You cannot set the organisation type Id [{request.OrganisationTypeId}] for this organisation's provider type";
                 _logger.LogInformation(organisationTypeIsNotAllowed);
                 throw new BadRequestException(organisationTypeIsNotAllowed);
             }
         }
 
-
-        private string TypeText(int typeId)
+        private string ConvertTypeIdToText(int typeId)
         {
             var organisationType = _lookupRepository.GetOrganisationType(typeId).Result;
 

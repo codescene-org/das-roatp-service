@@ -139,6 +139,11 @@ namespace SFA.DAS.RoATPService.Application.Validators
             return organisationTypeId >= 0 && organisationTypeId <= 20;
         }
 
+        public bool IsValidOrganisationStatusIdForOrganisation(int organisationStatusId, Guid organisationId)
+        {
+            return _lookupRepository.IsOrganisationStatusValidForOrganisation(organisationStatusId, organisationId).Result;
+        }
+
         public async Task<bool> IsValidOrganisationTypeIdForProvider(int organisationTypeId, int providerTypeId)
         {
             if (!IsValidOrganisationTypeId(organisationTypeId))
@@ -164,7 +169,7 @@ namespace SFA.DAS.RoATPService.Application.Validators
             return _duplicateCheckRepository.DuplicateUKPRNExists(organisationId, ukprn).Result;
         }
 
-        public bool IsValidOrganisationTypeIdForOrganisationProvider(int organisationTypeId, Guid organisationId)
+        public bool IsValidOrganisationTypeIdForOrganisation(int organisationTypeId, Guid organisationId)
         {
             return _lookupRepository.IsOrganisationTypeValidForOrganisation(organisationTypeId, organisationId).Result;
         }

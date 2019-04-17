@@ -24,7 +24,7 @@
         private Mock<IUpdateOrganisationRepository> _repository;
         private Mock<IAuditLogRepository> _auditLogRepository;
         private Mock<IOrganisationStatusRepository> _orgStatusRepository;
-        private Mock<IDuplicateCheckRepository> _duplicateRepository;
+
 
         [SetUp]
         public void Before_each_test()
@@ -36,7 +36,7 @@
                 UpdatedBy = "unit test",
                 RemovedReasonId = null
             };
-            _duplicateRepository = new Mock<IDuplicateCheckRepository>();
+
             _logger = new Mock<ILogger<UpdateOrganisationStatusHandler>>();
 
             _validator = new Mock<IOrganisationValidator>();
@@ -44,6 +44,7 @@
             _validator.Setup(x => x.IsValidOrganisationTypeIdForProvider(It.IsAny<int>(), It.IsAny<int>()))
                 .ReturnsAsync(true);
             _validator.Setup(x => x.IsValidStatusId(It.IsAny<int>())).Returns(true);
+            _validator.Setup(x => x.IsValidOrganisationStatusIdForOrganisation(It.IsAny<int>(), It.IsAny<Guid>())).Returns(true);
 
             _repository = new Mock<IUpdateOrganisationRepository>();
             _auditLogRepository = new Mock<IAuditLogRepository>();
@@ -85,6 +86,19 @@
         {
             _request.OrganisationStatusId = statusId;
             _request.RemovedReasonId = 1;
+
+            Func<Task> result = async () => await
+                _handler.Handle(_request, new CancellationToken());
+            result.Should().Throw<BadRequestException>();
+        }
+
+        [TestCase(-1)]
+        [TestCase(3)]
+        public void Handler_rejects_organisation_status_not_appropriate_for_organisation_provider_id(int statusId)
+        {
+            _validator.Setup(x => x.IsValidOrganisationStatusIdForOrganisation(statusId, It.IsAny<Guid>())).Returns(false);
+
+            _request.OrganisationStatusId = statusId;
 
             Func<Task> result = async () => await
                 _handler.Handle(_request, new CancellationToken());

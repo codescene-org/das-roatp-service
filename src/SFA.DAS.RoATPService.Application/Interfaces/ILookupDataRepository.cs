@@ -15,6 +15,7 @@ namespace SFA.DAS.RoATPService.Application.Interfaces
         Task<OrganisationType> GetOrganisationType(int organisationTypeId);
         Task<IEnumerable<RemovedReason>> GetRemovedReasons();
 
-        Task<bool> IsOrganisationTypeValidForOrganisation(int organitionTypeId, Guid organisationId);
+        Task<bool> IsOrganisationTypeValidForOrganisation(int organisationTypeId, Guid organisationId);
+        Task<bool> IsOrganisationStatusValidForOrganisation(int organisationStatusId, Guid organisationId);
     }
 }
