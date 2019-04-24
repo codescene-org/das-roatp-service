@@ -17,20 +17,22 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
     public class UpdateOrganisationFinancialTrackRecordHandlerTests
     {
         private Mock<ILogger<UpdateOrganisationFinancialTrackRecordHandler>> _logger;
-        private Mock<IUpdateOrganisationRepository> _repository;
+        private Mock<IUpdateOrganisationRepository> _updateRepository;
+        private Mock<IOrganisationRepository> _repository;
         private UpdateOrganisationFinancialTrackRecordHandler _handler;
 
         [SetUp]
         public void Before_each_test()
         {
             _logger = new Mock<ILogger<UpdateOrganisationFinancialTrackRecordHandler>>();
-            _repository = new Mock<IUpdateOrganisationRepository>();
+            _updateRepository = new Mock<IUpdateOrganisationRepository>();
+            _repository = new Mock<IOrganisationRepository>();
             _repository.Setup(x => x.GetFinancialTrackRecord(It.IsAny<Guid>())).ReturnsAsync(true).Verifiable();
-            _repository.Setup(x => x.UpdateFinancialTrackRecord(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<string>())).ReturnsAsync(true).Verifiable();
-            _repository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true).Verifiable();
+            _updateRepository.Setup(x => x.UpdateFinancialTrackRecord(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<string>())).ReturnsAsync(true).Verifiable();
+            _updateRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true).Verifiable();
 
 
-            _handler = new UpdateOrganisationFinancialTrackRecordHandler(_logger.Object, _repository.Object);
+            _handler = new UpdateOrganisationFinancialTrackRecordHandler(_logger.Object, _updateRepository.Object, _repository.Object);
         }
 
         [Test]
@@ -47,14 +49,14 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             result.Should().BeFalse();
 
             _repository.Verify(x => x.GetFinancialTrackRecord(It.IsAny<Guid>()), Times.Once);
-            _repository.Verify(x => x.UpdateFinancialTrackRecord(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<string>()), Times.Never);
-            _repository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
+            _updateRepository.Verify(x => x.UpdateFinancialTrackRecord(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<string>()), Times.Never);
+            _updateRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
         }
 
         [Test]
         public void Handler_does_not_write_audit_log_entry_if_save_operation_fails()
         {
-            _repository.Setup(x => x.UpdateFinancialTrackRecord(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<string>())).ReturnsAsync(false).Verifiable();
+            _updateRepository.Setup(x => x.UpdateFinancialTrackRecord(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<string>())).ReturnsAsync(false).Verifiable();
 
             var request = new UpdateOrganisationFinancialTrackRecordRequest
             {
@@ -67,8 +69,8 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             result.Should().BeFalse();
 
             _repository.Verify(x => x.GetFinancialTrackRecord(It.IsAny<Guid>()), Times.Once);
-            _repository.Verify(x => x.UpdateFinancialTrackRecord(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<string>()), Times.Never);
-            _repository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
+            _updateRepository.Verify(x => x.UpdateFinancialTrackRecord(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<string>()), Times.Never);
+            _updateRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
         }
 
         [Test]
@@ -85,8 +87,8 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             result.Should().BeTrue();
 
             _repository.Verify(x => x.GetFinancialTrackRecord(It.IsAny<Guid>()), Times.Once);
-            _repository.Verify(x => x.UpdateFinancialTrackRecord(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<string>()), Times.Once);
-            _repository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Once);
+            _updateRepository.Verify(x => x.UpdateFinancialTrackRecord(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<string>()), Times.Once);
+            _updateRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Once);
         }
     }
 }

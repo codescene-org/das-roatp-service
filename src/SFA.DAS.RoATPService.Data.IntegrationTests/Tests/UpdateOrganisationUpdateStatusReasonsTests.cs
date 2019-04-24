@@ -12,7 +12,8 @@
     public class UpdateOrganisationUpdateStatusReasonsTests : TestBase
     {
         private readonly DatabaseService _databaseService = new DatabaseService();
-        private UpdateOrganisationRepository _repository;
+        private UpdateOrganisationRepository _updateOrganisationRepository;
+        private OrganisationRepository _repository;
         private OrganisationStatusModel _status1;
         private OrganisationStatusModel _status2;
         private int _organisationStatusId1;
@@ -41,7 +42,8 @@
             _organisationUkprn = 11114433;
             _legalName = "Legal name 1";
             _organisationId = Guid.NewGuid();
-            _repository = new UpdateOrganisationRepository(_databaseService.WebConfiguration);
+            _updateOrganisationRepository = new UpdateOrganisationRepository(_databaseService.WebConfiguration);
+            _repository = new OrganisationRepository(_databaseService.WebConfiguration);
             _status1 = new OrganisationStatusModel { Id = _organisationStatusId1, Status = "Live", CreatedAt = DateTime.Now, CreatedBy = "TestSystem" };
             OrganisationStatusHandler.InsertRecord(_status1);
             _status2 = new OrganisationStatusModel { Id = _organisationStatusId0, Status = "Live", CreatedAt = DateTime.Now, CreatedBy = "TestSystem" };
@@ -72,9 +74,9 @@
             OrganisationHandler.InsertRecord(_organisation);
             _changedBy = "SystemChange";
 
-            var _updatedReason = _repository.UpdateStatusWithRemovedReason(_organisationId, _organisationStatusId0, _reason2.Id, _changedBy).Result;
+            var _updatedReason = _updateOrganisationRepository.UpdateStatusWithRemovedReason(_organisationId, _organisationStatusId0, _reason2.Id, _changedBy).Result;
             _successfulUpdate = (_updatedReason != null);
-            _newOrganisationStatusId = _repository.GetStatus(_organisationId).Result;
+            _newOrganisationStatusId = _repository.GetOrganisationStatus(_organisationId).Result;
         }
 
         [Test]

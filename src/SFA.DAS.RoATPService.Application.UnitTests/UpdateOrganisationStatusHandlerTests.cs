@@ -23,8 +23,9 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         private UpdateOrganisationStatusHandler _handler;
         private Mock<ILogger<UpdateOrganisationStatusHandler>> _logger;
         private Mock<IOrganisationValidator> _validator;
-        private Mock<IUpdateOrganisationRepository> _repository;
+        private Mock<IUpdateOrganisationRepository> _updateRepository;
         private Mock<ILookupDataRepository> _lookupDataRepository;
+        private Mock<IOrganisationRepository> _repository;
 
 
         [SetUp]
@@ -47,8 +48,9 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _validator.Setup(x => x.IsValidStatusId(It.IsAny<int>())).Returns(true);
             _validator.Setup(x => x.IsValidOrganisationStatusIdForOrganisation(It.IsAny<int>(), It.IsAny<Guid>())).Returns(true);
 
-            _repository = new Mock<IUpdateOrganisationRepository>();
+            _updateRepository = new Mock<IUpdateOrganisationRepository>();
             _lookupDataRepository = new Mock<ILookupDataRepository>();
+            _repository = new Mock<IOrganisationRepository>();
 
             var activeStatus = new OrganisationStatus { Id = 1, Status = "Active" };
             _lookupDataRepository.Setup(x => x.GetOrganisationStatus(1)).ReturnsAsync(activeStatus);
@@ -63,8 +65,8 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _repository.Setup(x => x.GetRemovedReason(It.IsAny<Guid>())).ReturnsAsync(nullReason);
 
             _handler = new UpdateOrganisationStatusHandler(_logger.Object, _validator.Object, 
-                                                           _repository.Object,
-                                                           _lookupDataRepository.Object);
+                                                           _updateRepository.Object,
+                                                           _lookupDataRepository.Object, _repository.Object);
         }
 
         [TestCase(-1)]
@@ -108,113 +110,113 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         [Test]
         public void Handler_accepts_change_from_active_to_not_taking_on_apprentices()
         {
-            _repository.Setup(x => x.GetStatus(It.IsAny<Guid>())).ReturnsAsync(OrganisationStatus.Active);
+            _repository.Setup(x => x.GetOrganisationStatus(It.IsAny<Guid>())).ReturnsAsync(OrganisationStatus.Active);
 
             _request.OrganisationStatusId = OrganisationStatus.ActiveNotTakingOnApprentices;
 
-            _repository.Setup(x =>
-                    x.UpdateStatus(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<string>()))
+            _updateRepository.Setup(x =>
+                    x.UpdateOrganisationStatus(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ReturnsAsync(true);
 
-            _repository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true);
+            _updateRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true);
 
-            _repository.Setup(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>())).ReturnsAsync(true).Verifiable();
+            _updateRepository.Setup(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>())).ReturnsAsync(true).Verifiable();
 
             var result = _handler.Handle(_request, new CancellationToken()).GetAwaiter().GetResult();
 
             result.Should().BeTrue();
 
-            _repository.Verify(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>()), Times.Never);
+            _updateRepository.Verify(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>()), Times.Never);
         }
 
         [Test]
         public void Handler_accepts_change_from_not_taking_on_apprentices_to_active()
         {
-            _repository.Setup(x => x.GetStatus(It.IsAny<Guid>())).ReturnsAsync(OrganisationStatus.ActiveNotTakingOnApprentices);
+            _repository.Setup(x => x.GetOrganisationStatus(It.IsAny<Guid>())).ReturnsAsync(OrganisationStatus.ActiveNotTakingOnApprentices);
 
             _request.OrganisationStatusId = OrganisationStatus.Active;
 
-            _repository.Setup(x =>
-                    x.UpdateStatus(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<string>()))
+            _updateRepository.Setup(x =>
+                    x.UpdateOrganisationStatus(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ReturnsAsync(true);
 
-            _repository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true);
+            _updateRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true);
 
-            _repository.Setup(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>())).ReturnsAsync(true).Verifiable();
+            _updateRepository.Setup(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>())).ReturnsAsync(true).Verifiable();
 
             var result = _handler.Handle(_request, new CancellationToken()).GetAwaiter().GetResult();
 
             result.Should().BeTrue();
 
-            _repository.Verify(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>()), Times.Never);
+            _updateRepository.Verify(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>()), Times.Never);
         }
 
         [Test]
         public void Handler_accepts_change_from_removed_to_active()
         {
-            _repository.Setup(x => x.GetStatus(It.IsAny<Guid>())).ReturnsAsync(OrganisationStatus.Removed);
+            _repository.Setup(x => x.GetOrganisationStatus(It.IsAny<Guid>())).ReturnsAsync(OrganisationStatus.Removed);
 
             _request.OrganisationStatusId = OrganisationStatus.Active;
 
-            _repository.Setup(x =>
-                    x.UpdateStatus(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<string>()))
+            _updateRepository.Setup(x =>
+                    x.UpdateOrganisationStatus(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ReturnsAsync(true);
 
-            _repository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true);
+            _updateRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true);
 
-            _repository.Setup(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>())).ReturnsAsync(true).Verifiable();
+            _updateRepository.Setup(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>())).ReturnsAsync(true).Verifiable();
 
             var result = _handler.Handle(_request, new CancellationToken()).GetAwaiter().GetResult();
 
             result.Should().BeTrue();
 
-            _repository.Verify(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>()), Times.Once);
+            _updateRepository.Verify(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>()), Times.Once);
         }
 
         [Test]
         public void Handler_accepts_change_from_removed_to_different_removed_reason()
         {
-            _repository.Setup(x => x.GetStatus(It.IsAny<Guid>())).ReturnsAsync(OrganisationStatus.Removed);
+            _repository.Setup(x => x.GetOrganisationStatus(It.IsAny<Guid>())).ReturnsAsync(OrganisationStatus.Removed);
             RemovedReason existingReason = new RemovedReason{ Id = 1, Reason = "test reason" };
             _repository.Setup(x => x.GetRemovedReason(It.IsAny<Guid>())).ReturnsAsync(existingReason);
             _request.OrganisationStatusId = OrganisationStatus.Removed;
 
-            _repository.Setup(x =>
-                    x.UpdateStatus(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<string>()))
+            _updateRepository.Setup(x =>
+                    x.UpdateOrganisationStatus(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ReturnsAsync(true);
 
-            _repository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true).Verifiable();
+            _updateRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true).Verifiable();
 
-            _repository.Setup(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>())).ReturnsAsync(true).Verifiable();
+            _updateRepository.Setup(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>())).ReturnsAsync(true).Verifiable();
 
             var result = _handler.Handle(_request, new CancellationToken()).GetAwaiter().GetResult();
 
             result.Should().BeTrue();
 
-            _repository.Verify(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>()), Times.Never);
-            _repository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Once);
+            _updateRepository.Verify(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>()), Times.Never);
+            _updateRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Once);
         }
 
         [Test]
         public void Handler_accepts_change_from_removed_to_not_taking_on_apprentices()
         {
-            _repository.Setup(x => x.GetStatus(It.IsAny<Guid>())).ReturnsAsync(OrganisationStatus.Removed);
+            _repository.Setup(x => x.GetOrganisationStatus(It.IsAny<Guid>())).ReturnsAsync(OrganisationStatus.Removed);
 
             _request.OrganisationStatusId = OrganisationStatus.ActiveNotTakingOnApprentices;
 
-            _repository.Setup(x =>
-                    x.UpdateStatus(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<string>()))
+            _updateRepository.Setup(x =>
+                    x.UpdateOrganisationStatus(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ReturnsAsync(true);
 
-            _repository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true);
+            _updateRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true);
 
-            _repository.Setup(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>())).ReturnsAsync(true).Verifiable();
+            _updateRepository.Setup(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>())).ReturnsAsync(true).Verifiable();
 
             var result = _handler.Handle(_request, new CancellationToken()).GetAwaiter().GetResult();
 
             result.Should().BeTrue();
 
-            _repository.Verify(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>()), Times.Once);
+            _updateRepository.Verify(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>()), Times.Once);
         }
 
         [TestCase(OrganisationStatus.Active, 1)]
@@ -243,26 +245,26 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         [TestCase(OrganisationStatus.ActiveNotTakingOnApprentices, 12)]
         public void Handler_accepts_change_from_active_to_removed_and_valid_removal_reasons(int statusId, int removalReasonId)
         {
-            _repository.Setup(x => x.GetStatus(It.IsAny<Guid>())).ReturnsAsync(statusId);
+            _repository.Setup(x => x.GetOrganisationStatus(It.IsAny<Guid>())).ReturnsAsync(statusId);
 
             _request.OrganisationStatusId = OrganisationStatus.Removed;
             _request.RemovedReasonId = removalReasonId;
 
             var removedReason = new RemovedReason {Id = 1, Reason = "test reason"};
 
-            _repository.Setup(x =>
+            _updateRepository.Setup(x =>
                     x.UpdateStatusWithRemovedReason(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ReturnsAsync(removedReason);
 
-            _repository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true);
+            _updateRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true);
 
-            _repository.Setup(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>())).ReturnsAsync(true).Verifiable();
+            _updateRepository.Setup(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>())).ReturnsAsync(true).Verifiable();
 
             var result = _handler.Handle(_request, new CancellationToken()).GetAwaiter().GetResult();
 
             result.Should().BeTrue();
 
-            _repository.Verify(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>()), Times.Never);
+            _updateRepository.Verify(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>()), Times.Never);
         }
     }
 }

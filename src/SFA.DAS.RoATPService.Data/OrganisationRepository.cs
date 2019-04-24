@@ -1,4 +1,5 @@
-﻿using SFA.DAS.RoATPService.Application.Commands;
+﻿using Newtonsoft.Json;
+using SFA.DAS.RoATPService.Application.Commands;
 
 namespace SFA.DAS.RoATPService.Data
 {
@@ -63,6 +64,156 @@ namespace SFA.DAS.RoATPService.Data
                 return await connection.ExecuteScalarAsync<string>(sql, new { organisationId });
             }
         }
+
+        public async Task<string> GetTradingName(Guid organisationId)
+        {
+            var connectionString = _configuration.SqlConnectionString;
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                const string sql = "select TradingName FROM [Organisations] " +
+                                   "WHERE Id = @organisationId";
+                return await connection.ExecuteScalarAsync<string>(sql, new { organisationId });
+            }
+        }
+
+        public async Task<int> GetOrganisationStatus(Guid organisationId)
+        {
+            var connectionString = _configuration.SqlConnectionString;
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                var sql = "select StatusId FROM [Organisations] " +
+                          "WHERE Id = @organisationId";
+                return await connection.ExecuteScalarAsync<int>(sql, new { organisationId });
+            }
+        }
+
+        public async Task<RemovedReason> GetRemovedReason(Guid organisationId)
+        {
+            var connectionString = _configuration.SqlConnectionString;
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                var sql = "select JSON_QUERY(OrganisationData, '$.RemovedReason') FROM [Organisations] " +
+                          "WHERE Id = @organisationId";
+                var results = await connection.QueryAsync<string>(sql, new { organisationId });
+                var resultJson = results.FirstOrDefault();
+                if (resultJson == null)
+                {
+                    RemovedReason nullResult = null;
+                    return await Task.FromResult(nullResult);
+                }
+
+                return JsonConvert.DeserializeObject<RemovedReason>(resultJson);
+            }
+        }
+
+        public async Task<bool> GetParentCompanyGuarantee(Guid organisationId)
+        {
+            var connectionString = _configuration.SqlConnectionString;
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                var sql = $@"select CASE WHEN isnull(JSON_Value(OrganisationData,'$.ParentCompanyGuarantee'),'false') = 'false'
+                                    THEN 0
+                                    ELSE 1
+                                    END
+                                    FROM[Organisations] " +
+                          "WHERE Id = @organisationId";
+                return await connection.ExecuteScalarAsync<bool>(sql, new { organisationId });
+            }
+        }
+
+        public async Task<bool> GetFinancialTrackRecord(Guid organisationId)
+        {
+            var connectionString = _configuration.SqlConnectionString;
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                var sql = $@"select CASE WHEN isnull(JSON_Value(OrganisationData,'$.FinancialTrackRecord'),'false') = 'false'
+                                    THEN 0
+                                    ELSE 1
+                                    END
+                                    FROM[Organisations] " +
+                          "WHERE Id = @organisationId";
+                return await connection.ExecuteScalarAsync<bool>(sql, new { organisationId });
+            }
+        }
+
+        public async Task<int> GetProviderType(Guid organisationId)
+        {
+            var connectionString = _configuration.SqlConnectionString;
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                const string sql = "SELECT ProviderTypeId FROM [Organisations] WHERE Id = @organisationId";
+                return await connection.ExecuteScalarAsync<int>(sql, new { organisationId });
+            }
+        }
+
+        public async Task<DateTime?> GetStartDate(Guid organisationId)
+        {
+            var connectionString = _configuration.SqlConnectionString;
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                const string sql = "SELECT Json_value(organisationData,'$.StartDate') FROM [Organisations] WHERE Id = @organisationId";
+                return await connection.ExecuteScalarAsync<DateTime?>(sql, new { organisationId });
+            }
+        }
+
+        public async Task<int> GetOrganisationType(Guid organisationId)
+        {
+            var connectionString = _configuration.SqlConnectionString;
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                const string sql = "SELECT OrganisationTypeId FROM [Organisations] WHERE Id = @organisationId";
+                return await connection.ExecuteScalarAsync<int>(sql, new { organisationId });
+            }
+        }
+
+        public async Task<long> GetUkprn(Guid organisationId)
+        {
+            var connectionString = _configuration.SqlConnectionString;
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                var sql = "select ukprn FROM [Organisations] " +
+                          "WHERE Id = @organisationId";
+
+                return await connection.ExecuteScalarAsync<long>(sql, new { organisationId });
+            }
+        }
+
 
 
     }

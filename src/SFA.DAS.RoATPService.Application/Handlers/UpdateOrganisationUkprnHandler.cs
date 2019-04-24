@@ -15,15 +15,18 @@
         private readonly ILogger<UpdateOrganisationUkprnHandler> _logger;
         private readonly IOrganisationValidator _validator;
         private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
+        private readonly IOrganisationRepository _organisationRepository;
 
         private const string FieldChanged = "UKPRN";
 
         public UpdateOrganisationUkprnHandler(ILogger<UpdateOrganisationUkprnHandler> logger,
-            IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository)
+            IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository, 
+            IOrganisationRepository organisationRepository)
         {
             _logger = logger;
             _validator = validator;
             _updateOrganisationRepository = updateOrganisationRepository;
+            _organisationRepository = organisationRepository;
         }
 
         public async Task<bool> Handle(UpdateOrganisationUkprnRequest request, CancellationToken cancellationToken)
@@ -47,7 +50,7 @@
 
             _logger.LogInformation($@"Handling Update '{FieldChanged}' for Organisation ID [{request.OrganisationId}]");
 
-            long previousUkprn = await _updateOrganisationRepository.GetUkprn(request.OrganisationId);
+            long previousUkprn = await _organisationRepository.GetUkprn(request.OrganisationId);
 
             if (previousUkprn == request.Ukprn)
             {

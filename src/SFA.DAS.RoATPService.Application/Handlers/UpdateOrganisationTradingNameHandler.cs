@@ -18,16 +18,19 @@ namespace SFA.DAS.RoATPService.Application.Handlers
     {
         private readonly ILogger<UpdateOrganisationTradingNameHandler> _logger;
         private readonly IOrganisationValidator _validator;
+        private readonly IOrganisationRepository _organisationRepository;
         private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
 
         private const string FieldChanged = "Trading Name";
 
         public UpdateOrganisationTradingNameHandler(ILogger<UpdateOrganisationTradingNameHandler> logger,
-            IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository)
+            IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository, 
+            IOrganisationRepository organisationRepository)
         {
             _logger = logger;
             _validator = validator;
             _updateOrganisationRepository = updateOrganisationRepository;
+            _organisationRepository = organisationRepository;
         }
 
         public async Task<bool> Handle(UpdateOrganisationTradingNameRequest request, CancellationToken cancellationToken)
@@ -39,7 +42,7 @@ namespace SFA.DAS.RoATPService.Application.Handlers
                 throw new BadRequestException(invalidLegalNameError);
             }
 
-            string previousTradingName = await _updateOrganisationRepository.GetTradingName(request.OrganisationId);
+            var previousTradingName = await _organisationRepository.GetTradingName(request.OrganisationId);
 
             if ((String.IsNullOrWhiteSpace(previousTradingName) && String.IsNullOrWhiteSpace(request.TradingName)) ||
                 (previousTradingName == request.TradingName))

@@ -16,15 +16,17 @@
         private readonly IOrganisationValidator _validator;
         private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
         private readonly ILookupDataRepository _lookupRepository;
+        private readonly IOrganisationRepository _organisationRepository;
 
         public UpdateOrganisationTypeHandler(ILogger<UpdateOrganisationTypeHandler> logger,
             IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository,
-            ILookupDataRepository lookupRepository)
+            ILookupDataRepository lookupRepository, IOrganisationRepository organisationRepository)
         {
             _logger = logger;
             _validator = validator;
             _updateOrganisationRepository = updateOrganisationRepository;
             _lookupRepository = lookupRepository;
+            _organisationRepository = organisationRepository;
         }
 
         public async Task<bool> Handle(UpdateOrganisationTypeRequest request, CancellationToken cancellationToken)
@@ -32,7 +34,7 @@
 
             ValidateUpdateTypeRequest(request);
 
-            var existingTypeId = await _updateOrganisationRepository.GetOrganisationType(request.OrganisationId);
+            var existingTypeId = await _organisationRepository.GetOrganisationType(request.OrganisationId);
 
             var success = false;
 

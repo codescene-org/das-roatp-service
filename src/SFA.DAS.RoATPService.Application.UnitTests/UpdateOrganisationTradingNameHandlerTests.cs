@@ -9,10 +9,10 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
     using Microsoft.Extensions.Logging;
     using Moq;
     using NUnit.Framework;
-    using SFA.DAS.RoATPService.Application.Exceptions;
-    using SFA.DAS.RoATPService.Application.Handlers;
-    using SFA.DAS.RoATPService.Application.Interfaces;
-    using SFA.DAS.RoATPService.Application.Validators;
+    using Exceptions;
+    using Handlers;
+    using Interfaces;
+    using Validators;
     using SFA.DAS.RoATPService.Domain;
 
     [TestFixture]
@@ -20,7 +20,8 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
     {
         private Mock<ILogger<UpdateOrganisationTradingNameHandler>> _logger;
         private Mock<IOrganisationValidator> _validator;
-        private Mock<IUpdateOrganisationRepository> _repository;
+        private Mock<IUpdateOrganisationRepository> _updateRepository;
+        private Mock<IOrganisationRepository> _repository;
         private UpdateOrganisationTradingNameHandler _handler;
 
         [SetUp]
@@ -29,12 +30,13 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _logger = new Mock<ILogger<UpdateOrganisationTradingNameHandler>>();
             _validator = new Mock<IOrganisationValidator>();
             _validator.Setup(x => x.IsValidTradingName(It.IsAny<string>())).Returns(true);
-            _repository = new Mock<IUpdateOrganisationRepository>();
+            _updateRepository = new Mock<IUpdateOrganisationRepository>();
+            _repository = new Mock<IOrganisationRepository>();
             _repository.Setup(x => x.GetTradingName(It.IsAny<Guid>())).ReturnsAsync("existing trading name").Verifiable();
-            _repository.Setup(x => x.UpdateTradingName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(true).Verifiable();
-            _repository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true).Verifiable();
+            _updateRepository.Setup(x => x.UpdateTradingName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(true).Verifiable();
+            _updateRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true).Verifiable();
 
-            _handler = new UpdateOrganisationTradingNameHandler(_logger.Object, _validator.Object, _repository.Object);
+            _handler = new UpdateOrganisationTradingNameHandler(_logger.Object, _validator.Object, _updateRepository.Object, _repository.Object);
         }
 
         [Test]
@@ -54,8 +56,8 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             result.Should().Throw<BadRequestException>();
 
             _repository.Verify(x => x.GetTradingName(It.IsAny<Guid>()), Times.Never);
-            _repository.Verify(x => x.UpdateTradingName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
-            _repository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
+            _updateRepository.Verify(x => x.UpdateTradingName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            _updateRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
         }
 
         [Test]
@@ -72,8 +74,8 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             result.Should().BeFalse();
 
             _repository.Verify(x => x.GetTradingName(It.IsAny<Guid>()), Times.Once);
-            _repository.Verify(x => x.UpdateTradingName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
-            _repository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
+            _updateRepository.Verify(x => x.UpdateTradingName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            _updateRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
         }
 
         [TestCase("", null)]
@@ -96,14 +98,14 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             result.Should().BeFalse();
 
             _repository.Verify(x => x.GetTradingName(It.IsAny<Guid>()), Times.Once);
-            _repository.Verify(x => x.UpdateTradingName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
-            _repository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
+            _updateRepository.Verify(x => x.UpdateTradingName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            _updateRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
         }
 
         [Test]
         public void Handler_does_not_write_audit_log_entry_if_save_operation_fails()
         {
-            _repository.Setup(x => x.UpdateTradingName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(false).Verifiable();
+            _updateRepository.Setup(x => x.UpdateTradingName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(false).Verifiable();
 
             var request = new UpdateOrganisationTradingNameRequest
             {
@@ -116,8 +118,8 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             result.Should().BeFalse();
 
             _repository.Verify(x => x.GetTradingName(It.IsAny<Guid>()), Times.Once);
-            _repository.Verify(x => x.UpdateTradingName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
-            _repository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
+            _updateRepository.Verify(x => x.UpdateTradingName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _updateRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
         }
 
         [Test]
@@ -134,8 +136,8 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             result.Should().BeTrue();
 
             _repository.Verify(x => x.GetTradingName(It.IsAny<Guid>()), Times.Once);
-            _repository.Verify(x => x.UpdateTradingName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
-            _repository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Once);
+            _updateRepository.Verify(x => x.UpdateTradingName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _updateRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Once);
         }
     }
 }

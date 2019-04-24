@@ -12,21 +12,23 @@ namespace SFA.DAS.RoATPService.Application.Handlers
     {
         private readonly ILogger<UpdateOrganisationFinancialTrackRecordHandler> _logger;
         private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
+        private readonly IOrganisationRepository _organisationRepository;
 
         private const string FieldChanged = "Financial Track Record";
 
         public UpdateOrganisationFinancialTrackRecordHandler(ILogger<UpdateOrganisationFinancialTrackRecordHandler> logger,
-            IUpdateOrganisationRepository updateOrganisationRepository)
+            IUpdateOrganisationRepository updateOrganisationRepository, IOrganisationRepository organisationRepository)
         {
             _logger = logger;
             _updateOrganisationRepository = updateOrganisationRepository;
+            _organisationRepository = organisationRepository;
         }
 
         public async Task<bool> Handle(UpdateOrganisationFinancialTrackRecordRequest request, CancellationToken cancellationToken)
         {
             _logger.LogInformation($@"Handling Update '{FieldChanged}' for Organisation ID [{request.OrganisationId}]");
 
-            var previousFinancialTrackRecord = await _updateOrganisationRepository.GetFinancialTrackRecord(request.OrganisationId);
+            var previousFinancialTrackRecord = await _organisationRepository.GetFinancialTrackRecord(request.OrganisationId);
 
             if (previousFinancialTrackRecord == request.FinancialTrackRecord)
             {

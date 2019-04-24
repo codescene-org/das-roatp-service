@@ -11,25 +11,27 @@
 
     public class UpdateOrganisationParentCompanyGuaranteeHandler : UpdateOrganisationHandlerBase, IRequestHandler<UpdateOrganisationParentCompanyGuaranteeRequest, bool>
     {
-        private ILogger<UpdateOrganisationParentCompanyGuaranteeHandler> _logger;
-        private IOrganisationValidator _validator;
-        private IUpdateOrganisationRepository _updateOrganisationRepository;
+        private readonly ILogger<UpdateOrganisationParentCompanyGuaranteeHandler> _logger;
+        private readonly IOrganisationValidator _validator;
+        private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
+        private readonly IOrganisationRepository _organisationRepository;
 
         private const string FieldChanged = "Parent Company Guarantee";
 
         public UpdateOrganisationParentCompanyGuaranteeHandler(ILogger<UpdateOrganisationParentCompanyGuaranteeHandler> logger,
-            IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository)
+            IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository, IOrganisationRepository organisationRepository)
         {
             _logger = logger;
             _validator = validator;
             _updateOrganisationRepository = updateOrganisationRepository;
+            _organisationRepository = organisationRepository;
         }
 
         public async Task<bool> Handle(UpdateOrganisationParentCompanyGuaranteeRequest request, CancellationToken cancellationToken)
         {
             _logger.LogInformation($@"Handling Update '{FieldChanged}' for Organisation ID [{request.OrganisationId}]");
 
-            var previousParentCompanyGuarantee = await _updateOrganisationRepository.GetParentCompanyGuarantee(request.OrganisationId);
+            var previousParentCompanyGuarantee = await _organisationRepository.GetParentCompanyGuarantee(request.OrganisationId);
 
             if (previousParentCompanyGuarantee == request.ParentCompanyGuarantee)
             {

@@ -11,7 +11,8 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
     public class UpdateOrganisationUpdateProviderTypeTests : TestBase
     {
         private readonly DatabaseService _databaseService = new DatabaseService();
-        private UpdateOrganisationRepository _repository;
+        private UpdateOrganisationRepository _updateOrganisationRepository;
+        private OrganisationRepository _repository;
         private OrganisationStatusModel _status1;
         private OrganisationStatusModel _status2;
         private int _organisationStatusId1;
@@ -44,7 +45,8 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
             _organisationUkprn = 11114433;
             _legalName = "Legal name 1";
             _organisationId = Guid.NewGuid();
-            _repository = new UpdateOrganisationRepository(_databaseService.WebConfiguration);
+            _updateOrganisationRepository = new UpdateOrganisationRepository(_databaseService.WebConfiguration);
+            _repository = new OrganisationRepository(_databaseService.WebConfiguration);
             _status1 = new OrganisationStatusModel { Id = _organisationStatusId1, Status = "Live", CreatedAt = DateTime.Now, CreatedBy = "TestSystem" };
             OrganisationStatusHandler.InsertRecord(_status1);
             _providerType1 = new ProviderTypeModel { Id = _providerTypeId1, ProviderType = "provider type 10", Description = "provider type description", CreatedAt = DateTime.Now, CreatedBy = "TestSystem", Status = "Live" };
@@ -70,7 +72,7 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
             OrganisationHandler.InsertRecord(_organisation);
             _changedBy = "SystemChange";
 
-            _successfulUpdate = _repository.UpdateProviderTypeAndOrganisationType(_organisationId, _providerTypeId2, _organisationTypeId2, _changedBy).Result;
+            _successfulUpdate = _updateOrganisationRepository.UpdateProviderTypeAndOrganisationType(_organisationId, _providerTypeId2, _organisationTypeId2, _changedBy).Result;
             _newProviderType = _repository.GetProviderType(_organisationId).Result;
             _newOrganisationType = _repository.GetOrganisationType(_organisationId).Result;
         }

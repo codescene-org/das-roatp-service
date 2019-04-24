@@ -17,23 +17,25 @@
         private readonly IOrganisationValidator _validator;
         private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
         private readonly ILookupDataRepository _lookupDataRepository;
+        private readonly IOrganisationRepository _organisationRepository;
 
         public UpdateOrganisationStatusHandler(ILogger<UpdateOrganisationStatusHandler> logger,
             IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository,
-            ILookupDataRepository lookupDataRepository)
+            ILookupDataRepository lookupDataRepository, IOrganisationRepository organisationRepository)
         {
             _logger = logger;
             _validator = validator;
             _updateOrganisationRepository = updateOrganisationRepository;
             _lookupDataRepository = lookupDataRepository;
+            _organisationRepository = organisationRepository;
         }
 
         public async Task<bool> Handle(UpdateOrganisationStatusRequest request, CancellationToken cancellationToken)
         {
             ValidateUpdateStatusRequest(request);
 
-            int existingStatusId = await _updateOrganisationRepository.GetStatus(request.OrganisationId);
-            var removedReason = await _updateOrganisationRepository.GetRemovedReason(request.OrganisationId);
+            int existingStatusId = await _organisationRepository.GetOrganisationStatus(request.OrganisationId);
+            var removedReason = await _organisationRepository.GetRemovedReason(request.OrganisationId);
 
             bool success = false;
 
@@ -47,7 +49,7 @@
             
             if (!request.RemovedReasonId.HasValue)
             {
-                success = await _updateOrganisationRepository.UpdateStatus(request.OrganisationId,
+                success = await _updateOrganisationRepository.UpdateOrganisationStatus(request.OrganisationId,
                                 request.OrganisationStatusId,  request.UpdatedBy);
             }
             else

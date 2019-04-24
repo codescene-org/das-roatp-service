@@ -21,6 +21,7 @@
         private Mock<IOrganisationValidator> _validator;
         private Mock<IUpdateOrganisationRepository> _updateOrganisationRepository;
         private Mock<ILookupDataRepository> _lookupDataRepository;
+        private Mock<IOrganisationRepository> _repository;
         private UpdateOrganisationTypeHandler _handler;
         private UpdateOrganisationTypeRequest _request;
 
@@ -32,9 +33,10 @@
             _validator.Setup(x => x.IsValidOrganisationTypeId(It.IsAny<int>())).Returns(true);
             _validator.Setup(x => x.IsValidOrganisationTypeIdForOrganisation(It.IsAny<int>(), It.IsAny<Guid>())).Returns(true);
             _updateOrganisationRepository = new Mock<IUpdateOrganisationRepository>();
+            _repository = new Mock<IOrganisationRepository>();
             _lookupDataRepository = new Mock<ILookupDataRepository>();
             _handler = new UpdateOrganisationTypeHandler(_logger.Object, _validator.Object,
-                _updateOrganisationRepository.Object, _lookupDataRepository.Object);
+                _updateOrganisationRepository.Object, _lookupDataRepository.Object, _repository.Object);
             _request = new UpdateOrganisationTypeRequest
             {
                 OrganisationId = Guid.NewGuid(),
@@ -76,7 +78,7 @@
         [Test]
         public void Handler_updates_organisation_type_and_records_audit_history()
         { 
-            _updateOrganisationRepository.Setup(x => x.GetOrganisationType(It.IsAny<Guid>())).ReturnsAsync(2);
+            _repository.Setup(x => x.GetOrganisationType(It.IsAny<Guid>())).ReturnsAsync(2);
 
             _updateOrganisationRepository.Setup(x =>
                     x.UpdateOrganisationType(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<string>()))
@@ -101,7 +103,7 @@
                 UpdatedBy = "test"
             };
 
-            _updateOrganisationRepository.Setup(x => x.GetOrganisationType(It.IsAny<Guid>())).ReturnsAsync(3);
+            _repository.Setup(x => x.GetOrganisationType(It.IsAny<Guid>())).ReturnsAsync(3);
 
             _updateOrganisationRepository.Setup(x =>
                     x.UpdateOrganisationType(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<string>()))

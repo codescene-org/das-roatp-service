@@ -22,6 +22,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         private Mock<ILogger<UpdateOrganisationProviderTypeHandler>> _logger;
         private Mock<IOrganisationValidator> _validator;
         private Mock<IUpdateOrganisationRepository> _updateOrganisationRepository;
+        private Mock<IOrganisationRepository> _repository;
         private Mock<ILookupDataRepository> _lookupDataRepository;
         private UpdateOrganisationProviderTypeHandler _handler;
         private UpdateOrganisationProviderTypeRequest _request;
@@ -35,9 +36,10 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _validator.Setup(x => x.IsValidOrganisationTypeIdForProvider(It.IsAny<int>(), It.IsAny<int>()))
                 .ReturnsAsync(true);
             _updateOrganisationRepository = new Mock<IUpdateOrganisationRepository>();
+            _repository = new Mock<IOrganisationRepository>();
             _lookupDataRepository = new Mock<ILookupDataRepository>();
             _handler = new UpdateOrganisationProviderTypeHandler(_logger.Object, _validator.Object, 
-                _updateOrganisationRepository.Object, _lookupDataRepository.Object, new OrganisationStatusManager());
+                _updateOrganisationRepository.Object, _lookupDataRepository.Object, new OrganisationStatusManager(), _repository.Object);
             _request = new UpdateOrganisationProviderTypeRequest
             {
                 OrganisationId = Guid.NewGuid(),
@@ -71,8 +73,8 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         [Test]
         public void Handler_updates_provider_type_and_organisation_type_and_records_audit_history()
         {
-            _updateOrganisationRepository.Setup(x => x.GetProviderType(It.IsAny<Guid>())).ReturnsAsync(1);
-            _updateOrganisationRepository.Setup(x => x.GetOrganisationType(It.IsAny<Guid>())).ReturnsAsync(2);
+            _repository.Setup(x => x.GetProviderType(It.IsAny<Guid>())).ReturnsAsync(1);
+            _repository.Setup(x => x.GetOrganisationType(It.IsAny<Guid>())).ReturnsAsync(2);
 
             _updateOrganisationRepository.Setup(x =>
                     x.UpdateProviderTypeAndOrganisationType(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(),
@@ -99,8 +101,8 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
                 UpdatedBy = "test"
             };
 
-            _updateOrganisationRepository.Setup(x => x.GetProviderType(It.IsAny<Guid>())).ReturnsAsync(1);
-            _updateOrganisationRepository.Setup(x => x.GetOrganisationType(It.IsAny<Guid>())).ReturnsAsync(3);
+            _repository.Setup(x => x.GetProviderType(It.IsAny<Guid>())).ReturnsAsync(1);
+            _repository.Setup(x => x.GetOrganisationType(It.IsAny<Guid>())).ReturnsAsync(3);
 
             _updateOrganisationRepository.Setup(x =>
                     x.UpdateProviderTypeAndOrganisationType(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))

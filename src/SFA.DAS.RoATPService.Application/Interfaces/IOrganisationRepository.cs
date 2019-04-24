@@ -10,5 +10,15 @@
         
         Task<Organisation> GetOrganisation(Guid organisationId);
         Task<string> GetLegalName(Guid organisationId);
+        Task<string> GetTradingName(Guid organisationId);
+        Task<bool> GetFinancialTrackRecord(Guid organisationId);
+        Task<long> GetUkprn(Guid organisationId);
+        Task<bool> GetParentCompanyGuarantee(Guid organisationId);
+        Task<int> GetOrganisationStatus(Guid organisationId);
+        Task<RemovedReason> GetRemovedReason(Guid organisationId);
+        Task<int> GetOrganisationType(Guid organisationId);
+        Task<DateTime?> GetStartDate(Guid organisationId);
+        Task<int> GetProviderType(Guid organisationId);
+
     }
 }
