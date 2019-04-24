@@ -58,17 +58,27 @@
             }
         }
         
-        public async Task<IEnumerable<OrganisationStatus>> GetOrganisationStatuses()
+        public async Task<IEnumerable<OrganisationStatus>> GetOrganisationStatuses(int? providerTypeId)
         {
             using (var connection = new SqlConnection(_configuration.SqlConnectionString))
             {
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();
 
-                string sql = $"SELECT [Id], [Status], [CreatedAt], [CreatedBy], [UpdatedAt], [UpdatedBy] " +
+                var sql = $"SELECT [Id], [Status], [CreatedAt], [CreatedBy], [UpdatedAt], [UpdatedBy] " +
                               "FROM [dbo].[OrganisationStatus] ORDER BY Id";
 
-                var organisationStatuses = await connection.QueryAsync<OrganisationStatus>(sql);
+                if (providerTypeId != null)
+                {
+                    sql =
+                        $@"SELECT os.[Id], os.[Status], os.[CreatedAt], os.[CreatedBy], os.[UpdatedAt], os.[UpdatedBy] 
+                            FROM [dbo].[OrganisationStatus] os
+                            inner join [ProviderTypeOrganisationStatus] ptos on os.Id = ptos.organisationStatusId
+                            where ptos.providerTypeId = @providerTypeId
+                            ORDER BY os.Id";
+                }
+
+                var organisationStatuses = await connection.QueryAsync<OrganisationStatus>(sql, new { providerTypeId });
                 return await Task.FromResult(organisationStatuses);
             }
         }

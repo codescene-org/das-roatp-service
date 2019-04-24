@@ -6,5 +6,6 @@
  
     public class GetOrganisationStatusesRequest : IRequest<IEnumerable<OrganisationStatus>>
     {
+        public int? ProviderTypeId { get; set; }
     }
 }

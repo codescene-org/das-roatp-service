@@ -11,11 +11,14 @@
     using Loggers;
     using Microsoft.Extensions.Logging;
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Converters;
     using SFA.DAS.RoATPService.Importer.Exceptions;
     using SFA.DAS.RoATPService.Importer.Models;
 
     public class RegisterImporter : IRegisterImporter
     {
+        private const string RoatpDateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
         private string ConnectionString { get; set; }
 
         private ILogger<RegisterImporter> Logger { get; }
@@ -104,7 +107,7 @@
                          " @ukprn, @legalName, @tradingName, @statusDate, @organisationData)";
 
             var statusId = registerEntry.Status;
-            var organisationData = JsonConvert.SerializeObject(organisationDataImport);
+            var organisationData = JsonConvert.SerializeObject(organisationDataImport, new IsoDateTimeConverter{ DateTimeFormat = RoatpDateTimeFormat });
 
             var organisationsCreated = await connection.ExecuteAsync(sql,
                 new

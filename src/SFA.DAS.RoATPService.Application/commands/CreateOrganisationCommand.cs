@@ -17,7 +17,6 @@ namespace SFA.DAS.RoATPService.Application.Commands
         public bool FinancialTrackRecord { get; set; }
         public bool NonLevyContract { get; set; }
         public DateTime? StartDate { get; set; }
-
         public string Username { get; set; }
     }
 }

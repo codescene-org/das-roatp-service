@@ -20,10 +20,11 @@
         private UpdateOrganisationStatusRequest _request;
         private UpdateOrganisationStatusHandler _handler;
         private Mock<ILogger<UpdateOrganisationStatusHandler>> _logger;
-        private Mock<OrganisationValidator> _validator;
+        private Mock<IOrganisationValidator> _validator;
         private Mock<IUpdateOrganisationRepository> _repository;
         private Mock<IAuditLogRepository> _auditLogRepository;
         private Mock<IOrganisationStatusRepository> _orgStatusRepository;
+        private Mock<IDuplicateCheckRepository> _duplicateRepository;
 
         [SetUp]
         public void Before_each_test()
@@ -35,8 +36,15 @@
                 UpdatedBy = "unit test",
                 RemovedReasonId = null
             };
+            _duplicateRepository = new Mock<IDuplicateCheckRepository>();
             _logger = new Mock<ILogger<UpdateOrganisationStatusHandler>>();
-            _validator = new Mock<OrganisationValidator>();
+
+            _validator = new Mock<IOrganisationValidator>();
+            _validator.Setup(x => x.IsValidProviderTypeId(It.IsAny<int>())).Returns(true);
+            _validator.Setup(x => x.IsValidOrganisationTypeIdForProvider(It.IsAny<int>(), It.IsAny<int>()))
+                .ReturnsAsync(true);
+            _validator.Setup(x => x.IsValidStatusId(It.IsAny<int>())).Returns(true);
+
             _repository = new Mock<IUpdateOrganisationRepository>();
             _auditLogRepository = new Mock<IAuditLogRepository>();
             _orgStatusRepository = new Mock<IOrganisationStatusRepository>();
@@ -47,6 +55,8 @@
             _orgStatusRepository.Setup(x => x.GetOrganisationStatus(0)).ReturnsAsync(removedStatus);
             var notTakingOnStatus = new OrganisationStatus { Id = 2, Status = "Active - not taking on" };
             _orgStatusRepository.Setup(x => x.GetOrganisationStatus(2)).ReturnsAsync(notTakingOnStatus);
+            var onboardingStatus = new OrganisationStatus { Id = 3, Status = "On-boarding" };
+            _orgStatusRepository.Setup(x => x.GetOrganisationStatus(3)).ReturnsAsync(onboardingStatus);
 
             RemovedReason nullReason = null;
             _repository.Setup(x => x.GetRemovedReason(It.IsAny<Guid>())).ReturnsAsync(nullReason);
@@ -60,6 +70,8 @@
         [TestCase(3)]
         public void Handler_rejects_invalid_organisation_status(int statusId)
         {
+            _validator.Setup(x => x.IsValidStatusId(It.IsAny<int>())).Returns(false);
+
             _request.OrganisationStatusId = statusId;
 
             Func<Task> result = async () => await
@@ -102,7 +114,7 @@
         }
 
         [Test]
-        public void Handle_accepts_change_from_not_taking_on_apprentices_to_active()
+        public void Handler_accepts_change_from_not_taking_on_apprentices_to_active()
         {
             _repository.Setup(x => x.GetStatus(It.IsAny<Guid>())).ReturnsAsync(OrganisationStatus.ActiveNotTakingOnApprentices);
 

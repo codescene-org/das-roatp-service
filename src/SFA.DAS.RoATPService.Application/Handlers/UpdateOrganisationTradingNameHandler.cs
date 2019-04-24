@@ -9,6 +9,7 @@ using SFA.DAS.RoATPService.Api.Types.Models;
 using SFA.DAS.RoATPService.Api.Types.Models.UpdateOrganisation;
 using SFA.DAS.RoATPService.Application.Exceptions;
 using SFA.DAS.RoATPService.Application.Interfaces;
+using SFA.DAS.RoATPService.Application.Services;
 using SFA.DAS.RoATPService.Application.Validators;
 
 namespace SFA.DAS.RoATPService.Application.Handlers
@@ -42,14 +43,17 @@ namespace SFA.DAS.RoATPService.Application.Handlers
                 throw new BadRequestException(invalidLegalNameError);
             }
 
-            _logger.LogInformation($@"Handling Update '{FieldChanged}' for Organisation ID [{request.OrganisationId}]");
-
             string previousTradingName = await _updateOrganisationRepository.GetTradingName(request.OrganisationId);
 
-            if (previousTradingName == request.TradingName)
+            if ((String.IsNullOrWhiteSpace(previousTradingName) && String.IsNullOrWhiteSpace(request.TradingName)) ||
+                (previousTradingName == request.TradingName))
             {
                 return await Task.FromResult(false);
             }
+
+            _logger.LogInformation($@"Handling Update '{FieldChanged}' for Organisation ID [{request.OrganisationId}]");
+
+            request.TradingName = HtmlTagRemover.StripOutTags(request.TradingName);
 
             var success = await _updateOrganisationRepository.UpdateTradingName(request.OrganisationId, request.TradingName, request.UpdatedBy);
 

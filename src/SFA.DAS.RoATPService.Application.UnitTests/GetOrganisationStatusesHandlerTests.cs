@@ -31,7 +31,7 @@
                 new OrganisationStatus { Id = 1, Status = "Active" },
                 new OrganisationStatus { Id = 2, Status = "Active -not taking on new apprentices"}
             };
-            _repository.Setup(x => x.GetOrganisationStatuses()).ReturnsAsync(organisationStatuses);
+            _repository.Setup(x => x.GetOrganisationStatuses(It.IsAny<int?>())).ReturnsAsync(organisationStatuses);
             _handler = new GetOrganisationStatusesHandler(_repository.Object, _logger.Object);
         }
 
@@ -46,7 +46,7 @@
         [Test]
         public void Handler_returns_exception_from_repository()
         {
-            _repository.Setup(x => x.GetOrganisationStatuses())
+            _repository.Setup(x => x.GetOrganisationStatuses(It.IsAny<int?>()))
                 .Throws(new Exception("Unit test exception"));
 
             Func<Task> result = async () => await

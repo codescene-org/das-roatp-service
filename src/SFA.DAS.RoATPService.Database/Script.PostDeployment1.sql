@@ -310,6 +310,51 @@ BEGIN
    DROP TABLE dbo.ApplicationRoutes
 END
 
+
+
+
+ -- STORY APR-388  April 2019
+IF NOT EXISTS (SELECT 1 FROM dbo.organisationStatus WHERE id = 3) 
+	BEGIN
+		SET IDENTITY_INSERT dbo.[OrganisationStatus] ON;
+		INSERT INTO [dbo].[OrganisationStatus]
+			   ([ID]
+			   ,[Status]
+			   ,[CreatedAt]
+			   ,[CreatedBy])
+		 VALUES
+			   (3,
+			   'On-boarding'
+			   ,getdate()
+			   ,'System')
+		set identity_insert dbo.[OrganisationStatus] OFF;
+			
+	END
+	
+-- STORY APR-390 April 2019
+
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ProviderTypeOrganisationStatus]) 
+BEGIN
+	SET IDENTITY_INSERT dbo.[ProviderTypeOrganisationStatus] ON
+
+	INSERT INTO dbo.[ProviderTypeOrganisationStatus]
+	([Id], [ProviderTypeId], [OrganisationStatusId], [CreatedBy], [CreatedAt], [Status])
+	VALUES
+	(1, 1, 0, 'System', SYSDATETIME(), 'Live'),
+	(2, 2, 0, 'System', SYSDATETIME(), 'Live'),
+	(3, 3, 0, 'System', SYSDATETIME(), 'Live'),
+	(4, 1, 1, 'System', SYSDATETIME(), 'Live'),
+	(5, 2, 1, 'System', SYSDATETIME(), 'Live'),
+	(6, 3, 1, 'System', SYSDATETIME(), 'Live'),
+	(7, 1, 2, 'System', SYSDATETIME(), 'Live'),
+	(8, 2, 2, 'System', SYSDATETIME(), 'Live'),
+	(9, 3, 2, 'System', SYSDATETIME(), 'Live'),
+	(10, 1, 3, 'System', SYSDATETIME(), 'Live'),
+	(11, 2, 3, 'System', SYSDATETIME(), 'Live')
+	SET IDENTITY_INSERT dbo.[ProviderTypeOrganisationStatus] OFF
+END
+
 -- load the Company House and Charity Numbers (assumes Register has already been imported)
 :r SaveCompanyandCharityNumber.sql
 :r UpdateStartDateForUkprns.sql
