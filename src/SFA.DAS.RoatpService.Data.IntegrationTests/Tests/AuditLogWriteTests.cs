@@ -14,7 +14,7 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
     public class AddAuditLogTests: TestBase
     {
         private readonly DatabaseService _databaseService = new DatabaseService();
-        private AuditLogRepository _repository;
+        private UpdateOrganisationRepository _repository;
         private Guid _organisationId;
         private bool _updateSuccessful;
         private AuditModel _auditRecord;
@@ -36,7 +36,7 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
             _fieldChanged = "trading name 1";
             _previousValue = "Trainer Trading Name";
             _newValue = "ANDERSON TRAINING LTD";
-            _repository = new AuditLogRepository(_databaseService.WebConfiguration);
+            _repository = new UpdateOrganisationRepository(_databaseService.WebConfiguration);
             var auditData = new AuditData
             {
                 OrganisationId =_organisationId,

@@ -13,20 +13,18 @@
 
     public class UpdateOrganisationStatusHandler : UpdateOrganisationHandlerBase, IRequestHandler<UpdateOrganisationStatusRequest, bool>
     {
-        private ILogger<UpdateOrganisationStatusHandler> _logger;
-        private IOrganisationValidator _validator;
-        private IUpdateOrganisationRepository _updateOrganisationRepository;
-        private IAuditLogRepository _auditLogRepository;
-        private IOrganisationStatusRepository _organisationStatusRepository;
+        private readonly ILogger<UpdateOrganisationStatusHandler> _logger;
+        private readonly IOrganisationValidator _validator;
+        private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
+        private readonly IOrganisationStatusRepository _organisationStatusRepository;
 
         public UpdateOrganisationStatusHandler(ILogger<UpdateOrganisationStatusHandler> logger,
             IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository,
-            IAuditLogRepository auditLogRepository, IOrganisationStatusRepository organisationStatusRepository)
+            IOrganisationStatusRepository organisationStatusRepository)
         {
             _logger = logger;
             _validator = validator;
             _updateOrganisationRepository = updateOrganisationRepository;
-            _auditLogRepository = auditLogRepository;
             _organisationStatusRepository = organisationStatusRepository;
         }
 
@@ -64,7 +62,7 @@
                 }
             }
             
-            success = await _auditLogRepository.WriteFieldChangesToAuditLog(auditData);
+            success = await _updateOrganisationRepository.WriteFieldChangesToAuditLog(auditData);
 
             if (success && UpdateStartDateRequired(existingStatusId, request.OrganisationStatusId))
             {

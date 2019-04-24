@@ -19,20 +19,20 @@ namespace SFA.DAS.RoATPService.Application.Handlers
     {
         private readonly IOrganisationRepository _organisationRepository;
         private readonly IAuditLogFieldComparison _auditLogFieldComparison;
-        private readonly IAuditLogRepository _auditLogRepository;
         private readonly ILogger<UpdateOrganisationHandler> _logger;
         private readonly IOrganisationValidator _organisationValidator;
+        private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
 
         public UpdateOrganisationHandler(IOrganisationRepository repository, ILogger<UpdateOrganisationHandler> logger, 
                                          IOrganisationValidator organisationValidator,
-                                         IAuditLogFieldComparison auditLogFieldComparison,
-                                         IAuditLogRepository auditLogRepository)
+                                         IAuditLogFieldComparison auditLogFieldComparison, 
+                                         IUpdateOrganisationRepository updateOrganisationRepository)
         {
             _organisationRepository = repository;
             _logger = logger;
             _organisationValidator = organisationValidator;
             _auditLogFieldComparison = auditLogFieldComparison;
-            _auditLogRepository = auditLogRepository;
+            _updateOrganisationRepository = updateOrganisationRepository;
         }
 
         public async Task<bool> Handle(UpdateOrganisationRequest request, CancellationToken cancellationToken)
@@ -61,7 +61,7 @@ namespace SFA.DAS.RoATPService.Application.Handlers
 
                 if (updateSuccess)
                 {
-                    return await _auditLogRepository.WriteFieldChangesToAuditLog(auditData);
+                    return await _updateOrganisationRepository.WriteFieldChangesToAuditLog(auditData);
                 }
             }
             

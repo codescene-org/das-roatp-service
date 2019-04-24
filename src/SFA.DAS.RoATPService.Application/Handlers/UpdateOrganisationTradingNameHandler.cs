@@ -16,21 +16,18 @@ namespace SFA.DAS.RoATPService.Application.Handlers
 
     public class UpdateOrganisationTradingNameHandler : UpdateOrganisationHandlerBase, IRequestHandler<UpdateOrganisationTradingNameRequest, bool>
     {
-        private ILogger<UpdateOrganisationTradingNameHandler> _logger;
-        private IOrganisationValidator _validator;
-        private IUpdateOrganisationRepository _updateOrganisationRepository;
-        private IAuditLogRepository _auditLogRepository;
+        private readonly ILogger<UpdateOrganisationTradingNameHandler> _logger;
+        private readonly IOrganisationValidator _validator;
+        private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
 
         private const string FieldChanged = "Trading Name";
 
         public UpdateOrganisationTradingNameHandler(ILogger<UpdateOrganisationTradingNameHandler> logger,
-            IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository,
-            IAuditLogRepository auditLogRepository)
+            IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository)
         {
             _logger = logger;
             _validator = validator;
             _updateOrganisationRepository = updateOrganisationRepository;
-            _auditLogRepository = auditLogRepository;
         }
 
         public async Task<bool> Handle(UpdateOrganisationTradingNameRequest request, CancellationToken cancellationToken)
@@ -64,7 +61,7 @@ namespace SFA.DAS.RoATPService.Application.Handlers
             var auditRecord = CreateAuditLogEntry(request.OrganisationId, request.UpdatedBy,
                 FieldChanged, previousTradingName, request.TradingName);
 
-            return await _auditLogRepository.WriteFieldChangesToAuditLog(auditRecord);
+            return await _updateOrganisationRepository.WriteFieldChangesToAuditLog(auditRecord);
         }
     }
 }

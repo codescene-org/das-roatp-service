@@ -19,7 +19,6 @@
         private readonly ILogger<UpdateOrganisationProviderTypeHandler> _logger;
         private readonly IOrganisationValidator _validator;
         private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
-        private readonly IAuditLogRepository _auditLogRepository;
         private readonly ILookupDataRepository _lookupDataRepository;
         private readonly IOrganisationStatusManager _organisationStatusManager;
 
@@ -27,13 +26,12 @@
 
         public UpdateOrganisationProviderTypeHandler(ILogger<UpdateOrganisationProviderTypeHandler> logger,
             IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository,
-            IAuditLogRepository auditLogRepository, ILookupDataRepository lookupDataRepository, 
+            ILookupDataRepository lookupDataRepository, 
             IOrganisationStatusManager organisationStatusManager)
         {
             _logger = logger;
             _validator = validator;
             _updateOrganisationRepository = updateOrganisationRepository;
-            _auditLogRepository = auditLogRepository;
             _lookupDataRepository = lookupDataRepository;
             _organisationStatusManager = organisationStatusManager;
         }
@@ -67,7 +65,7 @@
                                                                             previousProviderTypeId, previousOrganisationStatusId, previousStartDate, auditData);
             if (!success) return await Task.FromResult(false);
 
-            success = await _auditLogRepository.WriteFieldChangesToAuditLog(auditData);
+            success = await _updateOrganisationRepository.WriteFieldChangesToAuditLog(auditData);
             return await Task.FromResult(success);
         }
 

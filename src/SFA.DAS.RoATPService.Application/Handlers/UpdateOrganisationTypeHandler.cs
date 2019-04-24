@@ -15,17 +15,15 @@
         private readonly ILogger<UpdateOrganisationTypeHandler> _logger;
         private readonly IOrganisationValidator _validator;
         private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
-        private readonly IAuditLogRepository _auditLogRepository;
         private readonly ILookupDataRepository _lookupRepository;
 
         public UpdateOrganisationTypeHandler(ILogger<UpdateOrganisationTypeHandler> logger,
             IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository,
-            IAuditLogRepository auditLogRepository, ILookupDataRepository lookupRepository)
+            ILookupDataRepository lookupRepository)
         {
             _logger = logger;
             _validator = validator;
             _updateOrganisationRepository = updateOrganisationRepository;
-            _auditLogRepository = auditLogRepository;
             _lookupRepository = lookupRepository;
         }
 
@@ -50,7 +48,7 @@
             {
                 AddAuditEntry(auditData, "Organisation Type", ConvertTypeIdToText(existingTypeId),
                     ConvertTypeIdToText(request.OrganisationTypeId));
-                success = await _auditLogRepository.WriteFieldChangesToAuditLog(auditData);
+                success = await _updateOrganisationRepository.WriteFieldChangesToAuditLog(auditData);
             }
 
             return await Task.FromResult(success);

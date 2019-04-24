@@ -18,7 +18,6 @@
         private Mock<ILogger<UpdateOrganisationParentCompanyGuaranteeHandler>> _logger;
         private Mock<IOrganisationValidator> _validator;
         private Mock<IUpdateOrganisationRepository> _repository;
-        private Mock<IAuditLogRepository> _auditRepository;
         private UpdateOrganisationParentCompanyGuaranteeHandler _handler;
 
         [SetUp]
@@ -28,11 +27,10 @@
             _repository = new Mock<IUpdateOrganisationRepository>();
             _repository.Setup(x => x.GetParentCompanyGuarantee(It.IsAny<Guid>())).ReturnsAsync(true).Verifiable();
             _repository.Setup(x => x.UpdateParentCompanyGuarantee(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<string>())).ReturnsAsync(true).Verifiable();
-            _auditRepository = new Mock<IAuditLogRepository>();
-            _auditRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true).Verifiable();
+            _repository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true).Verifiable();
             _validator = new Mock<IOrganisationValidator>();
 
-            _handler = new UpdateOrganisationParentCompanyGuaranteeHandler(_logger.Object, _validator.Object, _repository.Object, _auditRepository.Object);
+            _handler = new UpdateOrganisationParentCompanyGuaranteeHandler(_logger.Object, _validator.Object, _repository.Object);
         }
 
         [Test]
@@ -50,7 +48,7 @@
 
             _repository.Verify(x => x.GetParentCompanyGuarantee(It.IsAny<Guid>()), Times.Once);
             _repository.Verify(x => x.UpdateParentCompanyGuarantee(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<string>()), Times.Never);
-            _auditRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
+            _repository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
         }
 
         [Test]
@@ -70,7 +68,7 @@
 
             _repository.Verify(x => x.GetParentCompanyGuarantee(It.IsAny<Guid>()), Times.Once);
             _repository.Verify(x => x.UpdateParentCompanyGuarantee(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<string>()), Times.Never);
-            _auditRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
+            _repository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
         }
 
         [Test]
@@ -88,7 +86,7 @@
 
             _repository.Verify(x => x.GetParentCompanyGuarantee(It.IsAny<Guid>()), Times.Once);
             _repository.Verify(x => x.UpdateParentCompanyGuarantee(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<string>()), Times.Once);
-            _auditRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Once);
+            _repository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Once);
         }
     }
 }

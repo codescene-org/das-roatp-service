@@ -14,18 +14,15 @@
         private ILogger<UpdateOrganisationParentCompanyGuaranteeHandler> _logger;
         private IOrganisationValidator _validator;
         private IUpdateOrganisationRepository _updateOrganisationRepository;
-        private IAuditLogRepository _auditLogRepository;
 
         private const string FieldChanged = "Parent Company Guarantee";
 
         public UpdateOrganisationParentCompanyGuaranteeHandler(ILogger<UpdateOrganisationParentCompanyGuaranteeHandler> logger,
-            IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository,
-            IAuditLogRepository auditLogRepository)
+            IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository)
         {
             _logger = logger;
             _validator = validator;
             _updateOrganisationRepository = updateOrganisationRepository;
-            _auditLogRepository = auditLogRepository;
         }
 
         public async Task<bool> Handle(UpdateOrganisationParentCompanyGuaranteeRequest request, CancellationToken cancellationToken)
@@ -49,7 +46,7 @@
             var auditRecord = CreateAuditLogEntry(request.OrganisationId, request.UpdatedBy,
                 FieldChanged, previousParentCompanyGuarantee.ToString(), request.ParentCompanyGuarantee.ToString());
 
-            return await _auditLogRepository.WriteFieldChangesToAuditLog(auditRecord);
+            return await _updateOrganisationRepository.WriteFieldChangesToAuditLog(auditRecord);
         }
     }
 }

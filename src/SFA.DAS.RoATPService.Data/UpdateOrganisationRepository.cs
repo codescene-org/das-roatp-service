@@ -395,5 +395,37 @@
                 return await connection.ExecuteScalarAsync<long>(sql, new { organisationId });
             }
         }
+
+
+        public async Task<bool> WriteFieldChangesToAuditLog(AuditData auditFieldChanges)
+        {
+            if (!auditFieldChanges.FieldChanges.Any())
+            {
+                return await Task.FromResult(false);
+            }
+
+            using (var connection = new SqlConnection(_configuration.SqlConnectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                string sql = $"INSERT INTO Audit " +
+                             "([OrganisationId], [UpdatedBy], [UpdatedAt], [AuditData]) " +
+                             "VALUES(@organisationId, @updatedBy, @updatedAt, @auditData)";
+
+                var updatedAt = DateTime.Now;
+                var auditData = JsonConvert.SerializeObject(auditFieldChanges);
+                var recordsAffected = await connection.ExecuteAsync(sql,
+                    new
+                    {
+                        auditFieldChanges.OrganisationId,
+                        auditFieldChanges.UpdatedBy,
+                        updatedAt,
+                        auditData
+                    });
+
+                return await Task.FromResult(recordsAffected > 0);
+            }
+        }
     }
 }

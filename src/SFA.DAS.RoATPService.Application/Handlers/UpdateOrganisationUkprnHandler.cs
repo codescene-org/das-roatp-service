@@ -12,21 +12,18 @@
     public class UpdateOrganisationUkprnHandler
         : UpdateOrganisationHandlerBase, IRequestHandler<UpdateOrganisationUkprnRequest, bool>
     {
-        private ILogger<UpdateOrganisationUkprnHandler> _logger;
-        private IOrganisationValidator _validator;
-        private IUpdateOrganisationRepository _updateOrganisationRepository;
-        private IAuditLogRepository _auditLogRepository;
+        private readonly ILogger<UpdateOrganisationUkprnHandler> _logger;
+        private readonly IOrganisationValidator _validator;
+        private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
 
         private const string FieldChanged = "UKPRN";
 
         public UpdateOrganisationUkprnHandler(ILogger<UpdateOrganisationUkprnHandler> logger,
-            IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository,
-            IAuditLogRepository auditLogRepository)
+            IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository)
         {
             _logger = logger;
             _validator = validator;
             _updateOrganisationRepository = updateOrganisationRepository;
-            _auditLogRepository = auditLogRepository;
         }
 
         public async Task<bool> Handle(UpdateOrganisationUkprnRequest request, CancellationToken cancellationToken)
@@ -67,7 +64,7 @@
             var auditRecord = CreateAuditLogEntry(request.OrganisationId, request.UpdatedBy,
                 FieldChanged, previousUkprn.ToString(), request.Ukprn.ToString());
 
-            return await _auditLogRepository.WriteFieldChangesToAuditLog(auditRecord);
+            return await _updateOrganisationRepository.WriteFieldChangesToAuditLog(auditRecord);
         }
     }
 }

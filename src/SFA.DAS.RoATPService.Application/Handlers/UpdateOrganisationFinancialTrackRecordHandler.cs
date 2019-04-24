@@ -12,17 +12,14 @@ namespace SFA.DAS.RoATPService.Application.Handlers
     {
         private readonly ILogger<UpdateOrganisationFinancialTrackRecordHandler> _logger;
         private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
-        private readonly IAuditLogRepository _auditLogRepository;
 
         private const string FieldChanged = "Financial Track Record";
 
         public UpdateOrganisationFinancialTrackRecordHandler(ILogger<UpdateOrganisationFinancialTrackRecordHandler> logger,
-            IUpdateOrganisationRepository updateOrganisationRepository,
-            IAuditLogRepository auditLogRepository)
+            IUpdateOrganisationRepository updateOrganisationRepository)
         {
             _logger = logger;
             _updateOrganisationRepository = updateOrganisationRepository;
-            _auditLogRepository = auditLogRepository;
         }
 
         public async Task<bool> Handle(UpdateOrganisationFinancialTrackRecordRequest request, CancellationToken cancellationToken)
@@ -46,7 +43,7 @@ namespace SFA.DAS.RoATPService.Application.Handlers
             var auditRecord = CreateAuditLogEntry(request.OrganisationId, request.UpdatedBy,
                 FieldChanged, previousFinancialTrackRecord.ToString(), request.FinancialTrackRecord.ToString());
 
-            return await _auditLogRepository.WriteFieldChangesToAuditLog(auditRecord);
+            return await _updateOrganisationRepository.WriteFieldChangesToAuditLog(auditRecord);
         }
     }
 }

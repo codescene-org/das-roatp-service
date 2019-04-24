@@ -20,7 +20,6 @@
         private Mock<ILogger<UpdateOrganisationTypeHandler>> _logger;
         private Mock<IOrganisationValidator> _validator;
         private Mock<IUpdateOrganisationRepository> _updateOrganisationRepository;
-        private Mock<IAuditLogRepository> _auditLogRepository;
         private Mock<ILookupDataRepository> _lookupDataRepository;
         private UpdateOrganisationTypeHandler _handler;
         private UpdateOrganisationTypeRequest _request;
@@ -33,10 +32,9 @@
             _validator.Setup(x => x.IsValidOrganisationTypeId(It.IsAny<int>())).Returns(true);
             _validator.Setup(x => x.IsValidOrganisationTypeIdForOrganisation(It.IsAny<int>(), It.IsAny<Guid>())).Returns(true);
             _updateOrganisationRepository = new Mock<IUpdateOrganisationRepository>();
-            _auditLogRepository = new Mock<IAuditLogRepository>();
             _lookupDataRepository = new Mock<ILookupDataRepository>();
             _handler = new UpdateOrganisationTypeHandler(_logger.Object, _validator.Object,
-                _updateOrganisationRepository.Object, _auditLogRepository.Object, _lookupDataRepository.Object);
+                _updateOrganisationRepository.Object, _lookupDataRepository.Object);
             _request = new UpdateOrganisationTypeRequest
             {
                 OrganisationId = Guid.NewGuid(),
@@ -84,14 +82,13 @@
                     x.UpdateType(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ReturnsAsync(true).Verifiable();
 
-            _auditLogRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()))
+            _updateOrganisationRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()))
                 .ReturnsAsync(true).Verifiable();
 
             var result = _handler.Handle(_request, new CancellationToken()).Result;
 
             result.Should().BeTrue();
             _updateOrganisationRepository.VerifyAll();
-            _auditLogRepository.VerifyAll();
         }
 
         [Test]
@@ -110,7 +107,7 @@
                     x.UpdateType(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<string>()))
                     .ReturnsAsync(true).Verifiable();
 
-            _auditLogRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()))
+            _updateOrganisationRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()))
                 .ReturnsAsync(true).Verifiable();
 
             var result = _handler.Handle(_request, new CancellationToken()).Result;
@@ -118,7 +115,7 @@
             result.Should().BeFalse();
             _updateOrganisationRepository.Verify(x => x.UpdateType(It.IsAny<Guid>(), It.IsAny<int>(),
                 It.IsAny<string>()), Times.Never());
-            _auditLogRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
+            _updateOrganisationRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
         }
     }
 }

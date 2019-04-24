@@ -27,5 +27,6 @@
         Task<int> GetProviderType(Guid organisationId);
         Task<int> GetOrganisationType(Guid organisationId);
         Task<bool> UpdateProviderTypeAndOrganisationType(Guid organisationId, int providerTypeId, int organisationTypeId, string updatedBy);
+        Task<bool> WriteFieldChangesToAuditLog(AuditData auditFieldChanges);
     }
 }
