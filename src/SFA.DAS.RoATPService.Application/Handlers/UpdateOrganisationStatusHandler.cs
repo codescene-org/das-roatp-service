@@ -16,16 +16,16 @@
         private readonly ILogger<UpdateOrganisationStatusHandler> _logger;
         private readonly IOrganisationValidator _validator;
         private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
-        private readonly IOrganisationStatusRepository _organisationStatusRepository;
+        private readonly ILookupDataRepository _lookupDataRepository;
 
         public UpdateOrganisationStatusHandler(ILogger<UpdateOrganisationStatusHandler> logger,
             IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository,
-            IOrganisationStatusRepository organisationStatusRepository)
+            ILookupDataRepository lookupDataRepository)
         {
             _logger = logger;
             _validator = validator;
             _updateOrganisationRepository = updateOrganisationRepository;
-            _organisationStatusRepository = organisationStatusRepository;
+            _lookupDataRepository = lookupDataRepository;
         }
 
         public async Task<bool> Handle(UpdateOrganisationStatusRequest request, CancellationToken cancellationToken)
@@ -111,7 +111,7 @@
 
         private string StatusText(int statusId)
         {
-            var organisationStatus = _organisationStatusRepository.GetOrganisationStatus(statusId).Result;
+            var organisationStatus = _lookupDataRepository.GetOrganisationStatus(statusId).Result;
 
             if (organisationStatus == null)
             {

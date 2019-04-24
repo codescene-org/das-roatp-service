@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.RoATPService.Application.UnitTests
+﻿using Microsoft.Extensions.FileSystemGlobbing.Internal;
+
+namespace SFA.DAS.RoATPService.Application.UnitTests
 {
     using System;
     using System.Threading;
@@ -22,7 +24,7 @@
         private Mock<ILogger<UpdateOrganisationStatusHandler>> _logger;
         private Mock<IOrganisationValidator> _validator;
         private Mock<IUpdateOrganisationRepository> _repository;
-        private Mock<IOrganisationStatusRepository> _orgStatusRepository;
+        private Mock<ILookupDataRepository> _lookupDataRepository;
 
 
         [SetUp]
@@ -46,23 +48,23 @@
             _validator.Setup(x => x.IsValidOrganisationStatusIdForOrganisation(It.IsAny<int>(), It.IsAny<Guid>())).Returns(true);
 
             _repository = new Mock<IUpdateOrganisationRepository>();
-            _orgStatusRepository = new Mock<IOrganisationStatusRepository>();
+            _lookupDataRepository = new Mock<ILookupDataRepository>();
 
             var activeStatus = new OrganisationStatus { Id = 1, Status = "Active" };
-            _orgStatusRepository.Setup(x => x.GetOrganisationStatus(1)).ReturnsAsync(activeStatus);
+            _lookupDataRepository.Setup(x => x.GetOrganisationStatus(1)).ReturnsAsync(activeStatus);
             var removedStatus = new OrganisationStatus { Id = 0, Status = "Removed" };
-            _orgStatusRepository.Setup(x => x.GetOrganisationStatus(0)).ReturnsAsync(removedStatus);
+            _lookupDataRepository.Setup(x => x.GetOrganisationStatus(0)).ReturnsAsync(removedStatus);
             var notTakingOnStatus = new OrganisationStatus { Id = 2, Status = "Active - not taking on" };
-            _orgStatusRepository.Setup(x => x.GetOrganisationStatus(2)).ReturnsAsync(notTakingOnStatus);
+            _lookupDataRepository.Setup(x => x.GetOrganisationStatus(2)).ReturnsAsync(notTakingOnStatus);
             var onboardingStatus = new OrganisationStatus { Id = 3, Status = "On-boarding" };
-            _orgStatusRepository.Setup(x => x.GetOrganisationStatus(3)).ReturnsAsync(onboardingStatus);
+            _lookupDataRepository.Setup(x => x.GetOrganisationStatus(3)).ReturnsAsync(onboardingStatus);
 
             RemovedReason nullReason = null;
             _repository.Setup(x => x.GetRemovedReason(It.IsAny<Guid>())).ReturnsAsync(nullReason);
 
             _handler = new UpdateOrganisationStatusHandler(_logger.Object, _validator.Object, 
                                                            _repository.Object,
-                                                           _orgStatusRepository.Object);
+                                                           _lookupDataRepository.Object);
         }
 
         [TestCase(-1)]

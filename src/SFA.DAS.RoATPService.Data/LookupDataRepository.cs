@@ -15,7 +15,7 @@ namespace SFA.DAS.RoATPService.Data
 
     public class LookupDataRepository : ILookupDataRepository
     {
-        private IWebConfiguration _configuration;
+        private readonly IWebConfiguration _configuration;
 
         private ILogger<LookupDataRepository> _logger;
 
@@ -122,6 +122,24 @@ namespace SFA.DAS.RoATPService.Data
 
                 var removedReasons = await connection.QueryAsync<RemovedReason>(sql);
                 return await Task.FromResult(removedReasons);
+            }
+        }
+
+        public async Task<OrganisationStatus> GetOrganisationStatus(int statusId)
+        {
+            var connectionString = _configuration.SqlConnectionString;
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                var sql = "select * FROM [OrganisationStatus] " +
+                          "WHERE Id = @statusId";
+
+                var results = await connection.QueryAsync<OrganisationStatus>(sql, new { statusId });
+
+                return await Task.FromResult(results.FirstOrDefault());
             }
         }
 
