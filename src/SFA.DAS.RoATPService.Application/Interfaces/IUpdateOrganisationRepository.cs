@@ -3,9 +3,11 @@
     using System;
     using System.Threading.Tasks;
     using Domain;
+    using SFA.DAS.RoATPService.Application.Commands;
 
     public interface IUpdateOrganisationRepository
     {
+        Task<Guid?> CreateOrganisation(CreateOrganisationCommand command);
         Task<string> GetLegalName(Guid organisationId);
         Task<bool> UpdateLegalName(Guid organisationId, string legalName, string updatedBy);
         Task<bool> GetFinancialTrackRecord(Guid organisationId);

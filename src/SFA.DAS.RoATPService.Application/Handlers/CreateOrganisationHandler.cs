@@ -13,13 +13,13 @@ namespace SFA.DAS.RoATPService.Application.Handlers
 
     public class CreateOrganisationHandler : IRequestHandler<CreateOrganisationRequest, Guid?>
     {
-        private readonly IOrganisationRepository _organisationRepository;
+        private readonly IUpdateOrganisationRepository _organisationRepository;
         private readonly ILogger<CreateOrganisationHandler> _logger;
         private readonly IOrganisationValidator _organisationValidator;
         private readonly IProviderTypeValidator _providerTypeValidator;
         private readonly IMapCreateOrganisationRequestToCommand _mapper;
 
-        public CreateOrganisationHandler(IOrganisationRepository repository, ILogger<CreateOrganisationHandler> logger, 
+        public CreateOrganisationHandler(IUpdateOrganisationRepository repository, ILogger<CreateOrganisationHandler> logger, 
                                          IOrganisationValidator organisationValidator, IProviderTypeValidator providerTypeValidator, 
                                          IMapCreateOrganisationRequestToCommand mapper)
         {
