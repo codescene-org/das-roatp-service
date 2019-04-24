@@ -49,7 +49,7 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
         [TestCase(3, 0)]
         public void Get_organisation_statuses_for_provider_type_id_is_returning_correct_counts(int? providerTypeId, int numberOfExpectedResults)
         {
-            var result = _lookupRepository.GetOrganisationStatuses(providerTypeId).Result;
+            var result = _lookupRepository.GetOrganisationStatusesForProviderTypeId(providerTypeId).Result;
             Assert.AreEqual(numberOfExpectedResults, result.Count());
         }
 

@@ -51,7 +51,7 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
         [TestCase(3, 0)]
         public void Get_organisation_types_for_provider_type_id_is_returning_correct_counts(int? providerTypeId, int numberOfExpectedResults)
         {
-            var result = _lookupRepository.GetOrganisationTypes(providerTypeId).Result;
+            var result = _lookupRepository.GetOrganisationTypesForProviderTypeId(providerTypeId).Result;
             Assert.AreEqual(numberOfExpectedResults, result.Count());
         }
 

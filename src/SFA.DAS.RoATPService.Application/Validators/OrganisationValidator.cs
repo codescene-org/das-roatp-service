@@ -151,7 +151,7 @@ namespace SFA.DAS.RoATPService.Application.Validators
                 return false;
             }
 
-            var organisationTypes = await _lookupRepository.GetOrganisationTypes(providerTypeId);
+            var organisationTypes = await _lookupRepository.GetOrganisationTypesForProviderTypeId(providerTypeId);
 
             var organisationType = organisationTypes.FirstOrDefault(x => x.Id == organisationTypeId);
 

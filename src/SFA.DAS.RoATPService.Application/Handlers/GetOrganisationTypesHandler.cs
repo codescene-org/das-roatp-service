@@ -39,7 +39,7 @@
 
             try
             {
-                return await _repository.GetOrganisationTypes(request.ProviderTypeId);
+                return await _repository.GetOrganisationTypesForProviderTypeId(request.ProviderTypeId);
             }
             catch (Exception ex)
             {

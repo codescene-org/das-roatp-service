@@ -40,7 +40,7 @@
                     Type = "University"
                 }
             };
-            _repository.Setup(x => x.GetOrganisationTypes(It.IsAny<int>())).ReturnsAsync(organisationTypes);
+            _repository.Setup(x => x.GetOrganisationTypesForProviderTypeId(It.IsAny<int>())).ReturnsAsync(organisationTypes);
             _logger = new Mock<ILogger<GetOrganisationTypesHandler>>();
             _validator = new ProviderTypeValidator();
             _handler = new GetOrganisationTypesHandler(_repository.Object, _logger.Object, _validator);
@@ -75,7 +75,7 @@
         {
             var request = new GetOrganisationTypesRequest { ProviderTypeId = 1 };
 
-            _repository.Setup(x => x.GetOrganisationTypes(It.IsAny<int>()))
+            _repository.Setup(x => x.GetOrganisationTypesForProviderTypeId(It.IsAny<int>()))
                 .Throws(new Exception("Unit test exception"));
 
             Func<Task> result = async () => await

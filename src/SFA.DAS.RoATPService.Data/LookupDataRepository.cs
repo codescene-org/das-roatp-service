@@ -25,7 +25,53 @@ namespace SFA.DAS.RoATPService.Data
             _configuration = configuration;
         }
 
-        public async Task<IEnumerable<OrganisationType>> GetOrganisationTypes(int? providerTypeId)
+        public async Task<IEnumerable<ProviderType>> GetProviderTypes()
+        {
+            using (var connection = new SqlConnection(_configuration.SqlConnectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                var sql = $"select Id, ProviderType AS [Type], Description, " +
+                          "CreatedAt, CreatedBy, UpdatedAt, UpdatedBy, Status " +
+                          "from [ProviderTypes] " +
+                          "order by Id";
+
+                var providerTypes = await connection.QueryAsync<ProviderType>(sql);
+                return await Task.FromResult(providerTypes);
+            }
+        }
+
+        public async Task<ProviderType> GetProviderType(int providerTypeId)
+        {
+            var types = await GetProviderTypes();
+            return types.FirstOrDefault(x => x.Id == providerTypeId);
+        }
+
+        public async Task<IEnumerable<OrganisationType>> GetOrganisationTypes()
+        {
+            using (var connection = new SqlConnection(_configuration.SqlConnectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                var sql = $"select ot.Id, ot.Type, ot.Description, ot.CreatedBy, ot.CreatedAt, ot.UpdatedBy, ot.UpdatedAt, ot.Status "
+                          + "from [OrganisationTypes] ot " +
+                          "order by Id";
+
+                var organisationTypes = await connection.QueryAsync<OrganisationType>(sql);
+                return await Task.FromResult(organisationTypes);
+            }
+        }
+
+        public async Task<OrganisationType> GetOrganisationType(int organisationTypeId)
+        {
+            var types = await GetOrganisationTypes();
+            return types.FirstOrDefault(x => x.Id == organisationTypeId);
+        }
+
+
+        public async Task<IEnumerable<OrganisationType>> GetOrganisationTypesForProviderTypeId(int? providerTypeId)
         {
             using (var connection = new SqlConnection(_configuration.SqlConnectionString))
             {
@@ -51,40 +97,13 @@ namespace SFA.DAS.RoATPService.Data
             }
         }
 
-        public async Task<OrganisationType> GetOrganisationType(int organisationTypeId)
-        {
-            using (var connection = new SqlConnection(_configuration.SqlConnectionString))
-            {
-                if (connection.State != ConnectionState.Open)
-                    await connection.OpenAsync();
+       
 
-                string sql = $"select ot.Id, ot.Type, ot.Description, ot.CreatedBy, ot.CreatedAt, ot.UpdatedBy, ot.UpdatedAt, ot.Status "
-                             + "from [OrganisationTypes] ot " +
-                             "where ot.Id = @organisationTypeId";
+       
 
-                var organisationTypes = await connection.QueryAsync<OrganisationType>(sql, new { organisationTypeId });
-                return await Task.FromResult(organisationTypes.FirstOrDefault());
-            }
-        }
-
-        public async Task<IEnumerable<ProviderType>> GetProviderTypes()
-        {
-            using (var connection = new SqlConnection(_configuration.SqlConnectionString))
-            {
-                if (connection.State != ConnectionState.Open)
-                    await connection.OpenAsync();
-
-                string sql = $"select Id, ProviderType AS [Type], Description, " + 
-                             "CreatedAt, CreatedBy, UpdatedAt, UpdatedBy, Status " +
-                             "from [ProviderTypes] " +
-                             "order by Id";
-
-                var providerTypes = await connection.QueryAsync<ProviderType>(sql);
-                return await Task.FromResult(providerTypes);
-            }
-        }
+       
         
-        public async Task<IEnumerable<OrganisationStatus>> GetOrganisationStatuses(int? providerTypeId)
+        public async Task<IEnumerable<OrganisationStatus>> GetOrganisationStatusesForProviderTypeId(int? providerTypeId)
         {
             using (var connection = new SqlConnection(_configuration.SqlConnectionString))
             {

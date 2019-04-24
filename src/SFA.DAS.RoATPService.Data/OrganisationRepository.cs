@@ -12,11 +12,11 @@ namespace SFA.DAS.RoATPService.Data
     using Dapper;
     using Domain;
     using Settings;
-    using SFA.DAS.RoatpService.Data.DapperTypeHandlers;
+    using RoatpService.Data.DapperTypeHandlers;
 
     public class OrganisationRepository : IOrganisationRepository
     {
-        private IWebConfiguration _configuration;
+        private readonly IWebConfiguration _configuration;
 
         public OrganisationRepository(IWebConfiguration configuration)
         {

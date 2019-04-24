@@ -194,7 +194,7 @@
 
         private async Task<string> GetOrganisationType(int organisationTypeId, int providerTypeId)
         {
-            var organisationTypes = await _lookupDataRepository.GetOrganisationTypes(providerTypeId);
+            var organisationTypes = await _lookupDataRepository.GetOrganisationTypesForProviderTypeId(providerTypeId);
 
             var organisationType = organisationTypes.FirstOrDefault(x => x.Id == organisationTypeId);
             if (organisationType != null)
@@ -207,7 +207,7 @@
 
         private async Task<string> GetOrganisationStatus(int organisationStatusId)
         {
-            var organisationStatuses = await _lookupDataRepository.GetOrganisationStatuses(null);
+            var organisationStatuses = await _lookupDataRepository.GetOrganisationStatusesForProviderTypeId(null);
 
             var organisationType = organisationStatuses.FirstOrDefault(x => x.Id == organisationStatusId);
             if (organisationType != null)
