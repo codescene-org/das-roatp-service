@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.RoATPService.Application.Handlers
+﻿using SFA.DAS.RoATPService.Application.Services;
+
+namespace SFA.DAS.RoATPService.Application.Handlers
 {
     using System.Threading;
     using System.Threading.Tasks;
@@ -46,7 +48,7 @@
                 return await Task.FromResult(false);
             }
 
-            bool success = await _updateOrganisationRepository.UpdateLegalName(request.OrganisationId, request.LegalName, request.UpdatedBy);
+            bool success = await _updateOrganisationRepository.UpdateLegalName(request.OrganisationId, HtmlTagRemover.StripOutTags(request.LegalName), request.UpdatedBy);
 
             if (!success)
             {

@@ -9,6 +9,7 @@ using SFA.DAS.RoATPService.Api.Types.Models;
 using SFA.DAS.RoATPService.Api.Types.Models.UpdateOrganisation;
 using SFA.DAS.RoATPService.Application.Exceptions;
 using SFA.DAS.RoATPService.Application.Interfaces;
+using SFA.DAS.RoATPService.Application.Services;
 using SFA.DAS.RoATPService.Application.Validators;
 
 namespace SFA.DAS.RoATPService.Application.Handlers
@@ -52,7 +53,7 @@ namespace SFA.DAS.RoATPService.Application.Handlers
 
             _logger.LogInformation($@"Handling Update '{FieldChanged}' for Organisation ID [{request.OrganisationId}]");
             
-            var success = await _updateOrganisationRepository.UpdateTradingName(request.OrganisationId, request.TradingName, request.UpdatedBy);
+            var success = await _updateOrganisationRepository.UpdateTradingName(request.OrganisationId, HtmlTagRemover.StripOutTags(request.TradingName), request.UpdatedBy);
 
             if (!success)
             {

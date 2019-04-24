@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.RoATPService.Application.Handlers
+﻿using SFA.DAS.RoATPService.Application.Services;
+
+namespace SFA.DAS.RoATPService.Application.Handlers
 {
     using System;
     using System.Linq;
@@ -35,6 +37,10 @@
 
         public async Task<bool> Handle(UpdateOrganisationRequest request, CancellationToken cancellationToken)
         {
+            request.Organisation.LegalName = HtmlTagRemover.StripOutTags(request.Organisation?.LegalName);
+            request.Organisation.TradingName = HtmlTagRemover.StripOutTags(request.Organisation?.TradingName);
+
+
             if (!IsValidUpdateOrganisation(request.Organisation))
             {
                 string invalidOrganisationError = $@"Invalid Organisation data";
