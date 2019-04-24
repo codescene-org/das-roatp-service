@@ -13,18 +13,21 @@ namespace SFA.DAS.RoATPService.Application.Handlers
 
     public class UpdateOrganisationLegalNameHandler : UpdateOrganisationHandlerBase, IRequestHandler<UpdateOrganisationLegalNameRequest, bool>
     {
-        private ILogger<UpdateOrganisationLegalNameHandler> _logger;
+        private readonly ILogger<UpdateOrganisationLegalNameHandler> _logger;
         private readonly IOrganisationValidator _validator;
         private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
+        private readonly IOrganisationRepository _organisationRepository;
 
         private const string FieldChanged = "Legal Name";
 
         public UpdateOrganisationLegalNameHandler(ILogger<UpdateOrganisationLegalNameHandler> logger,
-            IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository)
+            IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository, 
+            IOrganisationRepository organisationRepository)
         {
             _logger = logger;
             _validator = validator;
             _updateOrganisationRepository = updateOrganisationRepository;
+            _organisationRepository = organisationRepository;
         }
 
         public async Task<bool> Handle(UpdateOrganisationLegalNameRequest request, CancellationToken cancellationToken)
@@ -38,7 +41,7 @@ namespace SFA.DAS.RoATPService.Application.Handlers
 
             _logger.LogInformation($@"Handling Update '{FieldChanged}' for Organisation ID [{request.OrganisationId}]");
 
-            string previousLegalName = await _updateOrganisationRepository.GetLegalName(request.OrganisationId);
+            string previousLegalName = await _organisationRepository.GetLegalName(request.OrganisationId);
 
             if (previousLegalName == request.LegalName)
             {

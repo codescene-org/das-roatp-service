@@ -9,5 +9,6 @@
     {
         
         Task<Organisation> GetOrganisation(Guid organisationId);
+        Task<string> GetLegalName(Guid organisationId);
     }
 }

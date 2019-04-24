@@ -90,22 +90,7 @@ namespace SFA.DAS.RoATPService.Data
                 return null;
             }
         }
-
-        public async Task<string> GetLegalName(Guid organisationId)
-        {
-            var connectionString = _configuration.SqlConnectionString;
-
-            using (var connection = new SqlConnection(connectionString))
-            {
-                if (connection.State != ConnectionState.Open)
-                    await connection.OpenAsync();
-
-                var sql = "select LegalName FROM [Organisations] " +
-                          "WHERE Id = @organisationId";
-                return await connection.ExecuteScalarAsync<string>(sql, new { organisationId });
-            }
-        }
-
+        
         public async Task<bool> UpdateLegalName(Guid organisationId, string legalName, string updatedBy)
         {
             var connectionString = _configuration.SqlConnectionString;
@@ -239,7 +224,7 @@ namespace SFA.DAS.RoATPService.Data
             }
         }
 
-        public async Task<bool> UpdateType(Guid organisationId, int organisationTypeId, string updatedBy)
+        public async Task<bool> UpdateOrganisationType(Guid organisationId, int organisationTypeId, string updatedBy)
         {
             var connectionString = _configuration.SqlConnectionString;
 

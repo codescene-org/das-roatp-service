@@ -19,7 +19,8 @@
     {
         private Mock<ILogger<UpdateOrganisationLegalNameHandler>> _logger;
         private Mock<IOrganisationValidator> _validator;
-        private Mock<IUpdateOrganisationRepository> _repository;
+        private Mock<IUpdateOrganisationRepository> _updateRepository;
+        private Mock<IOrganisationRepository> _repository;
         private UpdateOrganisationLegalNameHandler _handler;
 
         [SetUp]
@@ -28,12 +29,13 @@
             _logger = new Mock<ILogger<UpdateOrganisationLegalNameHandler>>();
             _validator = new Mock<IOrganisationValidator>();
             _validator.Setup(x => x.IsValidLegalName(It.IsAny<string>())).Returns(true);
-            _repository = new Mock<IUpdateOrganisationRepository>();
+            _updateRepository = new Mock<IUpdateOrganisationRepository>();
+            _repository = new Mock<IOrganisationRepository>();
             _repository.Setup(x => x.GetLegalName(It.IsAny<Guid>())).ReturnsAsync("existing legal name").Verifiable();
-            _repository.Setup(x => x.UpdateLegalName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(true).Verifiable();
-            _repository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true).Verifiable();
+            _updateRepository.Setup(x => x.UpdateLegalName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(true).Verifiable();
+            _updateRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true).Verifiable();
 
-            _handler = new UpdateOrganisationLegalNameHandler(_logger.Object, _validator.Object, _repository.Object);
+            _handler = new UpdateOrganisationLegalNameHandler(_logger.Object, _validator.Object, _updateRepository.Object, _repository.Object);
         }
 
         [Test]
@@ -51,8 +53,8 @@
             result.Should().Throw<BadRequestException>();
 
             _repository.Verify(x => x.GetLegalName(It.IsAny<Guid>()), Times.Never);
-            _repository.Verify(x => x.UpdateLegalName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
-            _repository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
+            _updateRepository.Verify(x => x.UpdateLegalName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            _updateRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
         }
 
         [Test]
@@ -69,14 +71,14 @@
             result.Should().BeFalse(); 
 
             _repository.Verify(x => x.GetLegalName(It.IsAny<Guid>()), Times.Once);
-            _repository.Verify(x => x.UpdateLegalName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
-            _repository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
+            _updateRepository.Verify(x => x.UpdateLegalName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            _updateRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
         }
 
         [Test]
         public void Handler_does_not_write_audit_log_entry_if_save_operation_fails()
         {
-            _repository.Setup(x => x.UpdateLegalName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(false).Verifiable();
+            _updateRepository.Setup(x => x.UpdateLegalName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(false).Verifiable();
             
             var request = new UpdateOrganisationLegalNameRequest
             {
@@ -89,8 +91,8 @@
             result.Should().BeFalse();
 
             _repository.Verify(x => x.GetLegalName(It.IsAny<Guid>()), Times.Once);
-            _repository.Verify(x => x.UpdateLegalName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
-            _repository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
+            _updateRepository.Verify(x => x.UpdateLegalName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _updateRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
         }
         
         [Test]
@@ -107,8 +109,8 @@
             result.Should().BeTrue();
 
             _repository.Verify(x => x.GetLegalName(It.IsAny<Guid>()), Times.Once);
-            _repository.Verify(x => x.UpdateLegalName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
-            _repository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Once);
+            _updateRepository.Verify(x => x.UpdateLegalName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _updateRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Once);
         }
     }
 }

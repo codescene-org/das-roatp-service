@@ -40,7 +40,7 @@
 
             if (existingTypeId != request.OrganisationTypeId)
             {
-                success = await _updateOrganisationRepository.UpdateType(request.OrganisationId,
+                success = await _updateOrganisationRepository.UpdateOrganisationType(request.OrganisationId,
                     request.OrganisationTypeId, request.UpdatedBy);    
             }
 
