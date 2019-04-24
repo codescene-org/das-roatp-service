@@ -48,7 +48,9 @@ namespace SFA.DAS.RoATPService.Application.Handlers
                 return await Task.FromResult(false);
             }
 
-            bool success = await _updateOrganisationRepository.UpdateLegalName(request.OrganisationId, HtmlTagRemover.StripOutTags(request.LegalName), request.UpdatedBy);
+            request.LegalName = HtmlTagRemover.StripOutTags(request.LegalName);
+
+            bool success = await _updateOrganisationRepository.UpdateLegalName(request.OrganisationId, request.LegalName, request.UpdatedBy);
 
             if (!success)
             {

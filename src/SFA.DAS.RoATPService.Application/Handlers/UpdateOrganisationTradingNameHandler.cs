@@ -52,8 +52,10 @@ namespace SFA.DAS.RoATPService.Application.Handlers
             }
 
             _logger.LogInformation($@"Handling Update '{FieldChanged}' for Organisation ID [{request.OrganisationId}]");
-            
-            var success = await _updateOrganisationRepository.UpdateTradingName(request.OrganisationId, HtmlTagRemover.StripOutTags(request.TradingName), request.UpdatedBy);
+
+            request.TradingName = HtmlTagRemover.StripOutTags(request.TradingName);
+
+            var success = await _updateOrganisationRepository.UpdateTradingName(request.OrganisationId, request.TradingName, request.UpdatedBy);
 
             if (!success)
             {
