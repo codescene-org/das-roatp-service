@@ -8,15 +8,6 @@ namespace SFA.DAS.RoATPService.Application.Interfaces
 
     public interface ILookupDataRepository
     {
-        // MFCMFC  
-        // GetAll, GetOne (derived from GetAll)
-        // OrganisationStatus
-        // RemovedReason
-        // ProviderTypeOrganisationStatus
-        // ProviderTypeOrganisationTypes
-
-
-
         Task<IEnumerable<ProviderType>> GetProviderTypes();
         Task<ProviderType> GetProviderType(int providerTypeId);
 
@@ -29,13 +20,17 @@ namespace SFA.DAS.RoATPService.Application.Interfaces
 
 
         Task<IEnumerable<RemovedReason>> GetRemovedReasons();
+        Task<RemovedReason> GetRemovedReason(int removedReasonId);
 
-      
+        Task<IEnumerable<ProviderTypeOrganisationType>> GetProviderTypeOrganisationTypes();
+        Task<IEnumerable<ProviderTypeOrganisationStatus>> GetProviderTypeOrganisationStatuses();
+
+
 
         // convert all logic below to rely on the GetAll calls....
         Task<IEnumerable<OrganisationType>> GetOrganisationTypesForProviderTypeId(int? providerTypeId);
         Task<IEnumerable<OrganisationStatus>> GetOrganisationStatusesForProviderTypeId(int? providerTypeId);
-        Task<bool> IsOrganisationTypeValidForOrganisation(int organisationTypeId, Guid organisationId);
-        Task<bool> IsOrganisationStatusValidForOrganisation(int organisationStatusId, Guid organisationId);
+        //Task<bool> IsOrganisationTypeValidForOrganisation(int organisationTypeId, Guid organisationId);
+        //Task<bool> IsOrganisationStatusValidForOrganisation(int organisationStatusId, Guid organisationId);
     }
 }

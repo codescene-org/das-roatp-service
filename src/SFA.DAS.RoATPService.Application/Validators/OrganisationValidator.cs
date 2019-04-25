@@ -16,23 +16,21 @@ namespace SFA.DAS.RoATPService.Application.Validators
         private const string CharityNumberInvalidCharactersRegex = "[^a-zA-Z0-9\\-]";
         private readonly IDuplicateCheckRepository _duplicateCheckRepository;
         private readonly ILookupDataRepository _lookupRepository;
+        private readonly IOrganisationRepository _organisationRepository;
 
+        //MFCMFC remove magic numbers for lookup stuff
 
-        public OrganisationValidator(IDuplicateCheckRepository duplicateCheckRepository, ILookupDataRepository lookupRepository)
+        public OrganisationValidator(IDuplicateCheckRepository duplicateCheckRepository, ILookupDataRepository lookupRepository, IOrganisationRepository organisationRepository)
         {
             _duplicateCheckRepository = duplicateCheckRepository;
             _lookupRepository = lookupRepository;
+            _organisationRepository = organisationRepository;
         }
 
 
         public bool IsValidOrganisationId(Guid organisationId)
         {
-            if (organisationId == null || organisationId == Guid.Empty)
-            {
-                return false;
-            }
-
-            return true;
+            return organisationId != Guid.Empty;
         }
 
         public bool IsValidProviderType(ProviderType providerType)
@@ -141,7 +139,18 @@ namespace SFA.DAS.RoATPService.Application.Validators
 
         public bool IsValidOrganisationStatusIdForOrganisation(int organisationStatusId, Guid organisationId)
         {
-            return _lookupRepository.IsOrganisationStatusValidForOrganisation(organisationStatusId, organisationId).Result;
+             var providerTypeId = _organisationRepository.GetProviderType(organisationId).Result;
+     
+            if (!IsValidStatusId(organisationStatusId))
+            {
+                return false;
+            }
+
+            var organisationStatuses = _lookupRepository.GetOrganisationStatusesForProviderTypeId(providerTypeId).Result;
+
+            var organisationStatus = organisationStatuses.FirstOrDefault(x => x.Id == organisationStatusId);
+
+            return (organisationStatus != null);
         }
 
         public async Task<bool> IsValidOrganisationTypeIdForProvider(int organisationTypeId, int providerTypeId)
@@ -171,7 +180,8 @@ namespace SFA.DAS.RoATPService.Application.Validators
 
         public bool IsValidOrganisationTypeIdForOrganisation(int organisationTypeId, Guid organisationId)
         {
-            return _lookupRepository.IsOrganisationTypeValidForOrganisation(organisationTypeId, organisationId).Result;
+            var providerTypeId = _organisationRepository.GetProviderType(organisationId).Result;
+            return IsValidOrganisationTypeIdForProvider(organisationTypeId, providerTypeId).Result;
         }
     }
 }

@@ -43,6 +43,13 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
             ProviderTypeOrganisationStatusHandler.InsertRecord(new ProviderTypeOrganisationStatusModel { Id = 4, OrganisationStatusId = _organisationStatusId4WithProviderTypeId2, ProviderTypeId = _providerTypeId2 });
         }
 
+        [Test]
+        public void Get_organisation_statuses()
+        {
+            var result = _lookupRepository.GetProviderTypeOrganisationStatuses().Result;
+            Assert.AreEqual(4, result.Count());
+        }
+
         [TestCase(null,4)]
         [TestCase(1, 3)]
         [TestCase(2, 1)]

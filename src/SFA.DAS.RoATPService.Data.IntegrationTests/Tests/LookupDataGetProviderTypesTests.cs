@@ -17,8 +17,8 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
         private int _providerTypeId1;
         private int _providerTypeIdNonExistent;
         private double _numberOfExpectedResults;
-        private ProviderTypeModel providerType1;
-        private ProviderTypeModel providerType2;
+        private ProviderTypeModel _providerType1;
+        private ProviderTypeModel _providerType2;
 
         [OneTimeSetUp]
         public void Before_the_tests()
@@ -29,7 +29,7 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
             _providerTypeIdNonExistent = 100;
             _numberOfExpectedResults = 2;
 
-            providerType1 = new ProviderTypeModel
+            _providerType1 = new ProviderTypeModel
             {
                 Id = _providerTypeId1,
                 CreatedAt = DateTime.Now,
@@ -37,7 +37,7 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
                 Status = "x",
                 ProviderType = "a"
             };
-            providerType2 = new ProviderTypeModel
+            _providerType2 = new ProviderTypeModel
             {
                 Id = _providerTypeId2,
                 CreatedAt = DateTime.Now,
@@ -45,8 +45,8 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
                 Status = "x",
                 ProviderType = "b"
             };
-            ProviderTypeHandler.InsertRecord(providerType1);
-            ProviderTypeHandler.InsertRecord(providerType2);
+            ProviderTypeHandler.InsertRecord(_providerType1);
+            ProviderTypeHandler.InsertRecord(_providerType2);
       }
 
         [Test]

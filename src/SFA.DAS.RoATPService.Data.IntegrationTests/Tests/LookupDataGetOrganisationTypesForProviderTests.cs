@@ -43,6 +43,13 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
             ProviderTypeOrganisationTypeHandler.InsertRecord(new ProviderTypeOrganisationTypeModel { Id = 4, OrganisationTypeId = _organisationTypeId4WithProviderTypeId2, ProviderTypeId = _providerTypeId2 });
         }
 
+        [Test]
+        public void Get_provider_type_organisation_types()
+        {
+            var result = _lookupRepository.GetProviderTypeOrganisationTypes().Result;
+            Assert.AreEqual(4, result.Count());
+        }
+
         [TestCase(null, 4)]
         [TestCase(1, 3)]
         [TestCase(2, 1)]
@@ -52,6 +59,8 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
             var result = _lookupRepository.GetOrganisationTypesForProviderTypeId(providerTypeId).Result;
             Assert.AreEqual(numberOfExpectedResults, result.Count());
         }
+
+        
 
         [OneTimeTearDown]
         public void Tear_down()

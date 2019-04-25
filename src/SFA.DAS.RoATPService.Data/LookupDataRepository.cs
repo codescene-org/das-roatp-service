@@ -94,64 +94,7 @@ namespace SFA.DAS.RoATPService.Data
             var statuses = await GetOrganisationStatuses();
             return statuses.FirstOrDefault(x => x.Id == statusId);
         }
-        
 
-        public async Task<IEnumerable<OrganisationType>> GetOrganisationTypesForProviderTypeId(int? providerTypeId)
-        {
-            using (var connection = new SqlConnection(_configuration.SqlConnectionString))
-            {
-                if (connection.State != ConnectionState.Open)
-                    await connection.OpenAsync();
-
-                var sql = $"SELECT [Id], [Type], [CreatedAt], [CreatedBy], [UpdatedAt], [UpdatedBy], [Status] " +
-                          "FROM [dbo].[OrganisationTypes] ORDER BY Id";
-
-                if (providerTypeId != null)
-                {
-                    sql =
-                        $"select ot.Id, ot.Type, ot.Description, ot.CreatedBy, ot.CreatedAt, ot.UpdatedBy, ot.UpdatedAt, ot.Status "
-                        + "from [OrganisationTypes] ot " +
-                        "inner join [ProviderTypeOrganisationTypes] ptot " +
-                        "on ptot.OrganisationTypeId = ot.Id " +
-                        "and ptot.ProviderTypeId = @providerTypeId " +
-                        "order by ot.Id";
-                }
-
-                var organisationTypes = await connection.QueryAsync<OrganisationType>(sql, new { providerTypeId });
-                return await Task.FromResult(organisationTypes);
-            }
-        }
-
-       
-
-       
-
-       
-        
-        public async Task<IEnumerable<OrganisationStatus>> GetOrganisationStatusesForProviderTypeId(int? providerTypeId)
-        {
-            using (var connection = new SqlConnection(_configuration.SqlConnectionString))
-            {
-                if (connection.State != ConnectionState.Open)
-                    await connection.OpenAsync();
-
-                var sql = $"SELECT [Id], [Status], [CreatedAt], [CreatedBy], [UpdatedAt], [UpdatedBy] " +
-                              "FROM [dbo].[OrganisationStatus] ORDER BY Id";
-
-                if (providerTypeId != null)
-                {
-                    sql =
-                        $@"SELECT os.[Id], os.[Status], os.[CreatedAt], os.[CreatedBy], os.[UpdatedAt], os.[UpdatedBy] 
-                            FROM [dbo].[OrganisationStatus] os
-                            inner join [ProviderTypeOrganisationStatus] ptos on os.Id = ptos.organisationStatusId
-                            where ptos.providerTypeId = @providerTypeId
-                            ORDER BY os.Id";
-                }
-
-                var organisationStatuses = await connection.QueryAsync<OrganisationStatus>(sql, new { providerTypeId });
-                return await Task.FromResult(organisationStatuses);
-            }
-        }
 
         public async Task<IEnumerable<RemovedReason>> GetRemovedReasons()
         {
@@ -169,43 +112,114 @@ namespace SFA.DAS.RoATPService.Data
             }
         }
 
+        public async Task<RemovedReason> GetRemovedReason(int removedReasonId)
+        {
+            var removedReasons = await GetRemovedReasons();
+            return removedReasons.FirstOrDefault(x => x.Id == removedReasonId);
+        }
 
-        public async Task<bool> IsOrganisationTypeValidForOrganisation(int organisationTypeId, Guid organisationId)
+        public async Task<IEnumerable<ProviderTypeOrganisationType>> GetProviderTypeOrganisationTypes()
         {
             using (var connection = new SqlConnection(_configuration.SqlConnectionString))
             {
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();
 
-                var sql = $@"SELECT case count(*)
-                            when 0 then 0 else 1 end
-                            FROM [ProviderTypeOrganisationTypes] ptot
-                                 inner join organisations o on ptot.ProviderTypeId = o.ProviderTypeId
-                            where o.Id = @organisationId
-                            and ptot.OrganisationTypeId = @organisationTypeId";
+                var sql = "select Id, ProviderTypeId, OrganisationTypeId, CreatedAt, " +
+                          "CreatedBy, UpdatedAt, UpdatedBy FROM [ProviderTypeOrganisationTypes] " +
+                          "ORDER BY Id";
 
-                var organisationTypeValid = await connection.ExecuteScalarAsync<bool>(sql, new { organisationId, organisationTypeId });
-                return await Task.FromResult(organisationTypeValid);
+                var providerTypeOrganisationTypes = await connection.QueryAsync<ProviderTypeOrganisationType>(sql);
+                return await Task.FromResult(providerTypeOrganisationTypes);
             }
         }
 
-        public async Task<bool> IsOrganisationStatusValidForOrganisation(int organisationStatusId, Guid organisationId)
+        public async Task<IEnumerable<ProviderTypeOrganisationStatus>> GetProviderTypeOrganisationStatuses()
         {
             using (var connection = new SqlConnection(_configuration.SqlConnectionString))
             {
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();
 
-                var sql = $@"SELECT case count(*)
-                            when 0 then 0 else 1 end
-                            FROM [ProviderTypeOrganisationStatus] ptos
-                                 inner join organisations o on ptos.ProviderTypeId = o.ProviderTypeId
-                            where o.Id = @organisationId
-                            and ptos.OrganisationStatusId = @organisationStatusId";
+                var sql = "select Id, ProviderTypeId, OrganisationStatusId, CreatedAt, " +
+                          "CreatedBy, UpdatedAt, UpdatedBy FROM [ProviderTypeOrganisationStatus] " +
+                          "ORDER BY Id";
 
-                var organisationStatusValid = await connection.ExecuteScalarAsync<bool>(sql, new { organisationId, organisationStatusId });
-                return await Task.FromResult(organisationStatusValid);
+                var providerTypeOrganisationStatuses = await connection.QueryAsync<ProviderTypeOrganisationStatus>(sql);
+                return await Task.FromResult(providerTypeOrganisationStatuses);
             }
         }
+
+        public async Task<IEnumerable<OrganisationType>> GetOrganisationTypesForProviderTypeId(int? providerTypeId)
+        {
+            var organisationTypes = await GetOrganisationTypes();
+            if (providerTypeId == null)
+                return organisationTypes;
+
+            var providerTypeOrganisationTypes = await GetProviderTypeOrganisationTypes();
+
+            var selectedproviderTypeOrganisationTypes =
+                providerTypeOrganisationTypes.Where(x => x.ProviderTypeId == providerTypeId);
+
+            return organisationTypes.Where(
+                x => selectedproviderTypeOrganisationTypes.Any(z => z.OrganisationTypeId == x.Id));
+        }
+
+
+        public async Task<IEnumerable<OrganisationStatus>> GetOrganisationStatusesForProviderTypeId(int? providerTypeId)
+        {
+            var organisationStatuses = await GetOrganisationStatuses();
+            if (providerTypeId == null)
+                return organisationStatuses;
+
+            var providerTypeOrganisationStatuses = await GetProviderTypeOrganisationStatuses();
+            var selectedProviderTypeOrganisationStatuses =
+                providerTypeOrganisationStatuses.Where(x => x.ProviderTypeId == providerTypeId);
+
+            return organisationStatuses.Where(
+                x => selectedProviderTypeOrganisationStatuses.Any(z => z.OrganisationStatusId == x.Id));
+        }
+
+
+        //public async Task<bool> IsOrganisationTypeValidForOrganisation(int organisationTypeId, Guid organisationId)
+        //{
+        //    using (var connection = new SqlConnection(_configuration.SqlConnectionString))
+        //    {
+        //        if (connection.State != ConnectionState.Open)
+        //            await connection.OpenAsync();
+
+        //        var sql = $@"SELECT case count(*)
+        //                    when 0 then 0 else 1 end
+        //                    FROM [ProviderTypeOrganisationTypes] ptot
+        //                         inner join organisations o on ptot.ProviderTypeId = o.ProviderTypeId
+        //                    where o.Id = @organisationId
+        //                    and ptot.OrganisationTypeId = @organisationTypeId";
+
+        //        var organisationTypeValid = await connection.ExecuteScalarAsync<bool>(sql, new { organisationId, organisationTypeId });
+        //        return await Task.FromResult(organisationTypeValid);
+        //    }
+        //}
+
+
+   
+    
+        //public async Task<bool> IsOrganisationStatusValidForOrganisation(int organisationStatusId, Guid organisationId)
+        //{
+        //    using (var connection = new SqlConnection(_configuration.SqlConnectionString))
+        //    {
+        //        if (connection.State != ConnectionState.Open)
+        //            await connection.OpenAsync();
+
+        //        var sql = $@"SELECT case count(*)
+        //                    when 0 then 0 else 1 end
+        //                    FROM [ProviderTypeOrganisationStatus] ptos
+        //                         inner join organisations o on ptos.ProviderTypeId = o.ProviderTypeId
+        //                    where o.Id = @organisationId
+        //                    and ptos.OrganisationStatusId = @organisationStatusId";
+
+        //        var organisationStatusValid = await connection.ExecuteScalarAsync<bool>(sql, new { organisationId, organisationStatusId });
+        //        return await Task.FromResult(organisationStatusValid);
+        //    }
+        //}
     }
 }
