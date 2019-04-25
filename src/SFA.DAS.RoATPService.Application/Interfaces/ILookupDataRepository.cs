@@ -25,12 +25,7 @@ namespace SFA.DAS.RoATPService.Application.Interfaces
         Task<IEnumerable<ProviderTypeOrganisationType>> GetProviderTypeOrganisationTypes();
         Task<IEnumerable<ProviderTypeOrganisationStatus>> GetProviderTypeOrganisationStatuses();
 
-
-
-        // convert all logic below to rely on the GetAll calls....
         Task<IEnumerable<OrganisationType>> GetOrganisationTypesForProviderTypeId(int? providerTypeId);
         Task<IEnumerable<OrganisationStatus>> GetOrganisationStatusesForProviderTypeId(int? providerTypeId);
-        //Task<bool> IsOrganisationTypeValidForOrganisation(int organisationTypeId, Guid organisationId);
-        //Task<bool> IsOrganisationStatusValidForOrganisation(int organisationStatusId, Guid organisationId);
     }
 }

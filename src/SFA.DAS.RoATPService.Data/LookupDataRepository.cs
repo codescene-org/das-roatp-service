@@ -179,47 +179,5 @@ namespace SFA.DAS.RoATPService.Data
             return organisationStatuses.Where(
                 x => selectedProviderTypeOrganisationStatuses.Any(z => z.OrganisationStatusId == x.Id));
         }
-
-
-        //public async Task<bool> IsOrganisationTypeValidForOrganisation(int organisationTypeId, Guid organisationId)
-        //{
-        //    using (var connection = new SqlConnection(_configuration.SqlConnectionString))
-        //    {
-        //        if (connection.State != ConnectionState.Open)
-        //            await connection.OpenAsync();
-
-        //        var sql = $@"SELECT case count(*)
-        //                    when 0 then 0 else 1 end
-        //                    FROM [ProviderTypeOrganisationTypes] ptot
-        //                         inner join organisations o on ptot.ProviderTypeId = o.ProviderTypeId
-        //                    where o.Id = @organisationId
-        //                    and ptot.OrganisationTypeId = @organisationTypeId";
-
-        //        var organisationTypeValid = await connection.ExecuteScalarAsync<bool>(sql, new { organisationId, organisationTypeId });
-        //        return await Task.FromResult(organisationTypeValid);
-        //    }
-        //}
-
-
-   
-    
-        //public async Task<bool> IsOrganisationStatusValidForOrganisation(int organisationStatusId, Guid organisationId)
-        //{
-        //    using (var connection = new SqlConnection(_configuration.SqlConnectionString))
-        //    {
-        //        if (connection.State != ConnectionState.Open)
-        //            await connection.OpenAsync();
-
-        //        var sql = $@"SELECT case count(*)
-        //                    when 0 then 0 else 1 end
-        //                    FROM [ProviderTypeOrganisationStatus] ptos
-        //                         inner join organisations o on ptos.ProviderTypeId = o.ProviderTypeId
-        //                    where o.Id = @organisationId
-        //                    and ptos.OrganisationStatusId = @organisationStatusId";
-
-        //        var organisationStatusValid = await connection.ExecuteScalarAsync<bool>(sql, new { organisationId, organisationStatusId });
-        //        return await Task.FromResult(organisationStatusValid);
-        //    }
-        //}
     }
 }
