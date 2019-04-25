@@ -8,7 +8,7 @@ using SFA.DAS.RoATPService.Data;
 
 namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
 {
-    public class LookupDataGetOrganisationTypesTests : TestBase
+    public class LookupDataGetOrganisationTypesForProviderTests : TestBase
     {
         private readonly DatabaseService _databaseService = new DatabaseService();
         private LookupDataRepository _lookupRepository;

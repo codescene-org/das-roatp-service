@@ -50,7 +50,7 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
       }
 
         [Test]
-        public void Get_organisation_types()
+        public void Get_provider_types()
         {
             var result = _lookupRepository.GetProviderTypes().Result;
             Assert.AreEqual(_numberOfExpectedResults, result.Count());
@@ -58,7 +58,7 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
 
         [TestCase(1,"a")]
         [TestCase(2,"b")]
-        public void Get_organisation_type_for_valid_id(int providerTypeId, string providerType)
+        public void Get_provider_type_for_valid_id(int providerTypeId, string providerType)
         {
             var result = _lookupRepository.GetProviderType(providerTypeId).Result;
             Assert.AreEqual(providerTypeId, result.Id);
@@ -66,7 +66,7 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
         }
 
         [Test]
-        public void Get_organisation_type_for_invalid_id()
+        public void Get_null_provider_type_for_invalid_id()
         {
             var result = _lookupRepository.GetProviderType(_providerTypeIdNonExistent).Result;
             Assert.IsNull(result);
