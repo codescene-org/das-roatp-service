@@ -10,8 +10,6 @@ namespace SFA.DAS.RoATPService.Application.Interfaces
     {
         // MFCMFC  
         // GetAll, GetOne (derived from GetAll)
-        // ProviderType  DONE
-        // OrganisationType DONE
         // OrganisationStatus
         // RemovedReason
         // ProviderTypeOrganisationStatus
@@ -24,6 +22,8 @@ namespace SFA.DAS.RoATPService.Application.Interfaces
 
         Task<IEnumerable<OrganisationType>> GetOrganisationTypes();
         Task<OrganisationType> GetOrganisationType(int organisationTypeId);
+
+        Task<IEnumerable<OrganisationStatus>> GetOrganisationStatuses();
 
         Task<OrganisationStatus> GetOrganisationStatus(int statusId);
 

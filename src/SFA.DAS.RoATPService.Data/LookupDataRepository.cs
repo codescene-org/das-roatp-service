@@ -70,6 +70,31 @@ namespace SFA.DAS.RoATPService.Data
             return types.FirstOrDefault(x => x.Id == organisationTypeId);
         }
 
+        public async Task<IEnumerable<OrganisationStatus>> GetOrganisationStatuses()
+        {
+            var connectionString = _configuration.SqlConnectionString;
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                var sql = "select * FROM [OrganisationStatus] " +
+                          "order by Id";
+
+                var results = await connection.QueryAsync<OrganisationStatus>(sql);
+
+                return await Task.FromResult(results);
+            }
+        }
+
+
+        public async Task<OrganisationStatus> GetOrganisationStatus(int statusId)
+        {
+            var statuses = await GetOrganisationStatuses();
+            return statuses.FirstOrDefault(x => x.Id == statusId);
+        }
+        
 
         public async Task<IEnumerable<OrganisationType>> GetOrganisationTypesForProviderTypeId(int? providerTypeId)
         {
@@ -144,23 +169,6 @@ namespace SFA.DAS.RoATPService.Data
             }
         }
 
-        public async Task<OrganisationStatus> GetOrganisationStatus(int statusId)
-        {
-            var connectionString = _configuration.SqlConnectionString;
-
-            using (var connection = new SqlConnection(connectionString))
-            {
-                if (connection.State != ConnectionState.Open)
-                    await connection.OpenAsync();
-
-                var sql = "select * FROM [OrganisationStatus] " +
-                          "WHERE Id = @statusId";
-
-                var results = await connection.QueryAsync<OrganisationStatus>(sql, new { statusId });
-
-                return await Task.FromResult(results.FirstOrDefault());
-            }
-        }
 
         public async Task<bool> IsOrganisationTypeValidForOrganisation(int organisationTypeId, Guid organisationId)
         {
