@@ -37,8 +37,8 @@ namespace SFA.DAS.RoATPService.Application.Handlers
 
         public async Task<bool> Handle(UpdateOrganisationRequest request, CancellationToken cancellationToken)
         {
-            request.Organisation.LegalName = HtmlTagRemover.StripOutTags(request.Organisation?.LegalName);
-            request.Organisation.TradingName = HtmlTagRemover.StripOutTags(request.Organisation?.TradingName);
+            request.Organisation.LegalName = TextSanitiser.SanitiseText(request.Organisation?.LegalName);
+            request.Organisation.TradingName = TextSanitiser.SanitiseText(request.Organisation?.TradingName);
 
 
             if (!IsValidUpdateOrganisation(request.Organisation))
