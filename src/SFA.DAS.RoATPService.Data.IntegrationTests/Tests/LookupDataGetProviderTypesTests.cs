@@ -4,6 +4,7 @@ using NUnit.Framework;
 using SFA.DAS.RoatpService.Data.IntegrationTests.Handlers;
 using SFA.DAS.RoatpService.Data.IntegrationTests.Models;
 using SFA.DAS.RoatpService.Data.IntegrationTests.Services;
+using SFA.DAS.RoATPService.Application.Validators;
 using SFA.DAS.RoATPService.Data;
 
 namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
@@ -12,6 +13,7 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
     {
         private readonly DatabaseService _databaseService = new DatabaseService();
         private LookupDataRepository _lookupRepository;
+        private OrganisationValidator _organisationValidator;
 
         private int _providerTypeId2;
         private int _providerTypeId1;
@@ -24,6 +26,7 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
         public void Before_the_tests()
         {
             _lookupRepository = new LookupDataRepository(null, _databaseService.WebConfiguration);
+            _organisationValidator = new OrganisationValidator(null,_lookupRepository,null);
             _providerTypeId1 = 1;
             _providerTypeId2 = 2;
             _providerTypeIdNonExistent = 100;
@@ -63,6 +66,15 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
             var result = _lookupRepository.GetProviderType(providerTypeId).Result;
             Assert.AreEqual(providerTypeId, result.Id);
             Assert.AreEqual(providerType, result.Type);
+        }
+
+        [TestCase(1, true)]
+        [TestCase(2, true)]
+        [TestCase(3, false)]
+        public void Check_provider_type_valid_is_returning_expected_result(int providerTypeId, bool expectedResult)
+        {
+            var result = _organisationValidator.IsValidProviderTypeId(providerTypeId);
+            Assert.AreEqual(expectedResult,result);
         }
 
         [Test]

@@ -4,6 +4,7 @@ using NUnit.Framework;
 using SFA.DAS.RoatpService.Data.IntegrationTests.Handlers;
 using SFA.DAS.RoatpService.Data.IntegrationTests.Models;
 using SFA.DAS.RoatpService.Data.IntegrationTests.Services;
+using SFA.DAS.RoATPService.Application.Validators;
 using SFA.DAS.RoATPService.Data;
 
 namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
@@ -12,7 +13,7 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
     {
         private readonly DatabaseService _databaseService = new DatabaseService();
         private LookupDataRepository _lookupRepository;
-
+        private OrganisationValidator _organisationValidator;
 
         private int _organisationTypeId1;
         private int _organisationTypeId2;
@@ -24,7 +25,7 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
         public void Before_the_tests()
         {
             _lookupRepository = new LookupDataRepository(null, _databaseService.WebConfiguration);
-
+            _organisationValidator = new OrganisationValidator(null,_lookupRepository,null);
             _organisationTypeId1 = 10;
             _organisationTypeId2 = 20;
             _organisationTypeId3 = 30;
@@ -52,6 +53,17 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
             var result = _lookupRepository.GetOrganisationType(organisationTypeId).Result;
             Assert.AreEqual(organisationTypeId, result.Id);
             Assert.AreEqual(organisationType, result.Type);
+        }
+
+        [TestCase(10, true)]
+        [TestCase(20, true)]
+        [TestCase(30, true)]
+        [TestCase(40, false)]
+
+        public void Check_organisation_type_valid_is_returning_expected_result(int organisationTypeId, bool expectedResult)
+        {
+            var result = _organisationValidator.IsValidOrganisationTypeId(organisationTypeId);
+            Assert.AreEqual(expectedResult, result);
         }
 
         [Test]

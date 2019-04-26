@@ -17,6 +17,7 @@ namespace SFA.DAS.RoATPService.Data
     {
         private readonly IWebConfiguration _configuration;
 
+        //MFCMFC add logging? Or remove logger
         private ILogger<LookupDataRepository> _logger;
 
         public LookupDataRepository(ILogger<LookupDataRepository> logger, IWebConfiguration configuration)
