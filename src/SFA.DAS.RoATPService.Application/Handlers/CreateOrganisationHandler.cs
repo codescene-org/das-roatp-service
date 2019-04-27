@@ -1,7 +1,6 @@
 ﻿namespace SFA.DAS.RoATPService.Application.Handlers
 {
     using System;
-    using SFA.DAS.RoATPService.Application.Commands;
     using System.Threading;
     using System.Threading.Tasks;
     using Api.Types.Models;
@@ -35,6 +34,9 @@
 
         public Task<Guid?> Handle(CreateOrganisationRequest request, CancellationToken cancellationToken)
         {
+            request.LegalName = _textSanitiser.SanitiseInputText(request.LegalName);
+            request.TradingName = _textSanitiser.SanitiseInputText(request.TradingName);
+
             if (!IsValidCreateOrganisation(request))
             {
                 string invalidOrganisationError = $@"Invalid Organisation data";
@@ -72,10 +74,7 @@
             }
 
             _logger.LogInformation($@"Handling Create Organisation Search for UKPRN [{request.Ukprn}]");
-
-            request.LegalName = _textSanitiser.SanitiseInputText(request.LegalName);
-            request.TradingName = _textSanitiser.SanitiseInputText(request.TradingName);
-
+  
             var command = _mapper.Map(request);
 
             return _organisationRepository.CreateOrganisation(command);

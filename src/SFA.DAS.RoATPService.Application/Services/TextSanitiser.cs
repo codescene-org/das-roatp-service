@@ -13,7 +13,7 @@
             return text;
         }
 
-        public string StripOutHtmlTags(string inputText)
+        private string StripOutHtmlTags(string inputText)
         {
             if (string.IsNullOrEmpty(inputText))
                 return inputText;
@@ -32,7 +32,7 @@
             return text;
         }
 
-        public string StripExcelFormulae(string inputText)
+        private string StripExcelFormulae(string inputText)
         {
             if (string.IsNullOrEmpty(inputText))
                 return inputText;
