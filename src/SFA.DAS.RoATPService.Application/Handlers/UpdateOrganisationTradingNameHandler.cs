@@ -52,7 +52,7 @@ namespace SFA.DAS.RoATPService.Application.Handlers
 
             _logger.LogInformation($@"Handling Update '{FieldChanged}' for Organisation ID [{request.OrganisationId}]");
 
-            request.TradingName = HtmlTagRemover.StripOutTags(request.TradingName);
+            request.TradingName = TextSanitiser.SanitiseText(request.TradingName);
 
             var success = await _updateOrganisationRepository.UpdateTradingName(request.OrganisationId, request.TradingName, request.UpdatedBy);
 

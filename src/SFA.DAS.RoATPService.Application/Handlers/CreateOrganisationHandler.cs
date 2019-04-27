@@ -9,6 +9,7 @@
     using Interfaces;
     using MediatR;
     using Microsoft.Extensions.Logging;
+    using Services;
     using Validators;
 
     public class CreateOrganisationHandler : IRequestHandler<CreateOrganisationRequest, Guid?>
@@ -69,6 +70,9 @@
             }
 
             _logger.LogInformation($@"Handling Create Organisation Search for UKPRN [{request.Ukprn}]");
+
+            request.LegalName = TextSanitiser.SanitiseText(request.LegalName);
+            request.TradingName = TextSanitiser.SanitiseText(request.TradingName);
 
             var command = _mapper.Map(request);
 
