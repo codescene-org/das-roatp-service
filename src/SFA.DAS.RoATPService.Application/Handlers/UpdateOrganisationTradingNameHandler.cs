@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -20,21 +18,25 @@ namespace SFA.DAS.RoATPService.Application.Handlers
         private readonly IOrganisationValidator _validator;
         private readonly IOrganisationRepository _organisationRepository;
         private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
+        private readonly ITextSanitiser _textSanitiser;
 
         private const string FieldChanged = "Trading Name";
 
         public UpdateOrganisationTradingNameHandler(ILogger<UpdateOrganisationTradingNameHandler> logger,
             IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository, 
-            IOrganisationRepository organisationRepository)
+            IOrganisationRepository organisationRepository, ITextSanitiser textSanitiser)
         {
             _logger = logger;
             _validator = validator;
             _updateOrganisationRepository = updateOrganisationRepository;
             _organisationRepository = organisationRepository;
+            _textSanitiser = textSanitiser;
         }
 
         public async Task<bool> Handle(UpdateOrganisationTradingNameRequest request, CancellationToken cancellationToken)
         {
+            request.TradingName = _textSanitiser.SanitiseInputText(request.TradingName);
+
             if (!_validator.IsValidTradingName(request.TradingName))
             {
                 string invalidLegalNameError = $@"Invalid Organisation Trading Name '{request.TradingName}'";
@@ -44,7 +46,7 @@ namespace SFA.DAS.RoATPService.Application.Handlers
 
             var previousTradingName = await _organisationRepository.GetTradingName(request.OrganisationId);
 
-            if ((String.IsNullOrWhiteSpace(previousTradingName) && String.IsNullOrWhiteSpace(request.TradingName)) ||
+                  if ((String.IsNullOrWhiteSpace(previousTradingName) && String.IsNullOrWhiteSpace(request.TradingName)) ||
                 (previousTradingName == request.TradingName))
             {
                 return await Task.FromResult(false);
@@ -52,8 +54,7 @@ namespace SFA.DAS.RoATPService.Application.Handlers
 
             _logger.LogInformation($@"Handling Update '{FieldChanged}' for Organisation ID [{request.OrganisationId}]");
 
-            request.TradingName = TextSanitiser.SanitiseText(request.TradingName);
-
+       
             var success = await _updateOrganisationRepository.UpdateTradingName(request.OrganisationId, request.TradingName, request.UpdatedBy);
 
             if (!success)

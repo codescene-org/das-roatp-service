@@ -19,16 +19,18 @@
         private readonly IOrganisationValidator _organisationValidator;
         private readonly IProviderTypeValidator _providerTypeValidator;
         private readonly IMapCreateOrganisationRequestToCommand _mapper;
+        private readonly ITextSanitiser _textSanitiser;
 
         public CreateOrganisationHandler(IUpdateOrganisationRepository repository, ILogger<CreateOrganisationHandler> logger, 
                                          IOrganisationValidator organisationValidator, IProviderTypeValidator providerTypeValidator, 
-                                         IMapCreateOrganisationRequestToCommand mapper)
+                                         IMapCreateOrganisationRequestToCommand mapper, ITextSanitiser textSanitiser)
         {
             _organisationRepository = repository;
             _logger = logger;
             _organisationValidator = organisationValidator;
             _providerTypeValidator = providerTypeValidator;
             _mapper = mapper;
+            _textSanitiser = textSanitiser;
         }
 
         public Task<Guid?> Handle(CreateOrganisationRequest request, CancellationToken cancellationToken)
@@ -71,8 +73,8 @@
 
             _logger.LogInformation($@"Handling Create Organisation Search for UKPRN [{request.Ukprn}]");
 
-            request.LegalName = TextSanitiser.SanitiseText(request.LegalName);
-            request.TradingName = TextSanitiser.SanitiseText(request.TradingName);
+            request.LegalName = _textSanitiser.SanitiseInputText(request.LegalName);
+            request.TradingName = _textSanitiser.SanitiseInputText(request.TradingName);
 
             var command = _mapper.Map(request);
 

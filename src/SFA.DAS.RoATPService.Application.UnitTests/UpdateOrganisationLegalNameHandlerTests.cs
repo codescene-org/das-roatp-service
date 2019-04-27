@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.RoATPService.Application.UnitTests
+﻿using SFA.DAS.RoATPService.Application.Services;
+
+namespace SFA.DAS.RoATPService.Application.UnitTests
 {
     using Interfaces;
     using Microsoft.Extensions.Logging;
@@ -22,7 +24,7 @@
         private Mock<IUpdateOrganisationRepository> _updateRepository;
         private Mock<IOrganisationRepository> _repository;
         private UpdateOrganisationLegalNameHandler _handler;
-
+        private Mock<ITextSanitiser> _textSanitiser;
         [SetUp]
         public void Before_each_test()
         {
@@ -34,8 +36,9 @@
             _repository.Setup(x => x.GetLegalName(It.IsAny<Guid>())).ReturnsAsync("existing legal name").Verifiable();
             _updateRepository.Setup(x => x.UpdateLegalName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(true).Verifiable();
             _updateRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true).Verifiable();
-
-            _handler = new UpdateOrganisationLegalNameHandler(_logger.Object, _validator.Object, _updateRepository.Object, _repository.Object);
+            _textSanitiser = new Mock<ITextSanitiser>();
+            _textSanitiser.Setup(x=>x.SanitiseInputText(It.IsAny<string>())).Returns<string>(x => x);
+            _handler = new UpdateOrganisationLegalNameHandler(_logger.Object, _validator.Object, _updateRepository.Object, _repository.Object, _textSanitiser.Object);
         }
 
         [Test]

@@ -1,4 +1,5 @@
 ﻿using SFA.DAS.RoATPService.Api.Types.Models;
+using SFA.DAS.RoATPService.Application.Services;
 
 namespace SFA.DAS.RoATPService.Application.UnitTests
 {
@@ -23,7 +24,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         private Mock<IUpdateOrganisationRepository> _updateRepository;
         private Mock<IOrganisationRepository> _repository;
         private UpdateOrganisationTradingNameHandler _handler;
-
+        private Mock<ITextSanitiser> _textSanitiser;
         [SetUp]
         public void Before_each_test()
         {
@@ -35,8 +36,10 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _repository.Setup(x => x.GetTradingName(It.IsAny<Guid>())).ReturnsAsync("existing trading name").Verifiable();
             _updateRepository.Setup(x => x.UpdateTradingName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(true).Verifiable();
             _updateRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true).Verifiable();
+            _textSanitiser = new Mock<ITextSanitiser>();
+            _textSanitiser.Setup(x => x.SanitiseInputText(It.IsAny<string>())).Returns<string>(x => x);
 
-            _handler = new UpdateOrganisationTradingNameHandler(_logger.Object, _validator.Object, _updateRepository.Object, _repository.Object);
+            _handler = new UpdateOrganisationTradingNameHandler(_logger.Object, _validator.Object, _updateRepository.Object, _repository.Object, _textSanitiser.Object);
         }
 
         [Test]

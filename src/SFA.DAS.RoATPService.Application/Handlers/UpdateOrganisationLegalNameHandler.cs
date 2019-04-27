@@ -17,21 +17,25 @@ namespace SFA.DAS.RoATPService.Application.Handlers
         private readonly IOrganisationValidator _validator;
         private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
         private readonly IOrganisationRepository _organisationRepository;
+        private readonly ITextSanitiser _textSanitiser;
 
         private const string FieldChanged = "Legal Name";
 
         public UpdateOrganisationLegalNameHandler(ILogger<UpdateOrganisationLegalNameHandler> logger,
             IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository, 
-            IOrganisationRepository organisationRepository)
+            IOrganisationRepository organisationRepository, ITextSanitiser textSanitiser)
         {
             _logger = logger;
             _validator = validator;
             _updateOrganisationRepository = updateOrganisationRepository;
             _organisationRepository = organisationRepository;
+            _textSanitiser = textSanitiser;
         }
 
         public async Task<bool> Handle(UpdateOrganisationLegalNameRequest request, CancellationToken cancellationToken)
         {
+            request.LegalName = _textSanitiser.SanitiseInputText(request.LegalName);
+
             if (!_validator.IsValidLegalName(request.LegalName))
             {
                 string invalidLegalNameError = $@"Invalid Organisation Legal Name '{request.LegalName}'";
@@ -41,16 +45,15 @@ namespace SFA.DAS.RoATPService.Application.Handlers
 
             _logger.LogInformation($@"Handling Update '{FieldChanged}' for Organisation ID [{request.OrganisationId}]");
 
-            string previousLegalName = await _organisationRepository.GetLegalName(request.OrganisationId);
+            var previousLegalName = await _organisationRepository.GetLegalName(request.OrganisationId);
 
             if (previousLegalName == request.LegalName)
             {
                 return await Task.FromResult(false);
             }
 
-            request.LegalName = TextSanitiser.SanitiseText(request.LegalName);
-
-            bool success = await _updateOrganisationRepository.UpdateLegalName(request.OrganisationId, request.LegalName, request.UpdatedBy);
+       
+            var success = await _updateOrganisationRepository.UpdateLegalName(request.OrganisationId, request.LegalName, request.UpdatedBy);
 
             if (!success)
             {

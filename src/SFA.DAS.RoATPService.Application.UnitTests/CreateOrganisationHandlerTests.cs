@@ -1,5 +1,6 @@
 ﻿using SFA.DAS.RoATPService.Application.Commands;
 using SFA.DAS.RoATPService.Application.Mappers;
+using SFA.DAS.RoATPService.Application.Services;
 
 namespace SFA.DAS.RoATPService.Application.UnitTests
 {
@@ -26,7 +27,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         private Mock<ILookupDataRepository> _lookupDataRepository;
         private Mock<IOrganisationValidator> _validator;
         private Mock<IDuplicateCheckRepository> _duplicateCheckRepository;
-
+        private Mock<ITextSanitiser> _textSanitiser;
         private Guid _organisationId;
 
         private IMapCreateOrganisationRequestToCommand _mapper;
@@ -56,7 +57,10 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _validator.Setup(x => x.IsValidCharityNumber(It.IsAny<string>())).Returns(true);
             _validator.Setup(x => x.DuplicateUkprnInAnotherOrganisation(It.IsAny<long>(), It.IsAny<Guid>()))
                 .Returns(new DuplicateCheckResponse {DuplicateFound = false, DuplicateOrganisationName = ""});
-            _handler = new CreateOrganisationHandler(_repository.Object, _logger.Object, _validator.Object, new ProviderTypeValidator(), _mapper);
+            _textSanitiser = new Mock<ITextSanitiser>();
+            _textSanitiser.Setup(x => x.SanitiseInputText(It.IsAny<string>())).Returns<string>(x => x);
+
+            _handler = new CreateOrganisationHandler(_repository.Object, _logger.Object, _validator.Object, new ProviderTypeValidator(), _mapper, _textSanitiser.Object);
 
             _request = new CreateOrganisationRequest
             {                                                                       
