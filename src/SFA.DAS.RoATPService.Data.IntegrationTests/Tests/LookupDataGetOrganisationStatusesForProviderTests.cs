@@ -32,6 +32,7 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
             _organisationStatusId2WithProviderTypeId1 = 20;
             _organisationStatusId3WithProviderTypeId1 = 30;
             _organisationStatusId4WithProviderTypeId2 = 100;
+            _cacheHelper.PurgeAllCaches();
 
             OrganisationStatusHandler.InsertRecord(new OrganisationStatusModel{Id=_organisationStatusId1WithProviderTypeId1, CreatedAt = DateTime.Now, CreatedBy="system", Status = "x"});
             OrganisationStatusHandler.InsertRecord(new OrganisationStatusModel { Id = _organisationStatusId2WithProviderTypeId1, CreatedAt = DateTime.Now, CreatedBy = "system", Status = "x" });

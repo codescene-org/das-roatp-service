@@ -33,7 +33,7 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
             _organisationStatusId3 = 30;
             _organisationStatusIdNonExistent = 100;
             _numberOfExpectedResults = 3;
-
+            _cacheHelper.PurgeAllCaches();
 
             OrganisationStatusHandler.InsertRecord(new OrganisationStatusModel { Id = _organisationStatusId1, CreatedAt = DateTime.Now, CreatedBy = "system", Status = "a" });
             OrganisationStatusHandler.InsertRecord(new OrganisationStatusModel { Id = _organisationStatusId2, CreatedAt = DateTime.Now, CreatedBy = "system", Status =  "b" });

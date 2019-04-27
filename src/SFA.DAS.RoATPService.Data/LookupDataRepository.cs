@@ -23,7 +23,7 @@ namespace SFA.DAS.RoATPService.Data
         //MFCMFC add logging? Or remove logger
         private ILogger<LookupDataRepository> _logger;
 
-        private ICacheHelper _cacheHelper;
+        private readonly ICacheHelper _cacheHelper;
      
         public LookupDataRepository(ILogger<LookupDataRepository> logger, IWebConfiguration configuration, ICacheHelper cacheHelper)
         {
@@ -34,11 +34,11 @@ namespace SFA.DAS.RoATPService.Data
 
         public async Task<IEnumerable<ProviderType>> GetProviderTypes()
         {
-            var res = _cacheHelper.GetProviderTypes();
+            var results = _cacheHelper.GetProviderTypes();
 
-            if (res != null)
+            if (results != null)
             {
-                return await Task.FromResult(res);
+                return await Task.FromResult(results);
             }
 
             using (var connection = new SqlConnection(_configuration.SqlConnectionString))
@@ -67,6 +67,13 @@ namespace SFA.DAS.RoATPService.Data
 
         public async Task<IEnumerable<OrganisationType>> GetOrganisationTypes()
         {
+            var results = _cacheHelper.GetOrganisationTypes();
+
+            if (results != null)
+            {
+                return await Task.FromResult(results);
+            }
+
             using (var connection = new SqlConnection(_configuration.SqlConnectionString))
             {
                 if (connection.State != ConnectionState.Open)
@@ -77,6 +84,7 @@ namespace SFA.DAS.RoATPService.Data
                           "order by Id";
 
                 var organisationTypes = await connection.QueryAsync<OrganisationType>(sql);
+                _cacheHelper.CacheOrganisationTypes(organisationTypes);
                 return await Task.FromResult(organisationTypes);
             }
         }
@@ -89,6 +97,13 @@ namespace SFA.DAS.RoATPService.Data
 
         public async Task<IEnumerable<OrganisationStatus>> GetOrganisationStatuses()
         {
+            var results = _cacheHelper.GetOrganisationStatuses();
+
+            if (results != null)
+            {
+                return await Task.FromResult(results);
+            }
+
             var connectionString = _configuration.SqlConnectionString;
 
             using (var connection = new SqlConnection(connectionString))
@@ -99,9 +114,9 @@ namespace SFA.DAS.RoATPService.Data
                 var sql = "select * FROM [OrganisationStatus] " +
                           "order by Id";
 
-                var results = await connection.QueryAsync<OrganisationStatus>(sql);
-
-                return await Task.FromResult(results);
+                var organisationStatuses = await connection.QueryAsync<OrganisationStatus>(sql);
+                _cacheHelper.CacheOrganisationStatuses(organisationStatuses);
+                return await Task.FromResult(organisationStatuses);
             }
         }
 
@@ -115,6 +130,16 @@ namespace SFA.DAS.RoATPService.Data
 
         public async Task<IEnumerable<RemovedReason>> GetRemovedReasons()
         {
+            var results = _cacheHelper.GetRemovedReasons();
+            if (results != null)
+            {
+                return await Task.FromResult(results);
+            }
+
+            if (results != null)
+            {
+                return await Task.FromResult(results);
+            }
             using (var connection = new SqlConnection(_configuration.SqlConnectionString))
             {
                 if (connection.State != ConnectionState.Open)
@@ -125,6 +150,7 @@ namespace SFA.DAS.RoATPService.Data
                           "ORDER BY Id";
 
                 var removedReasons = await connection.QueryAsync<RemovedReason>(sql);
+                _cacheHelper.CacheRemovedReasons(removedReasons);
                 return await Task.FromResult(removedReasons);
             }
         }
@@ -137,6 +163,11 @@ namespace SFA.DAS.RoATPService.Data
 
         public async Task<IEnumerable<ProviderTypeOrganisationType>> GetProviderTypeOrganisationTypes()
         {
+            var results = _cacheHelper.GetProviderTypeOrganisationTypes();
+            if (results != null)
+            {
+                return await Task.FromResult(results);
+            }
             using (var connection = new SqlConnection(_configuration.SqlConnectionString))
             {
                 if (connection.State != ConnectionState.Open)
@@ -147,12 +178,19 @@ namespace SFA.DAS.RoATPService.Data
                           "ORDER BY Id";
 
                 var providerTypeOrganisationTypes = await connection.QueryAsync<ProviderTypeOrganisationType>(sql);
+                _cacheHelper.CacheProviderTypeOrganisationTypes(providerTypeOrganisationTypes);
+
                 return await Task.FromResult(providerTypeOrganisationTypes);
             }
         }
 
         public async Task<IEnumerable<ProviderTypeOrganisationStatus>> GetProviderTypeOrganisationStatuses()
         {
+            var results = _cacheHelper.GetProviderTypeOrganistionStatuses();
+            if (results != null)
+            {
+                return await Task.FromResult(results);
+            }
             using (var connection = new SqlConnection(_configuration.SqlConnectionString))
             {
                 if (connection.State != ConnectionState.Open)
@@ -163,6 +201,8 @@ namespace SFA.DAS.RoATPService.Data
                           "ORDER BY Id";
 
                 var providerTypeOrganisationStatuses = await connection.QueryAsync<ProviderTypeOrganisationStatus>(sql);
+                _cacheHelper.CacheProviderTypeOrganisationStatuses(providerTypeOrganisationStatuses);
+
                 return await Task.FromResult(providerTypeOrganisationStatuses);
             }
         }
@@ -185,6 +225,7 @@ namespace SFA.DAS.RoATPService.Data
 
         public async Task<IEnumerable<OrganisationStatus>> GetOrganisationStatusesForProviderTypeId(int? providerTypeId)
         {
+
             var organisationStatuses = await GetOrganisationStatuses();
             if (providerTypeId == null)
                 return organisationStatuses;
