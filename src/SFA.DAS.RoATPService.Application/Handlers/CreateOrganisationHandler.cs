@@ -1,10 +1,7 @@
-﻿using System;
-using AutoMapper;
-using SFA.DAS.RoATPService.Application.Commands;
-
-
-namespace SFA.DAS.RoATPService.Application.Handlers
+﻿namespace SFA.DAS.RoATPService.Application.Handlers
 {
+    using System;
+    using SFA.DAS.RoATPService.Application.Commands;
     using System.Threading;
     using System.Threading.Tasks;
     using Api.Types.Models;
@@ -74,12 +71,6 @@ namespace SFA.DAS.RoATPService.Application.Handlers
             _logger.LogInformation($@"Handling Create Organisation Search for UKPRN [{request.Ukprn}]");
 
             var command = _mapper.Map(request);
-
-           // var x = Map.Mapper<>;
-
-
-            var x =
-                Mapper.Map<CreateOrganisationCommand>(request);
 
             return _organisationRepository.CreateOrganisation(command);
         }
