@@ -4,6 +4,7 @@ using SFA.DAS.RoatpService.Data.IntegrationTests.Handlers;
 using SFA.DAS.RoatpService.Data.IntegrationTests.Models;
 using SFA.DAS.RoatpService.Data.IntegrationTests.Services;
 using SFA.DAS.RoATPService.Data;
+using SFA.DAS.RoATPService.Data.Helpers;
 
 namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
 {
@@ -11,7 +12,7 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
     {
         private readonly DatabaseService _databaseService = new DatabaseService();
         private LookupDataRepository _lookupRepository;
-
+        private readonly CacheHelper _cacheHelper = new CacheHelper();
         private int _removedReasonId2;
         private int _removedReasonId1;
         private int _removedReasonNonExistent;
@@ -22,7 +23,7 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
         [OneTimeSetUp]
         public void Before_the_tests()
         {
-            _lookupRepository = new LookupDataRepository(null, _databaseService.WebConfiguration);
+            _lookupRepository = new LookupDataRepository(null, _databaseService.WebConfiguration, _cacheHelper);
             _removedReasonId1 = 1;
             _removedReasonId2 = 2;
             _removedReasonNonExistent = 100;

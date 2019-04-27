@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Linq;
+using System.Runtime.Caching;
+using SFA.DAS.RoATPService.Data.Helpers;
 
 namespace SFA.DAS.RoATPService.Data
 {
@@ -20,14 +23,24 @@ namespace SFA.DAS.RoATPService.Data
         //MFCMFC add logging? Or remove logger
         private ILogger<LookupDataRepository> _logger;
 
-        public LookupDataRepository(ILogger<LookupDataRepository> logger, IWebConfiguration configuration)
+        private ICacheHelper _cacheHelper;
+     
+        public LookupDataRepository(ILogger<LookupDataRepository> logger, IWebConfiguration configuration, ICacheHelper cacheHelper)
         {
             _logger = logger;
             _configuration = configuration;
+            _cacheHelper = cacheHelper;
         }
 
         public async Task<IEnumerable<ProviderType>> GetProviderTypes()
         {
+            var res = _cacheHelper.GetProviderTypes();
+
+            if (res != null)
+            {
+                return await Task.FromResult(res);
+            }
+
             using (var connection = new SqlConnection(_configuration.SqlConnectionString))
             {
                 if (connection.State != ConnectionState.Open)
@@ -39,6 +52,9 @@ namespace SFA.DAS.RoATPService.Data
                           "order by Id";
 
                 var providerTypes = await connection.QueryAsync<ProviderType>(sql);
+                _cacheHelper.CacheProviderTypes(providerTypes);
+                
+
                 return await Task.FromResult(providerTypes);
             }
         }

@@ -6,6 +6,7 @@ using SFA.DAS.RoatpService.Data.IntegrationTests.Models;
 using SFA.DAS.RoatpService.Data.IntegrationTests.Services;
 using SFA.DAS.RoATPService.Application.Validators;
 using SFA.DAS.RoATPService.Data;
+using SFA.DAS.RoATPService.Data.Helpers;
 
 namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
 {
@@ -14,6 +15,7 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
         private readonly DatabaseService _databaseService = new DatabaseService();
         private LookupDataRepository _lookupRepository;
         private OrganisationValidator _organisationValidator;
+        private readonly CacheHelper _cacheHelper = new CacheHelper();
 
         private int _organisationTypeId1;
         private int _organisationTypeId2;
@@ -24,7 +26,7 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
         [OneTimeSetUp]
         public void Before_the_tests()
         {
-            _lookupRepository = new LookupDataRepository(null, _databaseService.WebConfiguration);
+            _lookupRepository = new LookupDataRepository(null, _databaseService.WebConfiguration,_cacheHelper);
             _organisationValidator = new OrganisationValidator(null,_lookupRepository,null);
             _organisationTypeId1 = 10;
             _organisationTypeId2 = 20;
