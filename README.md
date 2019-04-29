@@ -30,3 +30,6 @@
 - Set SFA.DAS.RoATPService.Application.Api as the startup project
 - Publish the database project SFA.DAS.RoATPService.Database to your local SQL Server instance
 - Running the solution will launch the API in your browser
+
+
+
