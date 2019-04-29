@@ -131,16 +131,17 @@ namespace SFA.DAS.RoATPService.Application.Services
 
             var previousFinancialTrackRecord = _organisationRepository.GetFinancialTrackRecord(organisationId).Result;
 
-            if (previousFinancialTrackRecord == newFinancialTrackRecord)
-                return auditData;
-
-            var entry = new AuditLogEntry
+            if (previousFinancialTrackRecord != newFinancialTrackRecord)
             {
-                FieldChanged = "Financial Track Record",
-                PreviousValue = previousFinancialTrackRecord.ToString(),
-                NewValue = newFinancialTrackRecord.ToString()
-            };
-            auditData.FieldChanges.Add(entry);
+                var entry = new AuditLogEntry
+                {
+                    FieldChanged = "Financial Track Record",
+                    PreviousValue = previousFinancialTrackRecord.ToString(),
+                    NewValue = newFinancialTrackRecord.ToString()
+                };
+                auditData.FieldChanges.Add(entry);
+            }
+        
             return auditData;
         }
     }

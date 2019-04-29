@@ -7,7 +7,6 @@ using NUnit.Framework;
 using NUnit.Framework.Constraints;
 using SFA.DAS.RoATPService.Application.Interfaces;
 using SFA.DAS.RoATPService.Application.Services;
-using SFA.DAS.RoATPService.Domain;
 using SFA.DAS.RoATPService.Settings;
 
 namespace SFA.DAS.RoATPService.Application.UnitTests
