@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.RoATPService.Application.Services
+﻿using SFA.DAS.RoATPService.Application.Interfaces;
+
+namespace SFA.DAS.RoATPService.Application.Services
 {
     public class TextSanitiser: ITextSanitiser
     {

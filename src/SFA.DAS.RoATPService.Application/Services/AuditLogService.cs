@@ -1,12 +1,86 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using System.Threading.Tasks;
+using KellermanSoftware.CompareNetObjects;
+using SFA.DAS.RoATPService.Application.Interfaces;
 using SFA.DAS.RoATPService.Domain;
+using SFA.DAS.RoATPService.Settings;
 
 namespace SFA.DAS.RoATPService.Application.Services
 {
-    public class AuditLogService: IAuditLogService
+    public class AuditLogService : IAuditLogService
     {
+        private readonly RegisterAuditLogSettings _settings;
+        private readonly IOrganisationRepository _organisationRepository;
+        public AuditLogService(RegisterAuditLogSettings settings, IOrganisationRepository organisationRepository)
+        {
+            _settings = settings;
+            _organisationRepository = organisationRepository;
+        }
+
+        public async Task<AuditData> BuildListOfFieldsChanged(Organisation originalOrganisation, Organisation updatedOrganisation)
+        {
+            CompareLogic organisationComparison = new CompareLogic(new ComparisonConfig
+                {
+                    CompareChildren = true,
+                    MaxDifferences = byte.MaxValue
+                }
+            );
+            ComparisonResult comparisonResult = organisationComparison.Compare(originalOrganisation, updatedOrganisation);
+
+            var updatedAt = updatedOrganisation.UpdatedAt ?? DateTime.Now;
+            var updatedBy = string.IsNullOrWhiteSpace(updatedOrganisation.UpdatedBy) ? "System" : updatedOrganisation.UpdatedBy;
+
+            var auditData = new AuditData
+            {
+                OrganisationId = updatedOrganisation.Id,
+                UpdatedAt = updatedAt,
+                UpdatedBy = updatedBy
+            };
+
+            List<AuditLogEntry> auditLogEntries = new List<AuditLogEntry>();
+            foreach (var difference in comparisonResult.Differences)
+            {
+                if (_settings.IgnoredFields.Contains(difference.PropertyName))
+                {
+                    continue;
+                }
+
+                string propertyName = difference.PropertyName;
+
+                AuditLogDisplayName displayNameForProperty = Enumerable.FirstOrDefault<AuditLogDisplayName>(_settings.DisplayNames, x => x.FieldName == propertyName);
+
+                if (displayNameForProperty != null)
+                {
+                    propertyName = displayNameForProperty.DisplayName;
+                }
+
+                if (!updatedOrganisation.UpdatedAt.HasValue)
+                {
+                    updatedOrganisation.UpdatedAt = DateTime.Now;
+                }
+
+                if (String.IsNullOrWhiteSpace(updatedOrganisation.UpdatedBy))
+                {
+                    updatedOrganisation.UpdatedBy = "System";
+                }
+
+                AuditLogEntry entry = new AuditLogEntry
+                {
+                    FieldChanged = propertyName,
+                    PreviousValue = difference.Object1Value,
+                    NewValue = difference.Object2Value
+                };
+                auditLogEntries.Add(entry);
+
+            }
+            auditData.FieldChanges = auditLogEntries;
+
+            return await Task.FromResult(auditData);
+        }
+
+
         public AuditData CreateAuditLogEntry(Guid organisationId, string updatedBy, string fieldName, string oldValue,
             string newValue)
         {
@@ -48,6 +122,26 @@ namespace SFA.DAS.RoATPService.Application.Services
             };
 
             auditData.FieldChanges.Add(entry);
+        }
+
+        public AuditData AuditFinancialTrackRecord(Guid organisationId, string updatedBy,
+            bool newFinancialTrackRecord)
+        {
+            var auditData = new AuditData { FieldChanges = new List<AuditLogEntry>(), OrganisationId = organisationId, UpdatedAt = DateTime.Now, UpdatedBy = updatedBy };
+
+            var previousFinancialTrackRecord = _organisationRepository.GetFinancialTrackRecord(organisationId).Result;
+
+            if (previousFinancialTrackRecord == newFinancialTrackRecord)
+                return auditData;
+
+            var entry = new AuditLogEntry
+            {
+                FieldChanged = "Financial Track Record",
+                PreviousValue = previousFinancialTrackRecord.ToString(),
+                NewValue = newFinancialTrackRecord.ToString()
+            };
+            auditData.FieldChanges.Add(entry);
+            return auditData;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace SFA.DAS.RoATPService.Application.Services
+﻿namespace SFA.DAS.RoATPService.Application.Interfaces
 {
     public interface ITextSanitiser
     {

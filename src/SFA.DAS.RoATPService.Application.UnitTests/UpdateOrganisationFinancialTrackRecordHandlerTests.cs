@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Threading;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
@@ -32,8 +31,13 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _updateRepository.Setup(x => x.UpdateFinancialTrackRecord(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<string>())).ReturnsAsync(true).Verifiable();
             _updateRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true).Verifiable();
             _auditLogService = new Mock<IAuditLogService>();
+            _auditLogService
+                .Setup(x => x.AuditFinancialTrackRecord(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<bool>()))
+                .Returns(new AuditData { FieldChanges = new List<AuditLogEntry>() });
 
-        _handler = new UpdateOrganisationFinancialTrackRecordHandler(_logger.Object, _updateRepository.Object, _repository.Object, _auditLogService.Object);
+            _auditLogService.Setup(x => x.CreateAuditData(It.IsAny<Guid>(), It.IsAny<string>()))
+                .Returns(new AuditData { FieldChanges = new List<AuditLogEntry>() });
+            _handler = new UpdateOrganisationFinancialTrackRecordHandler(_logger.Object, _updateRepository.Object, _auditLogService.Object);
         }
 
         [Test]
@@ -49,7 +53,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             var result = _handler.Handle(request, new CancellationToken()).GetAwaiter().GetResult();
             result.Should().BeFalse();
 
-            _repository.Verify(x => x.GetFinancialTrackRecord(It.IsAny<Guid>()), Times.Once);
+            _auditLogService.Verify(x=> x.AuditFinancialTrackRecord(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<bool>()),Times.Once);
             _updateRepository.Verify(x => x.UpdateFinancialTrackRecord(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<string>()), Times.Never);
             _updateRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
         }
@@ -69,7 +73,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             var result = _handler.Handle(request, new CancellationToken()).GetAwaiter().GetResult();
             result.Should().BeFalse();
 
-            _repository.Verify(x => x.GetFinancialTrackRecord(It.IsAny<Guid>()), Times.Once);
+            _auditLogService.Verify(x => x.AuditFinancialTrackRecord(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Once);
             _updateRepository.Verify(x => x.UpdateFinancialTrackRecord(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<string>()), Times.Never);
             _updateRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
         }
@@ -84,10 +88,15 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
                 UpdatedBy = "unit test"
             };
 
+            var fieldChanges = new List<AuditLogEntry>();
+            fieldChanges.Add(new AuditLogEntry {FieldChanged = "Financial Track Record", NewValue = "True", PreviousValue = "False"});
+            _auditLogService.Setup(x => x.AuditFinancialTrackRecord(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<bool>()))
+                .Returns(new AuditData { FieldChanges = fieldChanges });
+
             var result = _handler.Handle(request, new CancellationToken()).GetAwaiter().GetResult();
             result.Should().BeTrue();
 
-            _repository.Verify(x => x.GetFinancialTrackRecord(It.IsAny<Guid>()), Times.Once);
+            _auditLogService.Verify(x => x.AuditFinancialTrackRecord(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Once);
             _updateRepository.Verify(x => x.UpdateFinancialTrackRecord(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<string>()), Times.Once);
             _updateRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Once);
         }

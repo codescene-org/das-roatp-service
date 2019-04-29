@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.RoATPService.Domain
+﻿using Newtonsoft.Json;
+
+namespace SFA.DAS.RoATPService.Domain
 {
     using System;
     using System.Collections.Generic;
@@ -11,5 +13,8 @@
         public DateTime? UpdatedAt { get; set; }
 
         public List<AuditLogEntry> FieldChanges { get; set; }
+
+        [JsonIgnore]
+        public bool ChangesMade => FieldChanges.Count>0;
     }
 }
