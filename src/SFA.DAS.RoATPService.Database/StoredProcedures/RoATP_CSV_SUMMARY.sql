@@ -8,7 +8,7 @@ select ukprn AS UKPRN,
 	 case isnull(tradingName,'') when '' then ''
 	 else ' T/A ' + tradingName
 	 END AS 'Organisation Name',
- pt.ProviderType AS 'Provider Type',
+ pt.ProviderType AS 'Provider type',
  CASE Json_value(OrganisationData,'$.NonLevyContract')
 	WHEN 'true' then 'Y' else 'N' end  AS 'Contracted to deliver to non-levied employers',
  case Json_value(OrganisationData,'$.ParentCompanyGuarantee')
