@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.RoATPService.Application.Handlers
+﻿using SFA.DAS.RoATPService.Application.Services;
+
+namespace SFA.DAS.RoATPService.Application.Handlers
 {
     using System.Threading;
     using System.Threading.Tasks;
@@ -10,23 +12,25 @@
     using Interfaces;
     using Validators;
 
-    public class UpdateOrganisationTypeHandler : UpdateOrganisationHandlerBase, IRequestHandler<UpdateOrganisationTypeRequest, bool>
+    public class UpdateOrganisationTypeHandler : IRequestHandler<UpdateOrganisationTypeRequest, bool>
     {
         private readonly ILogger<UpdateOrganisationTypeHandler> _logger;
         private readonly IOrganisationValidator _validator;
         private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
         private readonly ILookupDataRepository _lookupRepository;
         private readonly IOrganisationRepository _organisationRepository;
+        private readonly IAuditLogService _auditLogService;
 
         public UpdateOrganisationTypeHandler(ILogger<UpdateOrganisationTypeHandler> logger,
             IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository,
-            ILookupDataRepository lookupRepository, IOrganisationRepository organisationRepository)
+            ILookupDataRepository lookupRepository, IOrganisationRepository organisationRepository, IAuditLogService auditLogService)
         {
             _logger = logger;
             _validator = validator;
             _updateOrganisationRepository = updateOrganisationRepository;
             _lookupRepository = lookupRepository;
             _organisationRepository = organisationRepository;
+            _auditLogService = auditLogService;
         }
 
         public async Task<bool> Handle(UpdateOrganisationTypeRequest request, CancellationToken cancellationToken)
@@ -38,7 +42,7 @@
 
             var success = false;
 
-            var auditData = CreateAuditData(request.OrganisationId, request.UpdatedBy);
+            var auditData = _auditLogService.CreateAuditData(request.OrganisationId, request.UpdatedBy);
 
             if (existingTypeId != request.OrganisationTypeId)
             {
@@ -48,7 +52,7 @@
 
             if (success)
             {
-                AddAuditEntry(auditData, "Organisation Type", ConvertTypeIdToText(existingTypeId),
+                _auditLogService.AddAuditEntry(auditData, "Organisation Type", ConvertTypeIdToText(existingTypeId),
                     ConvertTypeIdToText(request.OrganisationTypeId));
                 success = await _updateOrganisationRepository.WriteFieldChangesToAuditLog(auditData);
             }

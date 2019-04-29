@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.FileSystemGlobbing.Internal;
+using SFA.DAS.RoATPService.Application.Services;
 
 namespace SFA.DAS.RoATPService.Application.UnitTests
 {
@@ -26,7 +27,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         private Mock<IUpdateOrganisationRepository> _updateRepository;
         private Mock<ILookupDataRepository> _lookupDataRepository;
         private Mock<IOrganisationRepository> _repository;
-
+        private Mock<IAuditLogService> _auditLogService;
 
         [SetUp]
         public void Before_each_test()
@@ -63,10 +64,10 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
 
             RemovedReason nullReason = null;
             _repository.Setup(x => x.GetRemovedReason(It.IsAny<Guid>())).ReturnsAsync(nullReason);
-
+            _auditLogService = new Mock<IAuditLogService>();
             _handler = new UpdateOrganisationStatusHandler(_logger.Object, _validator.Object, 
                                                            _updateRepository.Object,
-                                                           _lookupDataRepository.Object, _repository.Object);
+                                                           _lookupDataRepository.Object, _repository.Object, _auditLogService.Object);
         }
 
         [TestCase(-1)]

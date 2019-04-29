@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.RoATPService.Application.UnitTests
+﻿using SFA.DAS.RoATPService.Application.Services;
+
+namespace SFA.DAS.RoATPService.Application.UnitTests
 {
     using System;
     using System.Threading;
@@ -24,6 +26,7 @@
         private Mock<IOrganisationRepository> _repository;
         private UpdateOrganisationTypeHandler _handler;
         private UpdateOrganisationTypeRequest _request;
+        private Mock<IAuditLogService> _auditLogService;
 
         [SetUp]
         public void Before_each_test()
@@ -34,9 +37,10 @@
             _validator.Setup(x => x.IsValidOrganisationTypeIdForOrganisation(It.IsAny<int>(), It.IsAny<Guid>())).Returns(true);
             _updateOrganisationRepository = new Mock<IUpdateOrganisationRepository>();
             _repository = new Mock<IOrganisationRepository>();
+            _auditLogService = new Mock<IAuditLogService>();
             _lookupDataRepository = new Mock<ILookupDataRepository>();
             _handler = new UpdateOrganisationTypeHandler(_logger.Object, _validator.Object,
-                _updateOrganisationRepository.Object, _lookupDataRepository.Object, _repository.Object);
+                _updateOrganisationRepository.Object, _lookupDataRepository.Object, _repository.Object, _auditLogService.Object);
             _request = new UpdateOrganisationTypeRequest
             {
                 OrganisationId = Guid.NewGuid(),

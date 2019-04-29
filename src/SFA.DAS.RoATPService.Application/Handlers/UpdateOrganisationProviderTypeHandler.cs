@@ -14,7 +14,7 @@
     using Interfaces;
     using Validators;
 
-    public class UpdateOrganisationProviderTypeHandler : UpdateOrganisationHandlerBase, IRequestHandler<UpdateOrganisationProviderTypeRequest, bool>
+    public class UpdateOrganisationProviderTypeHandler : IRequestHandler<UpdateOrganisationProviderTypeRequest, bool>
     {
         private readonly ILogger<UpdateOrganisationProviderTypeHandler> _logger;
         private readonly IOrganisationValidator _validator;
@@ -22,13 +22,14 @@
         private readonly ILookupDataRepository _lookupDataRepository;
         private readonly IOrganisationStatusManager _organisationStatusManager;
         private readonly IOrganisationRepository _organisationRepository;
+        private readonly IAuditLogService _auditLogService;
 
         private const string FieldChanged = "Provider Type";
 
         public UpdateOrganisationProviderTypeHandler(ILogger<UpdateOrganisationProviderTypeHandler> logger,
             IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository,
             ILookupDataRepository lookupDataRepository, 
-            IOrganisationStatusManager organisationStatusManager, IOrganisationRepository organisationRepository)
+            IOrganisationStatusManager organisationStatusManager, IOrganisationRepository organisationRepository, IAuditLogService auditLogService)
         {
             _logger = logger;
             _validator = validator;
@@ -36,6 +37,7 @@
             _lookupDataRepository = lookupDataRepository;
             _organisationStatusManager = organisationStatusManager;
             _organisationRepository = organisationRepository;
+            _auditLogService = auditLogService;
         }
 
         public async Task<bool> Handle(UpdateOrganisationProviderTypeRequest request, CancellationToken cancellationToken)
@@ -54,7 +56,7 @@
                var success = await _updateOrganisationRepository.UpdateProviderTypeAndOrganisationType(request.OrganisationId, request.ProviderTypeId, request.OrganisationTypeId, request.UpdatedBy);
             if (!success) return await Task.FromResult(false);
 
-            var auditData = CreateAuditData(request.OrganisationId, request.UpdatedBy);
+            var auditData = _auditLogService.CreateAuditData(request.OrganisationId, request.UpdatedBy);
 
             auditData.FieldChanges.Add(AuditProviderType(request.ProviderTypeId, previousProviderTypeId));
             var previousOrganisationTypeId = await _organisationRepository.GetOrganisationType(request.OrganisationId);
@@ -90,7 +92,7 @@
                         return false;
                     }
 
-                    AddAuditEntry(
+                    _auditLogService.AddAuditEntry(
                         auditData,
                         "Organisation Status",
                         GetOrganisationStatus(previousOrganisationStatusId).Result,
@@ -104,7 +106,7 @@
 
                     if (!success) { return false;}
 
-                    AddAuditEntry(
+                    _auditLogService.AddAuditEntry(
                         auditData,
                         "Start Date",
                         previousStartDate?.ToString(),
@@ -122,7 +124,7 @@
 
                     if (!success) return await Task.FromResult(false);
 
-                    AddAuditEntry(
+                    _auditLogService.AddAuditEntry(
                         auditData,
                         "Organisation Status",
                         GetOrganisationStatus(previousOrganisationStatusId).Result,

@@ -1,13 +1,14 @@
-﻿namespace SFA.DAS.RoATPService.Application.Handlers
-{
-    using System;
-    using System.Collections.Generic;
-    using Domain;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using SFA.DAS.RoATPService.Domain;
 
-    public class UpdateOrganisationHandlerBase
+namespace SFA.DAS.RoATPService.Application.Services
+{
+    public class AuditLogService: IAuditLogService
     {
-        protected AuditData CreateAuditLogEntry(Guid organisationId, string updatedBy, string fieldName, 
-                                                string oldValue, string newValue)
+        public AuditData CreateAuditLogEntry(Guid organisationId, string updatedBy, string fieldName, string oldValue,
+            string newValue)
         {
             return new AuditData
             {
@@ -26,7 +27,7 @@
             };
         }
 
-        protected AuditData CreateAuditData(Guid organisationId, string updatedBy)
+        public AuditData CreateAuditData(Guid organisationId, string updatedBy)
         {
             return new AuditData
             {
@@ -37,14 +38,14 @@
             };
         }
 
-        protected void AddAuditEntry(AuditData auditData, string fieldChanged, string previousValue, string newValue)
+        public void AddAuditEntry(AuditData auditData, string fieldChanged, string previousValue, string newValue)
         {
             var entry = new AuditLogEntry
-                {
-                    FieldChanged = fieldChanged,
-                    PreviousValue = previousValue,
-                    NewValue = newValue
-                };
+            {
+                FieldChanged = fieldChanged,
+                PreviousValue = previousValue,
+                NewValue = newValue
+            };
 
             auditData.FieldChanges.Add(entry);
         }

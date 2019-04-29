@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.RoATPService.Application.Handlers
+﻿using SFA.DAS.RoATPService.Application.Services;
+
+namespace SFA.DAS.RoATPService.Application.Handlers
 {
     using System;
     using System.Threading;
@@ -11,23 +13,25 @@
     using SFA.DAS.RoATPService.Application.Interfaces;
     using Validators;
 
-    public class UpdateOrganisationStatusHandler : UpdateOrganisationHandlerBase, IRequestHandler<UpdateOrganisationStatusRequest, bool>
+    public class UpdateOrganisationStatusHandler : IRequestHandler<UpdateOrganisationStatusRequest, bool>
     {
         private readonly ILogger<UpdateOrganisationStatusHandler> _logger;
         private readonly IOrganisationValidator _validator;
         private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
         private readonly ILookupDataRepository _lookupDataRepository;
         private readonly IOrganisationRepository _organisationRepository;
+        private readonly IAuditLogService _auditLogService;
 
         public UpdateOrganisationStatusHandler(ILogger<UpdateOrganisationStatusHandler> logger,
             IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository,
-            ILookupDataRepository lookupDataRepository, IOrganisationRepository organisationRepository)
+            ILookupDataRepository lookupDataRepository, IOrganisationRepository organisationRepository, IAuditLogService auditLogService)
         {
             _logger = logger;
             _validator = validator;
             _updateOrganisationRepository = updateOrganisationRepository;
             _lookupDataRepository = lookupDataRepository;
             _organisationRepository = organisationRepository;
+            _auditLogService = auditLogService;
         }
 
         public async Task<bool> Handle(UpdateOrganisationStatusRequest request, CancellationToken cancellationToken)
@@ -39,11 +43,11 @@
 
             bool success = false;
 
-            var auditData = CreateAuditData(request.OrganisationId, request.UpdatedBy);
+            var auditData = _auditLogService.CreateAuditData(request.OrganisationId, request.UpdatedBy);
 
             if (existingStatusId != request.OrganisationStatusId)
             {
-                AddAuditEntry(auditData, "Organisation Status", StatusText(existingStatusId),
+              _auditLogService.AddAuditEntry(auditData, "Organisation Status", StatusText(existingStatusId),
                               StatusText(request.OrganisationStatusId));                   
             }
             
@@ -60,7 +64,7 @@
 
                 if (removedReason == null || request.RemovedReasonId.Value != removedReason.Id)
                 {
-                    AddAuditEntry(auditData, "Removed Reason", removedReason?.Reason ?? "Not set", reason.Reason);
+                  _auditLogService.AddAuditEntry(auditData, "Removed Reason", removedReason?.Reason ?? "Not set", reason.Reason);
                 }
             }
             
@@ -85,7 +89,7 @@
 
             if (request.OrganisationStatusId != OrganisationStatus.Removed && request.RemovedReasonId.HasValue)
             {
-                string invalidRemovalReasonError = $@"Invalid Removal Reason for '{request.OrganisationStatusId}'";
+                var invalidRemovalReasonError = $@"Invalid Removal Reason for '{request.OrganisationStatusId}'";
                 _logger.LogInformation(invalidRemovalReasonError);
                 throw new BadRequestException(invalidRemovalReasonError);
             }

@@ -10,26 +10,28 @@ namespace SFA.DAS.RoATPService.Application.Handlers
     using Microsoft.Extensions.Logging;
     using SFA.DAS.RoATPService.Application.Exceptions;
     using Validators;
-
-    public class UpdateOrganisationLegalNameHandler : UpdateOrganisationHandlerBase, IRequestHandler<UpdateOrganisationLegalNameRequest, bool>
+  
+    public class UpdateOrganisationLegalNameHandler : IRequestHandler<UpdateOrganisationLegalNameRequest, bool>
     {
         private readonly ILogger<UpdateOrganisationLegalNameHandler> _logger;
         private readonly IOrganisationValidator _validator;
         private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
         private readonly IOrganisationRepository _organisationRepository;
         private readonly ITextSanitiser _textSanitiser;
+        private readonly IAuditLogService _auditLogService;
 
         private const string FieldChanged = "Legal Name";
 
         public UpdateOrganisationLegalNameHandler(ILogger<UpdateOrganisationLegalNameHandler> logger,
             IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository, 
-            IOrganisationRepository organisationRepository, ITextSanitiser textSanitiser)
+            IOrganisationRepository organisationRepository, ITextSanitiser textSanitiser, IAuditLogService auditLogService)
         {
             _logger = logger;
             _validator = validator;
             _updateOrganisationRepository = updateOrganisationRepository;
             _organisationRepository = organisationRepository;
             _textSanitiser = textSanitiser;
+            _auditLogService = auditLogService;
         }
 
         public async Task<bool> Handle(UpdateOrganisationLegalNameRequest request, CancellationToken cancellationToken)
@@ -60,7 +62,7 @@ namespace SFA.DAS.RoATPService.Application.Handlers
                 return await Task.FromResult(false);
             }
 
-            var auditRecord = CreateAuditLogEntry(request.OrganisationId, request.UpdatedBy,
+            var auditRecord = _auditLogService.CreateAuditLogEntry(request.OrganisationId, request.UpdatedBy,
                                                   FieldChanged, previousLegalName, request.LegalName);
 
             return await _updateOrganisationRepository.WriteFieldChangesToAuditLog(auditRecord);

@@ -38,7 +38,7 @@ namespace SFA.DAS.RoATPService.Data
            
             if (results != null)
             {
-                return await Task.FromResult(results);
+                return await Task.FromResult(results.ToList());
             }
 
             using (var connection = new SqlConnection(_configuration.SqlConnectionString))
@@ -213,7 +213,7 @@ namespace SFA.DAS.RoATPService.Data
             if (providerTypeId == null)
                 return organisationTypes;
 
-            var providerTypeOrganisationTypes = await GetProviderTypeOrganisationTypes();
+            var providerTypeOrganisationTypes =  await GetProviderTypeOrganisationTypes();
 
             var selectedproviderTypeOrganisationTypes =
                 providerTypeOrganisationTypes.Where(x => x.ProviderTypeId == providerTypeId);

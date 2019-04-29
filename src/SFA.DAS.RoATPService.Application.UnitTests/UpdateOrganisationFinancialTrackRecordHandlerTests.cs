@@ -9,6 +9,7 @@ using NUnit.Framework;
 using SFA.DAS.RoATPService.Api.Types.Models;
 using SFA.DAS.RoATPService.Application.Handlers;
 using SFA.DAS.RoATPService.Application.Interfaces;
+using SFA.DAS.RoATPService.Application.Services;
 using SFA.DAS.RoATPService.Domain;
 
 namespace SFA.DAS.RoATPService.Application.UnitTests
@@ -20,7 +21,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         private Mock<IUpdateOrganisationRepository> _updateRepository;
         private Mock<IOrganisationRepository> _repository;
         private UpdateOrganisationFinancialTrackRecordHandler _handler;
-
+        private Mock<IAuditLogService> _auditLogService;
         [SetUp]
         public void Before_each_test()
         {
@@ -30,9 +31,9 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _repository.Setup(x => x.GetFinancialTrackRecord(It.IsAny<Guid>())).ReturnsAsync(true).Verifiable();
             _updateRepository.Setup(x => x.UpdateFinancialTrackRecord(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<string>())).ReturnsAsync(true).Verifiable();
             _updateRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true).Verifiable();
+            _auditLogService = new Mock<IAuditLogService>();
 
-
-            _handler = new UpdateOrganisationFinancialTrackRecordHandler(_logger.Object, _updateRepository.Object, _repository.Object);
+        _handler = new UpdateOrganisationFinancialTrackRecordHandler(_logger.Object, _updateRepository.Object, _repository.Object, _auditLogService.Object);
         }
 
         [Test]

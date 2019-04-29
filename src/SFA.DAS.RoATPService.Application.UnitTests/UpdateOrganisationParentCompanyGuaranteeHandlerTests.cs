@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.RoATPService.Application.UnitTests
+﻿using SFA.DAS.RoATPService.Application.Services;
+
+namespace SFA.DAS.RoATPService.Application.UnitTests
 {
     using Interfaces;
     using Microsoft.Extensions.Logging;
@@ -16,10 +18,10 @@
     public class UpdateOrganisationParentCompanyGuaranteeHandlerTests
     {
         private Mock<ILogger<UpdateOrganisationParentCompanyGuaranteeHandler>> _logger;
-        private Mock<IOrganisationValidator> _validator;
         private Mock<IUpdateOrganisationRepository> _updateRepository;
         private Mock<IOrganisationRepository> _repository;
         private UpdateOrganisationParentCompanyGuaranteeHandler _handler;
+        private Mock<IAuditLogService> _auditLogService;
 
         [SetUp]
         public void Before_each_test()
@@ -30,9 +32,8 @@
             _repository.Setup(x => x.GetParentCompanyGuarantee(It.IsAny<Guid>())).ReturnsAsync(true).Verifiable();
             _updateRepository.Setup(x => x.UpdateParentCompanyGuarantee(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<string>())).ReturnsAsync(true).Verifiable();
             _updateRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true).Verifiable();
-            _validator = new Mock<IOrganisationValidator>();
-
-            _handler = new UpdateOrganisationParentCompanyGuaranteeHandler(_logger.Object, _validator.Object, _updateRepository.Object, _repository.Object);
+            _auditLogService = new Mock<IAuditLogService>();
+            _handler = new UpdateOrganisationParentCompanyGuaranteeHandler(_logger.Object,  _updateRepository.Object, _repository.Object, _auditLogService.Object);
         }
 
         [Test]

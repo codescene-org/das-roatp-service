@@ -1,4 +1,5 @@
-﻿using SFA.DAS.RoATPService.Application.Services;
+﻿using System.Collections.Generic;
+using SFA.DAS.RoATPService.Application.Services;
 
 namespace SFA.DAS.RoATPService.Application.UnitTests
 {
@@ -26,7 +27,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         private Mock<ILookupDataRepository> _lookupDataRepository;
         private UpdateOrganisationProviderTypeHandler _handler;
         private UpdateOrganisationProviderTypeRequest _request;
-
+        private Mock<IAuditLogService> _auditLogService;
         [SetUp]
         public void Before_each_test()
         {
@@ -38,8 +39,11 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _updateOrganisationRepository = new Mock<IUpdateOrganisationRepository>();
             _repository = new Mock<IOrganisationRepository>();
             _lookupDataRepository = new Mock<ILookupDataRepository>();
+            _auditLogService = new Mock<IAuditLogService>();
+            _auditLogService.Setup(x => x.CreateAuditData(It.IsAny<Guid>(), It.IsAny<string>()))
+                .Returns(new AuditData{FieldChanges = new List<AuditLogEntry>()});
             _handler = new UpdateOrganisationProviderTypeHandler(_logger.Object, _validator.Object, 
-                _updateOrganisationRepository.Object, _lookupDataRepository.Object, new OrganisationStatusManager(), _repository.Object);
+                _updateOrganisationRepository.Object, _lookupDataRepository.Object, new OrganisationStatusManager(), _repository.Object, _auditLogService.Object);
             _request = new UpdateOrganisationProviderTypeRequest
             {
                 OrganisationId = Guid.NewGuid(),

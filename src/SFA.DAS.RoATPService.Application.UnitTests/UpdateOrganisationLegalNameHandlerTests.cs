@@ -1,4 +1,5 @@
-﻿using SFA.DAS.RoATPService.Application.Services;
+﻿using System.Net;
+using SFA.DAS.RoATPService.Application.Services;
 
 namespace SFA.DAS.RoATPService.Application.UnitTests
 {
@@ -25,6 +26,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         private Mock<IOrganisationRepository> _repository;
         private UpdateOrganisationLegalNameHandler _handler;
         private Mock<ITextSanitiser> _textSanitiser;
+        private Mock<IAuditLogService> _auditLogService;
         [SetUp]
         public void Before_each_test()
         {
@@ -38,7 +40,8 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _updateRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true).Verifiable();
             _textSanitiser = new Mock<ITextSanitiser>();
             _textSanitiser.Setup(x=>x.SanitiseInputText(It.IsAny<string>())).Returns<string>(x => x);
-            _handler = new UpdateOrganisationLegalNameHandler(_logger.Object, _validator.Object, _updateRepository.Object, _repository.Object, _textSanitiser.Object);
+            _auditLogService = new Mock<IAuditLogService>();
+            _handler = new UpdateOrganisationLegalNameHandler(_logger.Object, _validator.Object, _updateRepository.Object, _repository.Object, _textSanitiser.Object, _auditLogService.Object);
         }
 
         [Test]

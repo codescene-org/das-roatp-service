@@ -9,6 +9,7 @@ using SFA.DAS.RoATPService.Api.Types.Models;
 using SFA.DAS.RoATPService.Application.Exceptions;
 using SFA.DAS.RoATPService.Application.Handlers;
 using SFA.DAS.RoATPService.Application.Interfaces;
+using SFA.DAS.RoATPService.Application.Services;
 using SFA.DAS.RoATPService.Application.Validators;
 using SFA.DAS.RoATPService.Domain;
 
@@ -22,7 +23,8 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             private Mock<IOrganisationValidator> _validator;
             private Mock<IUpdateOrganisationRepository> _updateOrganisationRepository;
             private Mock<IOrganisationRepository> _repository;
-        private UpdateOrganisationUkprnHandler _handler;
+            private UpdateOrganisationUkprnHandler _handler;
+            private Mock<IAuditLogService> _auditLogService;
 
             [SetUp]
             public void Before_each_test()
@@ -43,12 +45,12 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
                         DuplicateFound = false,
                         DuplicateOrganisationName = ""
                     });
-            _updateOrganisationRepository = new Mock<IUpdateOrganisationRepository>();
+                _updateOrganisationRepository = new Mock<IUpdateOrganisationRepository>();
                 _repository.Setup(x => x.GetUkprn(It.IsAny<Guid>())).ReturnsAsync(11111111).Verifiable();
                 _updateOrganisationRepository.Setup(x => x.UpdateUkprn(It.IsAny<Guid>(), It.IsAny<long>(), It.IsAny<string>())).ReturnsAsync(true).Verifiable();
                 _updateOrganisationRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true).Verifiable();
-
-                _handler = new UpdateOrganisationUkprnHandler(_logger.Object, _validator.Object, _updateOrganisationRepository.Object, _repository.Object);
+                _auditLogService = new Mock<IAuditLogService>();
+                _handler = new UpdateOrganisationUkprnHandler(_logger.Object, _validator.Object, _updateOrganisationRepository.Object, _repository.Object, _auditLogService.Object);
             }
 
             [Test]

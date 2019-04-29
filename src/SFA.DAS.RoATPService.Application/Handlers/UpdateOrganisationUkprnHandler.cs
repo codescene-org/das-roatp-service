@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.RoATPService.Application.Handlers
+﻿using SFA.DAS.RoATPService.Application.Services;
+
+namespace SFA.DAS.RoATPService.Application.Handlers
 {
     using System.Threading;
     using System.Threading.Tasks;
@@ -10,23 +12,25 @@
     using Validators;
 
     public class UpdateOrganisationUkprnHandler
-        : UpdateOrganisationHandlerBase, IRequestHandler<UpdateOrganisationUkprnRequest, bool>
+        : IRequestHandler<UpdateOrganisationUkprnRequest, bool>
     {
         private readonly ILogger<UpdateOrganisationUkprnHandler> _logger;
         private readonly IOrganisationValidator _validator;
         private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
         private readonly IOrganisationRepository _organisationRepository;
+        private readonly IAuditLogService _auditLogService;
 
         private const string FieldChanged = "UKPRN";
 
         public UpdateOrganisationUkprnHandler(ILogger<UpdateOrganisationUkprnHandler> logger,
             IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository, 
-            IOrganisationRepository organisationRepository)
+            IOrganisationRepository organisationRepository, IAuditLogService auditLogService)
         {
             _logger = logger;
             _validator = validator;
             _updateOrganisationRepository = updateOrganisationRepository;
             _organisationRepository = organisationRepository;
+            _auditLogService = auditLogService;
         }
 
         public async Task<bool> Handle(UpdateOrganisationUkprnRequest request, CancellationToken cancellationToken)
@@ -64,7 +68,7 @@
                 return await Task.FromResult(false);
             }
 
-            var auditRecord = CreateAuditLogEntry(request.OrganisationId, request.UpdatedBy,
+            var auditRecord = _auditLogService.CreateAuditLogEntry(request.OrganisationId, request.UpdatedBy,
                 FieldChanged, previousUkprn.ToString(), request.Ukprn.ToString());
 
             return await _updateOrganisationRepository.WriteFieldChangesToAuditLog(auditRecord);

@@ -33,9 +33,9 @@
 
         [HttpGet]
         [Route("organisationTypes")]
-        public async Task<IActionResult> OrganisationTypes(int organisationTypeId)
+        public async Task<IActionResult> OrganisationTypes(int providerTypeId)
         {
-            var request = new GetOrganisationTypesRequest {ProviderTypeId = organisationTypeId};
+            var request = new GetOrganisationTypesRequest {ProviderTypeId = providerTypeId};
 
             return Ok(await _mediator.Send(request));
         }
