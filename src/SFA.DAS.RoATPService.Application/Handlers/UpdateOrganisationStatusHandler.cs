@@ -83,7 +83,7 @@
                 throw new BadRequestException(invalidStatusError);
             }
 
-            if (request.OrganisationStatusId != 0 && request.RemovedReasonId.HasValue)
+            if (request.OrganisationStatusId != OrganisationStatus.Removed && request.RemovedReasonId.HasValue)
             {
                 string invalidRemovalReasonError = $@"Invalid Removal Reason for '{request.OrganisationStatusId}'";
                 _logger.LogInformation(invalidRemovalReasonError);

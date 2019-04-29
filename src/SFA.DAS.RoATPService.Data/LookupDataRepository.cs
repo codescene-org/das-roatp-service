@@ -34,8 +34,8 @@ namespace SFA.DAS.RoATPService.Data
 
         public async Task<IEnumerable<ProviderType>> GetProviderTypes()
         {
-            var results = _cacheHelper.GetProviderTypes();
-
+            var results = _cacheHelper.Get<ProviderType>();
+           
             if (results != null)
             {
                 return await Task.FromResult(results);
@@ -52,7 +52,7 @@ namespace SFA.DAS.RoATPService.Data
                           "order by Id";
 
                 var providerTypes = await connection.QueryAsync<ProviderType>(sql);
-                _cacheHelper.CacheProviderTypes(providerTypes);
+                _cacheHelper.Cache(providerTypes);
                 
 
                 return await Task.FromResult(providerTypes);
@@ -67,7 +67,7 @@ namespace SFA.DAS.RoATPService.Data
 
         public async Task<IEnumerable<OrganisationType>> GetOrganisationTypes()
         {
-            var results = _cacheHelper.GetOrganisationTypes();
+            var results = _cacheHelper.Get<OrganisationType>();
 
             if (results != null)
             {
@@ -84,7 +84,7 @@ namespace SFA.DAS.RoATPService.Data
                           "order by Id";
 
                 var organisationTypes = await connection.QueryAsync<OrganisationType>(sql);
-                _cacheHelper.CacheOrganisationTypes(organisationTypes);
+                _cacheHelper.Cache(organisationTypes);
                 return await Task.FromResult(organisationTypes);
             }
         }
@@ -97,7 +97,7 @@ namespace SFA.DAS.RoATPService.Data
 
         public async Task<IEnumerable<OrganisationStatus>> GetOrganisationStatuses()
         {
-            var results = _cacheHelper.GetOrganisationStatuses();
+            var results = _cacheHelper.Get<OrganisationStatus>();
 
             if (results != null)
             {
@@ -115,7 +115,7 @@ namespace SFA.DAS.RoATPService.Data
                           "order by Id";
 
                 var organisationStatuses = await connection.QueryAsync<OrganisationStatus>(sql);
-                _cacheHelper.CacheOrganisationStatuses(organisationStatuses);
+                _cacheHelper.Cache(organisationStatuses);
                 return await Task.FromResult(organisationStatuses);
             }
         }
@@ -130,7 +130,7 @@ namespace SFA.DAS.RoATPService.Data
 
         public async Task<IEnumerable<RemovedReason>> GetRemovedReasons()
         {
-            var results = _cacheHelper.GetRemovedReasons();
+            var results = _cacheHelper.Get<RemovedReason>();
             if (results != null)
             {
                 return await Task.FromResult(results);
@@ -150,7 +150,7 @@ namespace SFA.DAS.RoATPService.Data
                           "ORDER BY Id";
 
                 var removedReasons = await connection.QueryAsync<RemovedReason>(sql);
-                _cacheHelper.CacheRemovedReasons(removedReasons);
+                _cacheHelper.Cache(removedReasons);
                 return await Task.FromResult(removedReasons);
             }
         }
@@ -163,7 +163,7 @@ namespace SFA.DAS.RoATPService.Data
 
         public async Task<IEnumerable<ProviderTypeOrganisationType>> GetProviderTypeOrganisationTypes()
         {
-            var results = _cacheHelper.GetProviderTypeOrganisationTypes();
+            var results = _cacheHelper.Get<ProviderTypeOrganisationType>();
             if (results != null)
             {
                 return await Task.FromResult(results);
@@ -178,7 +178,7 @@ namespace SFA.DAS.RoATPService.Data
                           "ORDER BY Id";
 
                 var providerTypeOrganisationTypes = await connection.QueryAsync<ProviderTypeOrganisationType>(sql);
-                _cacheHelper.CacheProviderTypeOrganisationTypes(providerTypeOrganisationTypes);
+                _cacheHelper.Cache(providerTypeOrganisationTypes);
 
                 return await Task.FromResult(providerTypeOrganisationTypes);
             }
@@ -186,7 +186,7 @@ namespace SFA.DAS.RoATPService.Data
 
         public async Task<IEnumerable<ProviderTypeOrganisationStatus>> GetProviderTypeOrganisationStatuses()
         {
-            var results = _cacheHelper.GetProviderTypeOrganistionStatuses();
+            var results = _cacheHelper.Get<ProviderTypeOrganisationStatus>();
             if (results != null)
             {
                 return await Task.FromResult(results);
@@ -201,7 +201,7 @@ namespace SFA.DAS.RoATPService.Data
                           "ORDER BY Id";
 
                 var providerTypeOrganisationStatuses = await connection.QueryAsync<ProviderTypeOrganisationStatus>(sql);
-                _cacheHelper.CacheProviderTypeOrganisationStatuses(providerTypeOrganisationStatuses);
+                _cacheHelper.Cache(providerTypeOrganisationStatuses);
 
                 return await Task.FromResult(providerTypeOrganisationStatuses);
             }

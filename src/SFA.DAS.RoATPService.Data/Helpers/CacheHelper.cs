@@ -2,100 +2,35 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Caching;
-using SFA.DAS.RoATPService.Domain;
 
 namespace SFA.DAS.RoATPService.Data.Helpers
 {
     public class CacheHelper:ICacheHelper
     {
-        private const string ProviderTypesKey = "ProviderTypes";
-        private const string OrganisationTypesKey = "OrganisationTypes";
-        private const string OrganisationStatusesKey = "OrganisationStatuses";
-        private const string RemovedReasonsKey = "RemovedReasons";
-        private const string ProviderTypeOrganisationTypesKey = "ProviderTypeOrganisationTypes";
-        private const string ProviderTypeOrganisationStatusKey = "ProviderTypeOrganisationStatusKey";
-
         private readonly MemoryCache _cache = MemoryCache.Default;
-        private readonly CacheItemPolicy _policy = new CacheItemPolicy { SlidingExpiration = new TimeSpan(0, 0, 10, 0) };
-
-
-     
-
-        public IEnumerable<ProviderType> GetProviderTypes()
-        {   
-            var results = _cache.Get(ProviderTypesKey);
-            return (List<ProviderType>) results;
-        }
-
-        public void CacheProviderTypes(IEnumerable<ProviderType> providerTypes)
+   
+        public  List<T> Get<T>() 
         {
-            _cache.Add(ProviderTypesKey, providerTypes.ToList(), _policy);
+                var results = _cache.Get(typeof(T).Name);
+                return (List<T>)results;
         }
 
-        public IEnumerable<OrganisationType> GetOrganisationTypes()
+        public void Cache<T>(IEnumerable<T> dataList, int? minutesToCache)
+
         {
-            var results = _cache.Get(OrganisationTypesKey);
-            return (List<OrganisationType>)results;
-        }
-
-        public void CacheOrganisationTypes(IEnumerable<OrganisationType> organisationTypes)
-        {
-            _cache.Add(OrganisationTypesKey, organisationTypes.ToList(), _policy);
-        }
-
-        public IEnumerable<OrganisationStatus> GetOrganisationStatuses()
-        {
-            var results = _cache.Get(OrganisationStatusesKey);
-            return (List<OrganisationStatus>)results;
-        }
-
-        public void CacheOrganisationStatuses(IEnumerable<OrganisationStatus> organisationStatuses)
-        {
-            _cache.Add(OrganisationStatusesKey, organisationStatuses.ToList(), _policy);
-        }
-
-        public IEnumerable<RemovedReason> GetRemovedReasons()
-        {
-            var results = _cache.Get(RemovedReasonsKey);
-            return (List<RemovedReason>)results;
-        }
-
-        public void CacheRemovedReasons(IEnumerable<RemovedReason> removedReasons)
-        {
-            _cache.Add(RemovedReasonsKey, removedReasons.ToList(), _policy);
-
-        }
-
-        public IEnumerable<ProviderTypeOrganisationType> GetProviderTypeOrganisationTypes()
-        {
-            var results = _cache.Get(ProviderTypeOrganisationTypesKey);
-            return (List<ProviderTypeOrganisationType>)results;
-        }
-
-        public void CacheProviderTypeOrganisationTypes(IEnumerable<ProviderTypeOrganisationType> providerTypeOrganisationTypes)
-        {
-            _cache.Add(ProviderTypeOrganisationTypesKey, providerTypeOrganisationTypes.ToList(), _policy);
-        }
-
-        public IEnumerable<ProviderTypeOrganisationStatus> GetProviderTypeOrganistionStatuses()
-        {
-            var results = _cache.Get(ProviderTypeOrganisationStatusKey);
-            return (List<ProviderTypeOrganisationStatus>)results;
-        }
-
-        public void CacheProviderTypeOrganisationStatuses(IEnumerable<ProviderTypeOrganisationStatus> providerTypeOrganisationStatuses)
-        {
-            _cache.Add(ProviderTypeOrganisationStatusKey, providerTypeOrganisationStatuses.ToList(), _policy);
-        }
+            if (minutesToCache == null || minutesToCache.Value>=24*60)
+                minutesToCache = 10;
+         
+        _cache.Add(typeof(T).Name, dataList, new CacheItemPolicy { SlidingExpiration = new TimeSpan(0, 0, minutesToCache.Value, 0) });
+        }     
 
         public void PurgeAllCaches()
         {
-            _cache.Remove(ProviderTypesKey);
-            _cache.Remove(OrganisationTypesKey);
-            _cache.Remove(OrganisationStatusesKey);
-            _cache.Remove(RemovedReasonsKey);
-            _cache.Remove(ProviderTypeOrganisationTypesKey);
-            _cache.Remove(ProviderTypeOrganisationStatusKey);
+            var cacheKeys = MemoryCache.Default.Select(kvp => kvp.Key).ToList();
+            foreach (var cacheKey in cacheKeys)
+            {
+                MemoryCache.Default.Remove(cacheKey);
+            }
         }
     }
 }
