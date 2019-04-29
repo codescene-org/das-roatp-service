@@ -84,6 +84,8 @@
 
             var organisationDataImport = new OrganisationData();
             organisationDataImport.StartDate = registerEntry.StartDate;
+            organisationDataImport.FinancialTrackRecord = registerEntry.FinancialTrackRecord;
+            organisationDataImport.ParentCompanyGuarantee = registerEntry.ParentCompanyGuarantee;
 
             if (registerEntry.EndReasonId.HasValue)
             {
