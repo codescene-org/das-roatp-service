@@ -15,14 +15,15 @@ namespace SFA.DAS.RoATPService.Data.Helpers
                 return (List<T>)results;
         }
 
-        public void Cache<T>(IEnumerable<T> dataList, int? minutesToCache)
-
+        public void Cache<T>(IEnumerable<T> dataList, int minutesToCache)
         {
-            if (minutesToCache == null || minutesToCache.Value>=24*60)
-                minutesToCache = 10;
-         
-        _cache.Add(typeof(T).Name, dataList, new CacheItemPolicy { SlidingExpiration = new TimeSpan(0, 0, minutesToCache.Value, 0) });
-        }     
+            _cache.Add(typeof(T).Name, dataList, new CacheItemPolicy { SlidingExpiration = new TimeSpan(0, 0, minutesToCache, 0) });
+        }
+
+        public void Cache<T>(IEnumerable<T> dataList)
+        {
+            _cache.Add(typeof(T).Name, dataList, new CacheItemPolicy { SlidingExpiration = new TimeSpan(0, 0, 10, 0) });
+        }   
 
         public void PurgeAllCaches()
         {
