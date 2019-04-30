@@ -19,5 +19,6 @@ namespace SFA.DAS.RoATPService.Application.Interfaces
         AuditData AuditParentCompanyGuarantee(Guid organisationId, string updatedBy, bool newParentCompanyGuarantee);
         AuditData AuditLegalName(Guid organisationId, string updatedBy, string newLegalName);
         AuditData AuditTradingName(Guid organisationId, string updatedBy, string newTradingName);
+        AuditData AuditUkprn(Guid organisationId, string updatedBy, long newUkprn);
     }
 }

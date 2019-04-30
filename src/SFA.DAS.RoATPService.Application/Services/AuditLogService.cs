@@ -196,5 +196,23 @@ namespace SFA.DAS.RoATPService.Application.Services
             }
             return auditData;
         }
+
+        public AuditData AuditUkprn(Guid organisationId, string updatedBy, long newUkprn)
+        {
+            var auditData = new AuditData { FieldChanges = new List<AuditLogEntry>(), OrganisationId = organisationId, UpdatedAt = DateTime.Now, UpdatedBy = updatedBy };
+            var previousUkprn = _organisationRepository.GetUkprn(organisationId).Result;
+
+            if (previousUkprn != newUkprn)
+            {
+                var entry = new AuditLogEntry
+                {
+                    FieldChanged = "UKPRN",
+                    PreviousValue = previousUkprn.ToString(),
+                    NewValue = newUkprn.ToString()
+                };
+                auditData.FieldChanges.Add(entry);
+            }
+            return auditData;
+        }
     }
 }

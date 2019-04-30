@@ -17,19 +17,17 @@ namespace SFA.DAS.RoATPService.Application.Handlers
         private readonly ILogger<UpdateOrganisationUkprnHandler> _logger;
         private readonly IOrganisationValidator _validator;
         private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
-        private readonly IOrganisationRepository _organisationRepository;
         private readonly IAuditLogService _auditLogService;
 
         private const string FieldChanged = "UKPRN";
 
         public UpdateOrganisationUkprnHandler(ILogger<UpdateOrganisationUkprnHandler> logger,
             IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository, 
-            IOrganisationRepository organisationRepository, IAuditLogService auditLogService)
+            IAuditLogService auditLogService)
         {
             _logger = logger;
             _validator = validator;
             _updateOrganisationRepository = updateOrganisationRepository;
-            _organisationRepository = organisationRepository;
             _auditLogService = auditLogService;
         }
 
@@ -51,25 +49,22 @@ namespace SFA.DAS.RoATPService.Application.Handlers
                 throw new BadRequestException(invalidUkprnError);
             }
 
-
             _logger.LogInformation($@"Handling Update '{FieldChanged}' for Organisation ID [{request.OrganisationId}]");
 
-            long previousUkprn = await _organisationRepository.GetUkprn(request.OrganisationId);
+            var auditRecord = _auditLogService.AuditUkprn(request.OrganisationId, request.UpdatedBy, request.Ukprn);
 
-            if (previousUkprn == request.Ukprn)
+
+            if (!auditRecord.ChangesMade)
             {
                 return await Task.FromResult(false);
             }
 
-            bool success = await _updateOrganisationRepository.UpdateUkprn(request.OrganisationId, request.Ukprn, request.UpdatedBy);
+            var success = await _updateOrganisationRepository.UpdateUkprn(request.OrganisationId, request.Ukprn, request.UpdatedBy);
 
             if (!success)
             {
                 return await Task.FromResult(false);
             }
-
-            var auditRecord = _auditLogService.CreateAuditLogEntry(request.OrganisationId, request.UpdatedBy,
-                FieldChanged, previousUkprn.ToString(), request.Ukprn.ToString());
 
             return await _updateOrganisationRepository.WriteFieldChangesToAuditLog(auditRecord);
         }

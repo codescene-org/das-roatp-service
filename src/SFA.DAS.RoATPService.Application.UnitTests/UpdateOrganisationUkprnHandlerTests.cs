@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -50,7 +51,11 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
                 _updateOrganisationRepository.Setup(x => x.UpdateUkprn(It.IsAny<Guid>(), It.IsAny<long>(), It.IsAny<string>())).ReturnsAsync(true).Verifiable();
                 _updateOrganisationRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true).Verifiable();
                 _auditLogService = new Mock<IAuditLogService>();
-                _handler = new UpdateOrganisationUkprnHandler(_logger.Object, _validator.Object, _updateOrganisationRepository.Object, _repository.Object, _auditLogService.Object);
+                _auditLogService.Setup(x => x.CreateAuditData(It.IsAny<Guid>(), It.IsAny<string>()))
+                    .Returns(new AuditData { FieldChanges = new List<AuditLogEntry>() });
+                _auditLogService.Setup(x => x.AuditUkprn(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<long>()))
+                    .Returns(new AuditData { FieldChanges = new List<AuditLogEntry>() });
+            _handler = new  UpdateOrganisationUkprnHandler(_logger.Object, _validator.Object, _updateOrganisationRepository.Object, _auditLogService.Object);
             }
 
             [Test]
@@ -68,8 +73,8 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
                     _handler.Handle(request, new CancellationToken());
                 result.Should().Throw<BadRequestException>();
 
-                _repository.Verify(x => x.GetUkprn(It.IsAny<Guid>()), Times.Never);
-                _updateOrganisationRepository.Verify(x => x.UpdateUkprn(It.IsAny<Guid>(), It.IsAny<long>(), It.IsAny<string>()), Times.Never);
+            _auditLogService.Verify(x => x.AuditUkprn(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<long>()), Times.Never);
+            _updateOrganisationRepository.Verify(x => x.UpdateUkprn(It.IsAny<Guid>(), It.IsAny<long>(), It.IsAny<string>()), Times.Never);
                 _updateOrganisationRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
             }
 
@@ -86,7 +91,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
                 var result = _handler.Handle(request, new CancellationToken()).GetAwaiter().GetResult();
                 result.Should().BeFalse();
 
-                _repository.Verify(x => x.GetUkprn(It.IsAny<Guid>()), Times.Once);
+                _auditLogService.Verify(x => x.AuditUkprn(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<long>()), Times.Once);
                 _updateOrganisationRepository.Verify(x => x.UpdateUkprn(It.IsAny<Guid>(), It.IsAny<long>(), It.IsAny<string>()), Times.Never);
                 _updateOrganisationRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
             }
@@ -103,12 +108,17 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
                     UpdatedBy = "unit test"
                 };
 
-                var result = _handler.Handle(request, new CancellationToken()).GetAwaiter().GetResult();
+                var fieldChanges = new List<AuditLogEntry>();
+                fieldChanges.Add(new AuditLogEntry { FieldChanged = "UKPRN", NewValue = "1111111", PreviousValue = "22222222" });
+                _auditLogService.Setup(x => x.AuditUkprn(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<long>()))
+                    .Returns(new AuditData { FieldChanges = fieldChanges });
+
+            var result = _handler.Handle(request, new CancellationToken()).GetAwaiter().GetResult();
                 result.Should().BeFalse();
 
-                _repository.Verify(x => x.GetUkprn(It.IsAny<Guid>()), Times.Once);
-                _updateOrganisationRepository.Verify(x => x.UpdateUkprn(It.IsAny<Guid>(), It.IsAny<long>(), It.IsAny<string>()), Times.Once);
-                _updateOrganisationRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
+            _auditLogService.Verify(x => x.AuditUkprn(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<long>()), Times.Once); 
+            _updateOrganisationRepository.Verify(x => x.UpdateUkprn(It.IsAny<Guid>(), It.IsAny<long>(), It.IsAny<string>()), Times.Once);
+            _updateOrganisationRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
             }
 
             [Test]
@@ -121,12 +131,17 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
                     UpdatedBy = "unit test"
                 };
 
-                var result = _handler.Handle(request, new CancellationToken()).GetAwaiter().GetResult();
+                var fieldChanges = new List<AuditLogEntry>();
+                fieldChanges.Add(new AuditLogEntry { FieldChanged = "UKPRN", NewValue = "1111111", PreviousValue = "22222222" });
+                _auditLogService.Setup(x => x.AuditUkprn(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<long>()))
+                    .Returns(new AuditData { FieldChanges = fieldChanges });
+
+            var result = _handler.Handle(request, new CancellationToken()).GetAwaiter().GetResult();
                 result.Should().BeTrue();
 
-                _repository.Verify(x => x.GetUkprn(It.IsAny<Guid>()), Times.Once);
-                _updateOrganisationRepository.Verify(x => x.UpdateUkprn(It.IsAny<Guid>(), It.IsAny<long>(), It.IsAny<string>()), Times.Once);
-                _updateOrganisationRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Once);
+            _auditLogService.Verify(x => x.AuditUkprn(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<long>()), Times.Once);
+            _updateOrganisationRepository.Verify(x => x.UpdateUkprn(It.IsAny<Guid>(), It.IsAny<long>(), It.IsAny<string>()), Times.Once);
+            _updateOrganisationRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Once);
             }
         }
     
