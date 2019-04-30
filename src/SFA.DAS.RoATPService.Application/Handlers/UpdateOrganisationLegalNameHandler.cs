@@ -16,7 +16,6 @@ namespace SFA.DAS.RoATPService.Application.Handlers
         private readonly ILogger<UpdateOrganisationLegalNameHandler> _logger;
         private readonly IOrganisationValidator _validator;
         private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
-        private readonly IOrganisationRepository _organisationRepository;
         private readonly ITextSanitiser _textSanitiser;
         private readonly IAuditLogService _auditLogService;
 
@@ -24,46 +23,41 @@ namespace SFA.DAS.RoATPService.Application.Handlers
 
         public UpdateOrganisationLegalNameHandler(ILogger<UpdateOrganisationLegalNameHandler> logger,
             IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository, 
-            IOrganisationRepository organisationRepository, ITextSanitiser textSanitiser, IAuditLogService auditLogService)
+            ITextSanitiser textSanitiser, IAuditLogService auditLogService)
         {
             _logger = logger;
             _validator = validator;
             _updateOrganisationRepository = updateOrganisationRepository;
-            _organisationRepository = organisationRepository;
             _textSanitiser = textSanitiser;
             _auditLogService = auditLogService;
         }
 
         public async Task<bool> Handle(UpdateOrganisationLegalNameRequest request, CancellationToken cancellationToken)
         {
-            request.LegalName = _textSanitiser.SanitiseInputText(request.LegalName);
+            var legalName = _textSanitiser.SanitiseInputText(request.LegalName);
 
-            if (!_validator.IsValidLegalName(request.LegalName))
+            if (!_validator.IsValidLegalName(legalName))
             {
-                string invalidLegalNameError = $@"Invalid Organisation Legal Name '{request.LegalName}'";
+                string invalidLegalNameError = $@"Invalid Organisation Legal Name '{legalName}'";
                 _logger.LogInformation(invalidLegalNameError);
                 throw new BadRequestException(invalidLegalNameError);
             }
 
             _logger.LogInformation($@"Handling Update '{FieldChanged}' for Organisation ID [{request.OrganisationId}]");
 
-            var previousLegalName = await _organisationRepository.GetLegalName(request.OrganisationId);
-
-            if (previousLegalName == request.LegalName)
+            var auditRecord = _auditLogService.AuditLegalName(request.OrganisationId, request.UpdatedBy, legalName);
+  
+            if (!auditRecord.ChangesMade)
             {
                 return await Task.FromResult(false);
             }
-
-       
+   
             var success = await _updateOrganisationRepository.UpdateLegalName(request.OrganisationId, request.LegalName, request.UpdatedBy);
 
             if (!success)
             {
                 return await Task.FromResult(false);
             }
-
-            var auditRecord = _auditLogService.CreateAuditLogEntry(request.OrganisationId, request.UpdatedBy,
-                                                  FieldChanged, previousLegalName, request.LegalName);
 
             return await _updateOrganisationRepository.WriteFieldChangesToAuditLog(auditRecord);
         }

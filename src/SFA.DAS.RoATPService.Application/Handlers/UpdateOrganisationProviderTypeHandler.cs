@@ -175,7 +175,7 @@
 
             if (!_validator.IsValidOrganisationTypeIdForProvider(request.OrganisationTypeId, request.ProviderTypeId).Result)
             {
-                var invalidOrganisationTypeId = $@"Invalid Organisation Type Id '{request.OrganisationTypeId}'";
+                var invalidOrganisationTypeId = $@"Invalid Organisation Type Id '{request.OrganisationTypeId}' for Provider Type Id '{request.ProviderTypeId}'";
                 _logger.LogInformation(invalidOrganisationTypeId);
                 throw new BadRequestException(invalidOrganisationTypeId);
             }

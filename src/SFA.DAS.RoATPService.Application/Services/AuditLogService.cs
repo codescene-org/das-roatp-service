@@ -161,5 +161,23 @@ namespace SFA.DAS.RoATPService.Application.Services
             }
             return auditData;
         }
+
+        public AuditData AuditLegalName(Guid organisationId, string updatedBy, string newLegalName)
+        {
+            var auditData = new AuditData { FieldChanges = new List<AuditLogEntry>(), OrganisationId = organisationId, UpdatedAt = DateTime.Now, UpdatedBy = updatedBy };
+            var previousLegalName = _organisationRepository.GetLegalName(organisationId).Result;
+            if (newLegalName != previousLegalName)
+            {
+                var entry = new AuditLogEntry
+                {
+                    FieldChanged = "Legal Name",
+                    PreviousValue = previousLegalName,
+                    NewValue = newLegalName
+                };
+                auditData.FieldChanges.Add(entry);
+            }
+            return auditData;
+
+        }
     }
 }
