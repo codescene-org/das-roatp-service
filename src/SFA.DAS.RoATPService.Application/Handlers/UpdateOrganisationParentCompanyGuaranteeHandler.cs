@@ -15,17 +15,15 @@ namespace SFA.DAS.RoATPService.Application.Handlers
     {
         private readonly ILogger<UpdateOrganisationParentCompanyGuaranteeHandler> _logger;
         private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
-        private readonly IOrganisationRepository _organisationRepository;
         private readonly IAuditLogService _auditLogService;
 
         private const string FieldChanged = "Parent Company Guarantee";
 
         public UpdateOrganisationParentCompanyGuaranteeHandler(ILogger<UpdateOrganisationParentCompanyGuaranteeHandler> logger,
-            IUpdateOrganisationRepository updateOrganisationRepository, IOrganisationRepository organisationRepository, IAuditLogService auditLogService)
+            IUpdateOrganisationRepository updateOrganisationRepository,  IAuditLogService auditLogService)
         {
             _logger = logger;
             _updateOrganisationRepository = updateOrganisationRepository;
-            _organisationRepository = organisationRepository;
             _auditLogService = auditLogService;
         }
 
@@ -33,22 +31,19 @@ namespace SFA.DAS.RoATPService.Application.Handlers
         {
             _logger.LogInformation($@"Handling Update '{FieldChanged}' for Organisation ID [{request.OrganisationId}]");
 
-            var previousParentCompanyGuarantee = await _organisationRepository.GetParentCompanyGuarantee(request.OrganisationId);
+            var auditRecord = _auditLogService.AuditParentCompanyGuarantee(request.OrganisationId, request.UpdatedBy, request.ParentCompanyGuarantee);
 
-            if (previousParentCompanyGuarantee == request.ParentCompanyGuarantee)
+            if (!auditRecord.ChangesMade)
             {
                 return await Task.FromResult(false);
             }
 
-            bool success = await _updateOrganisationRepository.UpdateParentCompanyGuarantee(request.OrganisationId, request.ParentCompanyGuarantee, request.UpdatedBy);
+            var success = await _updateOrganisationRepository.UpdateParentCompanyGuarantee(request.OrganisationId, request.ParentCompanyGuarantee, request.UpdatedBy);
 
             if (!success)
             {
                 return await Task.FromResult(false);
             }
-
-            var auditRecord = _auditLogService.CreateAuditLogEntry(request.OrganisationId, request.UpdatedBy,
-                FieldChanged, previousParentCompanyGuarantee.ToString(), request.ParentCompanyGuarantee.ToString());
 
             return await _updateOrganisationRepository.WriteFieldChangesToAuditLog(auditRecord);
         }

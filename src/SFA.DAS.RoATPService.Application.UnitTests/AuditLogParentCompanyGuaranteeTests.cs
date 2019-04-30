@@ -8,7 +8,7 @@ using SFA.DAS.RoATPService.Settings;
 namespace SFA.DAS.RoATPService.Application.UnitTests
 {
     [TestFixture]
-    public class AuditLogServiceFinancialTrackRecordTests
+    public class AuditLogParentCompanyGuaranteeTests
     {
         private RegisterAuditLogSettings _settings;
         private Mock<IOrganisationRepository> _organisationRepository;
@@ -20,15 +20,15 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _settings = new RegisterAuditLogSettings();
         }
 
-        [TestCase(true,false,true)]
+        [TestCase(true, false, true)]
         [TestCase(false, true, true)]
         [TestCase(false, false, false)]
         [TestCase(true, true, false)]
-        public void Audit_log_checks_financial_track_record_audit_is_as_expected(bool currentFinancialTrackRecord, bool newFinancialTrackRecord, bool auditChangesMade)
+        public void Audit_log_checks_parent_company_guarantee_audit_is_as_expected(bool currentGuarantee, bool newGuarantee, bool auditChangesMade)
         {
-            _organisationRepository.Setup(x => x.GetFinancialTrackRecord(It.IsAny<Guid>())).ReturnsAsync(currentFinancialTrackRecord);
+            _organisationRepository.Setup(x => x.GetParentCompanyGuarantee(It.IsAny<Guid>())).ReturnsAsync(currentGuarantee);
             var auditLogService = new AuditLogService(_settings, _organisationRepository.Object);
-            var auditData = auditLogService.AuditFinancialTrackRecord(Guid.NewGuid(), "system", newFinancialTrackRecord);
+            var auditData = auditLogService.AuditParentCompanyGuarantee(Guid.NewGuid(), "system", newGuarantee);
 
             Assert.AreEqual(auditChangesMade, auditData.ChangesMade);
         }

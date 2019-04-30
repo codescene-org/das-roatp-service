@@ -17,5 +17,7 @@ namespace SFA.DAS.RoATPService.Application.Interfaces
 
         void AddAuditEntry(AuditData auditData, string fieldChanged, string previousValue, string newValue);
         AuditData AuditFinancialTrackRecord(Guid organisationId, string updatedBy, bool newFinancialTrackRecord);
+
+        AuditData AuditParentCompanyGuarantee(Guid organisationId, string updatedBy, bool newParentCompanyGuarantee);
     }
 }

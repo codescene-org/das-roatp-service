@@ -144,5 +144,22 @@ namespace SFA.DAS.RoATPService.Application.Services
         
             return auditData;
         }
+
+        public AuditData AuditParentCompanyGuarantee(Guid organisationId, string updatedBy, bool newParentCompanyGuarantee)
+        {
+            var auditData = new AuditData { FieldChanges = new List<AuditLogEntry>(), OrganisationId = organisationId, UpdatedAt = DateTime.Now, UpdatedBy = updatedBy };
+            var previousParentCompanyGuarantee =  _organisationRepository.GetParentCompanyGuarantee(organisationId).Result;
+            if (previousParentCompanyGuarantee != newParentCompanyGuarantee)
+            {
+                var entry = new AuditLogEntry
+                {
+                    FieldChanged = "Parent Company Guarantee",
+                    PreviousValue = previousParentCompanyGuarantee.ToString(),
+                    NewValue = newParentCompanyGuarantee.ToString()
+                };
+                auditData.FieldChanges.Add(entry);
+            }
+            return auditData;
+        }
     }
 }

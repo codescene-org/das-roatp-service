@@ -1,4 +1,5 @@
-﻿using SFA.DAS.RoATPService.Application.Services;
+﻿using System.Collections.Generic;
+using SFA.DAS.RoATPService.Application.Services;
 
 namespace SFA.DAS.RoATPService.Application.UnitTests
 {
@@ -33,7 +34,10 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _updateRepository.Setup(x => x.UpdateParentCompanyGuarantee(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<string>())).ReturnsAsync(true).Verifiable();
             _updateRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true).Verifiable();
             _auditLogService = new Mock<IAuditLogService>();
-            _handler = new UpdateOrganisationParentCompanyGuaranteeHandler(_logger.Object,  _updateRepository.Object, _repository.Object, _auditLogService.Object);
+            _auditLogService
+                .Setup(x => x.AuditParentCompanyGuarantee(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<bool>()))
+                .Returns(new AuditData { FieldChanges = new List<AuditLogEntry>() });
+            _handler = new UpdateOrganisationParentCompanyGuaranteeHandler(_logger.Object,  _updateRepository.Object, _auditLogService.Object);
         }
 
         [Test]
@@ -49,7 +53,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             var result = _handler.Handle(request, new CancellationToken()).GetAwaiter().GetResult();
             result.Should().BeFalse();
 
-            _repository.Verify(x => x.GetParentCompanyGuarantee(It.IsAny<Guid>()), Times.Once);
+            _auditLogService.Verify(x => x.AuditParentCompanyGuarantee(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Once);
             _updateRepository.Verify(x => x.UpdateParentCompanyGuarantee(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<string>()), Times.Never);
             _updateRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
         }
@@ -69,7 +73,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             var result = _handler.Handle(request, new CancellationToken()).GetAwaiter().GetResult();
             result.Should().BeFalse();
 
-            _repository.Verify(x => x.GetParentCompanyGuarantee(It.IsAny<Guid>()), Times.Once);
+            _auditLogService.Verify(x => x.AuditParentCompanyGuarantee(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Once);
             _updateRepository.Verify(x => x.UpdateParentCompanyGuarantee(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<string>()), Times.Never);
             _updateRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
         }
@@ -77,6 +81,10 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         [Test]
         public void Handler_writes_updated_parent_company_guarantee_and_audit_log_entry_to_database()
         {
+            var fieldChanges = new List<AuditLogEntry>();
+            fieldChanges.Add(new AuditLogEntry { FieldChanged = "Parent Company Guarantee", NewValue = "True", PreviousValue = "False" });
+            _auditLogService.Setup(x => x.AuditParentCompanyGuarantee(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<bool>()))
+                .Returns(new AuditData { FieldChanges = fieldChanges });
             var request = new UpdateOrganisationParentCompanyGuaranteeRequest
             {
                 ParentCompanyGuarantee = false,
@@ -87,7 +95,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             var result = _handler.Handle(request, new CancellationToken()).GetAwaiter().GetResult();
             result.Should().BeTrue();
 
-            _repository.Verify(x => x.GetParentCompanyGuarantee(It.IsAny<Guid>()), Times.Once);
+            _auditLogService.Verify(x => x.AuditParentCompanyGuarantee(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Once);
             _updateRepository.Verify(x => x.UpdateParentCompanyGuarantee(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<string>()), Times.Once);
             _updateRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Once);
         }
