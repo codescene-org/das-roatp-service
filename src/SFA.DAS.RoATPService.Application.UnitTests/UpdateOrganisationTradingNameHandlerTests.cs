@@ -1,4 +1,5 @@
-﻿using SFA.DAS.RoATPService.Api.Types.Models;
+﻿using System.Collections.Generic;
+using SFA.DAS.RoATPService.Api.Types.Models;
 using SFA.DAS.RoATPService.Application.Services;
 
 namespace SFA.DAS.RoATPService.Application.UnitTests
@@ -40,7 +41,11 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _textSanitiser = new Mock<ITextSanitiser>();
             _textSanitiser.Setup(x => x.SanitiseInputText(It.IsAny<string>())).Returns<string>(x => x);
             _auditLogService = new Mock<IAuditLogService>();
-            _handler = new UpdateOrganisationTradingNameHandler(_logger.Object, _validator.Object, _updateRepository.Object, _repository.Object, _textSanitiser.Object, _auditLogService.Object);
+            _auditLogService.Setup(x => x.CreateAuditData(It.IsAny<Guid>(), It.IsAny<string>()))
+                .Returns(new AuditData { FieldChanges = new List<AuditLogEntry>() });
+            _auditLogService.Setup(x => x.AuditTradingName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(new AuditData { FieldChanges = new List<AuditLogEntry>() });
+            _handler = new UpdateOrganisationTradingNameHandler(_logger.Object, _validator.Object, _updateRepository.Object, _textSanitiser.Object, _auditLogService.Object);
         }
 
         [Test]
@@ -59,7 +64,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
                 _handler.Handle(request, new CancellationToken());
             result.Should().Throw<BadRequestException>();
 
-            _repository.Verify(x => x.GetTradingName(It.IsAny<Guid>()), Times.Never);
+            _auditLogService.Verify(x => x.AuditTradingName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
             _updateRepository.Verify(x => x.UpdateTradingName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
             _updateRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
         }
@@ -77,7 +82,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             var result = _handler.Handle(request, new CancellationToken()).GetAwaiter().GetResult();
             result.Should().BeFalse();
 
-            _repository.Verify(x => x.GetTradingName(It.IsAny<Guid>()), Times.Once);
+            _auditLogService.Verify(x => x.AuditTradingName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             _updateRepository.Verify(x => x.UpdateTradingName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
             _updateRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
         }
@@ -95,13 +100,11 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
                 OrganisationId = Guid.NewGuid(),
                 UpdatedBy = "unit test"
             };
-            
-            _repository.Setup(x => x.GetTradingName(It.IsAny<Guid>())).ReturnsAsync(existingTradingName).Verifiable();
 
             var result = _handler.Handle(request, new CancellationToken()).GetAwaiter().GetResult();
             result.Should().BeFalse();
 
-            _repository.Verify(x => x.GetTradingName(It.IsAny<Guid>()), Times.Once);
+            _auditLogService.Verify(x => x.AuditTradingName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             _updateRepository.Verify(x => x.UpdateTradingName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
             _updateRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
         }
@@ -118,10 +121,15 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
                 UpdatedBy = "unit test"
             };
 
+            var fieldChanges = new List<AuditLogEntry>();
+            fieldChanges.Add(new AuditLogEntry { FieldChanged = "Trading Name", NewValue = "True", PreviousValue = "False" });
+            _auditLogService.Setup(x => x.AuditTradingName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(new AuditData { FieldChanges = fieldChanges });
+
             var result = _handler.Handle(request, new CancellationToken()).GetAwaiter().GetResult();
             result.Should().BeFalse();
 
-            _repository.Verify(x => x.GetTradingName(It.IsAny<Guid>()), Times.Once);
+            _auditLogService.Verify(x => x.AuditTradingName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             _updateRepository.Verify(x => x.UpdateTradingName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             _updateRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
         }
@@ -135,11 +143,15 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
                 OrganisationId = Guid.NewGuid(),
                 UpdatedBy = "unit test"
             };
+            var fieldChanges = new List<AuditLogEntry>();
+            fieldChanges.Add(new AuditLogEntry { FieldChanged = "Trading Name", NewValue = "True", PreviousValue = "False" });
+            _auditLogService.Setup(x => x.AuditTradingName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(new AuditData { FieldChanges = fieldChanges });
 
             var result = _handler.Handle(request, new CancellationToken()).GetAwaiter().GetResult();
             result.Should().BeTrue();
 
-            _repository.Verify(x => x.GetTradingName(It.IsAny<Guid>()), Times.Once);
+            _auditLogService.Verify(x => x.AuditTradingName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             _updateRepository.Verify(x => x.UpdateTradingName(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             _updateRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Once);
         }

@@ -177,7 +177,24 @@ namespace SFA.DAS.RoATPService.Application.Services
                 auditData.FieldChanges.Add(entry);
             }
             return auditData;
+        }
 
+        public AuditData AuditTradingName(Guid organisationId, string updatedBy, string newTradingName)
+        {
+            var auditData = new AuditData { FieldChanges = new List<AuditLogEntry>(), OrganisationId = organisationId, UpdatedAt = DateTime.Now, UpdatedBy = updatedBy };
+            var previousTradingName = _organisationRepository.GetTradingName(organisationId).Result;
+
+            if ((!(string.IsNullOrWhiteSpace(previousTradingName) && string.IsNullOrWhiteSpace(newTradingName))) && newTradingName != previousTradingName)
+            {
+                var entry = new AuditLogEntry
+                {
+                    FieldChanged = "Trading Name",
+                    PreviousValue = previousTradingName,
+                    NewValue = newTradingName
+                };
+                auditData.FieldChanges.Add(entry);
+            }
+            return auditData;
         }
     }
 }
