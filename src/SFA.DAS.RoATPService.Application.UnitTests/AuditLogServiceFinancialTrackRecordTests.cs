@@ -27,7 +27,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         public void Audit_log_checks_financial_track_record_audit_is_as_expected(bool currentFinancialTrackRecord, bool newFinancialTrackRecord, bool auditChangesMade)
         {
             _organisationRepository.Setup(x => x.GetFinancialTrackRecord(It.IsAny<Guid>())).ReturnsAsync(currentFinancialTrackRecord);
-            var auditLogService = new AuditLogService(_settings, _organisationRepository.Object);
+            var auditLogService = new AuditLogService(_settings, _organisationRepository.Object,null);
             var auditData = auditLogService.AuditFinancialTrackRecord(Guid.NewGuid(), "system", newFinancialTrackRecord);
 
             Assert.AreEqual(auditChangesMade, auditData.ChangesMade);

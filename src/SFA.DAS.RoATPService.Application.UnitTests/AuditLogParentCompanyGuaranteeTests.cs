@@ -27,7 +27,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         public void Audit_log_checks_parent_company_guarantee_audit_is_as_expected(bool currentGuarantee, bool newGuarantee, bool auditChangesMade)
         {
             _organisationRepository.Setup(x => x.GetParentCompanyGuarantee(It.IsAny<Guid>())).ReturnsAsync(currentGuarantee);
-            var auditLogService = new AuditLogService(_settings, _organisationRepository.Object);
+            var auditLogService = new AuditLogService(_settings, _organisationRepository.Object, null);
             var auditData = auditLogService.AuditParentCompanyGuarantee(Guid.NewGuid(), "system", newGuarantee);
 
             Assert.AreEqual(auditChangesMade, auditData.ChangesMade);

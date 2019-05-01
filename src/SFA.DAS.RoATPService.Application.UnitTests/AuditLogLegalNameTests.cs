@@ -27,7 +27,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         public void Audit_log_checks_legal_name_audit_is_as_expected(string currentName, string newName, bool auditChangesMade)
         {
             _organisationRepository.Setup(x => x.GetLegalName(It.IsAny<Guid>())).ReturnsAsync(currentName);
-            var auditLogService = new AuditLogService(_settings, _organisationRepository.Object);
+            var auditLogService = new AuditLogService(_settings, _organisationRepository.Object, null);
             var auditData = auditLogService.AuditLegalName(Guid.NewGuid(), "system", newName);
 
             Assert.AreEqual(auditChangesMade, auditData.ChangesMade);

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.FileSystemGlobbing.Internal;
+﻿using System.Collections.Generic;
+using Microsoft.Extensions.FileSystemGlobbing.Internal;
 using SFA.DAS.RoATPService.Application.Services;
 
 namespace SFA.DAS.RoATPService.Application.UnitTests
@@ -65,6 +66,10 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             RemovedReason nullReason = null;
             _repository.Setup(x => x.GetRemovedReason(It.IsAny<Guid>())).ReturnsAsync(nullReason);
             _auditLogService = new Mock<IAuditLogService>();
+            _auditLogService.Setup(x => x.CreateAuditData(It.IsAny<Guid>(), It.IsAny<string>()))
+                .Returns(new AuditData { FieldChanges = new List<AuditLogEntry>() });
+            _auditLogService.Setup(x => x.AuditOrganisationStatus(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int?>()))
+                .Returns(new AuditData { FieldChanges = new List<AuditLogEntry>() });
             _handler = new UpdateOrganisationStatusHandler(_logger.Object, _validator.Object, 
                                                            _updateRepository.Object,
                                                            _lookupDataRepository.Object, _repository.Object, _auditLogService.Object);
@@ -122,7 +127,10 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _updateRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true);
 
             _updateRepository.Setup(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>())).ReturnsAsync(true).Verifiable();
-
+            var fieldChanges = new List<AuditLogEntry>();
+            fieldChanges.Add(new AuditLogEntry { FieldChanged = AuditLogField.OrganisationStatus, NewValue = "Active - not taking on", PreviousValue = "Active" });
+            _auditLogService.Setup(x => x.AuditOrganisationStatus(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int?>()))
+                .Returns(new AuditData { FieldChanges = fieldChanges });
             var result = _handler.Handle(_request, new CancellationToken()).GetAwaiter().GetResult();
 
             result.Should().BeTrue();
@@ -144,7 +152,10 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _updateRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true);
 
             _updateRepository.Setup(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>())).ReturnsAsync(true).Verifiable();
-
+            var fieldChanges = new List<AuditLogEntry>();
+            fieldChanges.Add(new AuditLogEntry { FieldChanged = AuditLogField.OrganisationStatus, NewValue = "Active - not taking on", PreviousValue = "Active" });
+            _auditLogService.Setup(x => x.AuditOrganisationStatus(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int?>()))
+                .Returns(new AuditData { FieldChanges = fieldChanges });
             var result = _handler.Handle(_request, new CancellationToken()).GetAwaiter().GetResult();
 
             result.Should().BeTrue();
@@ -166,7 +177,11 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _updateRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true);
 
             _updateRepository.Setup(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>())).ReturnsAsync(true).Verifiable();
-
+            var fieldChanges = new List<AuditLogEntry>();
+            fieldChanges.Add(new AuditLogEntry { FieldChanged = AuditLogField.OrganisationStatus, NewValue = "Removed", PreviousValue = "Active" });
+            fieldChanges.Add(new AuditLogEntry { FieldChanged = AuditLogField.StartDate, NewValue = DateTime.Today.ToShortDateString(), PreviousValue = null });
+            _auditLogService.Setup(x => x.AuditOrganisationStatus(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int?>()))
+                .Returns(new AuditData { FieldChanges = fieldChanges });
             var result = _handler.Handle(_request, new CancellationToken()).GetAwaiter().GetResult();
 
             result.Should().BeTrue();
@@ -189,12 +204,18 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _updateRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true).Verifiable();
 
             _updateRepository.Setup(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>())).ReturnsAsync(true).Verifiable();
+            _updateRepository.Setup(x => x.UpdateRemovedReason(It.IsAny<Guid>(), It.IsAny<int?>(), It.IsAny<string>())).ReturnsAsync(true).Verifiable();
 
+            var fieldChanges = new List<AuditLogEntry>();
+            fieldChanges.Add(new AuditLogEntry { FieldChanged = AuditLogField.RemovedReason, NewValue = "Breach", PreviousValue = "Other"});
+            _auditLogService.Setup(x => x.AuditOrganisationStatus(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int?>()))
+                .Returns(new AuditData { FieldChanges = fieldChanges });
             var result = _handler.Handle(_request, new CancellationToken()).GetAwaiter().GetResult();
 
             result.Should().BeTrue();
 
             _updateRepository.Verify(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>()), Times.Never);
+            _updateRepository.Verify(x => x.UpdateRemovedReason(It.IsAny<Guid>(), It.IsAny<int?>(), It.IsAny<string>()), Times.Once);
             _updateRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Once);
         }
 
@@ -212,12 +233,19 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _updateRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true);
 
             _updateRepository.Setup(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>())).ReturnsAsync(true).Verifiable();
+            var fieldChanges = new List<AuditLogEntry>();
+            fieldChanges.Add(new AuditLogEntry { FieldChanged = AuditLogField.OrganisationStatus, NewValue = "Removed", PreviousValue = "Active - not taking on" });
+            fieldChanges.Add(new AuditLogEntry { FieldChanged = AuditLogField.StartDate, NewValue = null, PreviousValue = DateTime.Today.ToShortDateString()});
+            _auditLogService.Setup(x => x.AuditOrganisationStatus(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int?>()))
+                .Returns(new AuditData { FieldChanges = fieldChanges });
 
             var result = _handler.Handle(_request, new CancellationToken()).GetAwaiter().GetResult();
 
             result.Should().BeTrue();
 
+            _updateRepository.Verify(x => x.UpdateRemovedReason(It.IsAny<Guid>(), It.IsAny<int?>(), It.IsAny<string>()), Times.Never);
             _updateRepository.Verify(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>()), Times.Once);
+            _updateRepository.Verify(x => x.UpdateOrganisationStatus(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<string>()), Times.Once);
         }
 
         [TestCase(OrganisationStatus.Active, 1)]
@@ -251,11 +279,17 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _request.OrganisationStatusId = OrganisationStatus.Removed;
             _request.RemovedReasonId = removalReasonId;
 
-            var removedReason = new RemovedReason {Id = 1, Reason = "test reason"};
-
             _updateRepository.Setup(x =>
-                    x.UpdateStatusWithRemovedReason(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
-                .ReturnsAsync(removedReason);
+                    x.UpdateRemovedReason(It.IsAny<Guid>(), It.IsAny<int?>(),  It.IsAny<string>()))
+                .ReturnsAsync(true);
+            _updateRepository.Setup(x =>
+                    x.UpdateOrganisationStatus(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<string>()))
+                .ReturnsAsync(true);
+            var fieldChanges = new List<AuditLogEntry>();
+            fieldChanges.Add(new AuditLogEntry { FieldChanged = AuditLogField.OrganisationStatus, NewValue = "Removed", PreviousValue = "Active - not taking on" });
+            fieldChanges.Add(new AuditLogEntry { FieldChanged = AuditLogField.RemovedReason, NewValue = null, PreviousValue = "Breach" });
+            _auditLogService.Setup(x => x.AuditOrganisationStatus(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int?>()))
+                .Returns(new AuditData { FieldChanges = fieldChanges });
 
             _updateRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true);
 
@@ -266,6 +300,9 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             result.Should().BeTrue();
 
             _updateRepository.Verify(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>()), Times.Never);
+            _updateRepository.Verify(x => x.UpdateRemovedReason(It.IsAny<Guid>(), It.IsAny<int?>(), It.IsAny<string>()), Times.Once);
+            _updateRepository.Verify(x => x.UpdateOrganisationStatus(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<string>()), Times.Once);
+
         }
     }
 }

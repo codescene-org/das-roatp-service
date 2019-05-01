@@ -20,5 +20,8 @@ namespace SFA.DAS.RoATPService.Application.Interfaces
         AuditData AuditLegalName(Guid organisationId, string updatedBy, string newLegalName);
         AuditData AuditTradingName(Guid organisationId, string updatedBy, string newTradingName);
         AuditData AuditUkprn(Guid organisationId, string updatedBy, long newUkprn);
+
+        AuditData AuditOrganisationStatus(Guid organisationId, string updatedBy, int newOrganisationStatusId,
+            int? newRemovedReasonId);
     }
 }

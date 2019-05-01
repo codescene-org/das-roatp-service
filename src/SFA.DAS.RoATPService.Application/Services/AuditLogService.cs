@@ -13,10 +13,12 @@ namespace SFA.DAS.RoATPService.Application.Services
     {
         private readonly RegisterAuditLogSettings _settings;
         private readonly IOrganisationRepository _organisationRepository;
-        public AuditLogService(RegisterAuditLogSettings settings, IOrganisationRepository organisationRepository)
+        private readonly ILookupDataRepository _lookupDataRepository;
+        public AuditLogService(RegisterAuditLogSettings settings, IOrganisationRepository organisationRepository, ILookupDataRepository lookupDataRepository)
         {
             _settings = settings;
             _organisationRepository = organisationRepository;
+            _lookupDataRepository = lookupDataRepository;
         }
 
         public async Task<AuditData> BuildListOfFieldsChanged(Organisation originalOrganisation, Organisation updatedOrganisation)
@@ -135,7 +137,7 @@ namespace SFA.DAS.RoATPService.Application.Services
             {
                 var entry = new AuditLogEntry
                 {
-                    FieldChanged = "Financial Track Record",
+                    FieldChanged = AuditLogField.FinancialTrackRecord,
                     PreviousValue = previousFinancialTrackRecord.ToString(),
                     NewValue = newFinancialTrackRecord.ToString()
                 };
@@ -153,7 +155,7 @@ namespace SFA.DAS.RoATPService.Application.Services
             {
                 var entry = new AuditLogEntry
                 {
-                    FieldChanged = "Parent Company Guarantee",
+                    FieldChanged = AuditLogField.ParentCompanyGuarantee,
                     PreviousValue = previousParentCompanyGuarantee.ToString(),
                     NewValue = newParentCompanyGuarantee.ToString()
                 };
@@ -170,7 +172,7 @@ namespace SFA.DAS.RoATPService.Application.Services
             {
                 var entry = new AuditLogEntry
                 {
-                    FieldChanged = "Legal Name",
+                    FieldChanged = AuditLogField.LegalName,
                     PreviousValue = previousLegalName,
                     NewValue = newLegalName
                 };
@@ -188,7 +190,7 @@ namespace SFA.DAS.RoATPService.Application.Services
             {
                 var entry = new AuditLogEntry
                 {
-                    FieldChanged = "Trading Name",
+                    FieldChanged = AuditLogField.TradingName,
                     PreviousValue = previousTradingName,
                     NewValue = newTradingName
                 };
@@ -206,13 +208,74 @@ namespace SFA.DAS.RoATPService.Application.Services
             {
                 var entry = new AuditLogEntry
                 {
-                    FieldChanged = "UKPRN",
+                    FieldChanged = AuditLogField.Ukprn,
                     PreviousValue = previousUkprn.ToString(),
                     NewValue = newUkprn.ToString()
                 };
                 auditData.FieldChanges.Add(entry);
             }
             return auditData;
+        }
+
+        public AuditData AuditOrganisationStatus(Guid organisationId, string updatedBy, int newOrganisationStatusId, int? newRemovedReasonId)
+        {
+            var auditData = new AuditData { FieldChanges = new List<AuditLogEntry>(), OrganisationId = organisationId, UpdatedAt = DateTime.Now, UpdatedBy = updatedBy };
+
+            var existingStatusId =  _organisationRepository.GetOrganisationStatus(organisationId).Result;
+            var existingRemovedReason = _organisationRepository.GetRemovedReason(organisationId).Result;
+            var newRemovedReason = _lookupDataRepository.GetRemovedReasons().Result.FirstOrDefault(x=>x.Id == newRemovedReasonId);
+            var organisationStatuses = _lookupDataRepository.GetOrganisationStatuses().Result.ToList();
+            var newStartDate = DateTime.Today;
+            var existingStartDate = _organisationRepository.GetStartDate(organisationId).Result;
+
+            if (existingStatusId != newOrganisationStatusId)
+            {
+                var entry = new AuditLogEntry
+                {
+                    FieldChanged = AuditLogField.OrganisationStatus,
+                    PreviousValue =  organisationStatuses?.FirstOrDefault(x=>x.Id == existingStatusId)?.Status,
+                    NewValue = organisationStatuses?.FirstOrDefault(x => x.Id == newOrganisationStatusId)?.Status
+                };
+                auditData.FieldChanges.Add(entry);
+            }
+
+            if (existingRemovedReason != newRemovedReason || newRemovedReasonId.HasValue && newRemovedReasonId.Value != existingRemovedReason.Id)
+            {
+                var entry = new AuditLogEntry
+                {
+                    FieldChanged = AuditLogField.RemovedReason,
+                    PreviousValue = existingRemovedReason?.Reason ?? "Not set",
+                    NewValue = newRemovedReason?.Reason ?? "Not set"
+                };
+                auditData.FieldChanges.Add(entry);
+            }
+
+           
+            if (auditData.FieldChanges.Any() && UpdateStartDateRequired(existingStatusId, newOrganisationStatusId, newStartDate, existingStartDate))
+            {
+                var entry = new AuditLogEntry
+                {
+                    FieldChanged = AuditLogField.StartDate,
+                    PreviousValue = existingStartDate?.ToShortDateString() ?? "Not set",
+                    NewValue = newStartDate.ToShortDateString()
+                };
+                auditData.FieldChanges.Add(entry);
+            }
+            return auditData;
+        }
+
+        private bool UpdateStartDateRequired(int oldStatusId, int newStatusId, DateTime newStartDate, DateTime? existingStartDate)
+        {
+            if ((oldStatusId == OrganisationStatus.Removed || oldStatusId == OrganisationStatus.Onboarding) &&
+                (newStatusId == OrganisationStatus.Active || newStatusId == OrganisationStatus.ActiveNotTakingOnApprentices))
+            {
+                return true;
+            }
+
+            if (!existingStartDate.HasValue || existingStartDate.Value.Date != newStartDate.Date)
+                return true;
+
+            return false;
         }
     }
 }

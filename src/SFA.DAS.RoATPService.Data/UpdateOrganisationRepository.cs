@@ -221,6 +221,37 @@ namespace SFA.DAS.RoATPService.Data
             }
         }
 
+        public async Task<bool> UpdateRemovedReason(Guid organisationId, int? removedReasonId, string updatedBy)
+        {
+            var connectionString = _configuration.SqlConnectionString;
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                var sql = "select Id, RemovedReason as [Reason], Status, Description, CreatedAt, CreatedBy, UpdatedAt, UpdatedBy FROM [RemovedReasons] " +
+                          "WHERE Id = @removedReasonId";
+                var reason = await connection.QueryAsync<RemovedReason>(sql, new { removedReasonId });
+                var removedReason = reason.FirstOrDefault();
+
+                var reasonJson = JsonConvert.SerializeObject(removedReason,
+                    new IsoDateTimeConverter() { DateTimeFormat = RoatpDateTimeFormat });
+
+                var updatedAt = DateTime.Now;
+
+                var updateSql =
+                    "update [Organisations] set OrganisationData = JSON_MODIFY(OrganisationData, '$.RemovedReason', JSON_QUERY(@reasonJson)), " +
+                    " UpdatedBy = @updatedBy, UpdatedAt = @updatedAt, StatusDate = @updatedAt " +
+                    "WHERE Id = @organisationId";
+
+                var recordsAffected = await connection.ExecuteAsync(updateSql,
+                    new { reasonJson, updatedBy, updatedAt, organisationId });
+
+                return await Task.FromResult(recordsAffected > 0);
+            }
+        }
+
         public async Task<bool> UpdateParentCompanyGuarantee(Guid organisationId, bool parentCompanyGuarantee, string updatedBy)
         {
             var connectionString = _configuration.SqlConnectionString;

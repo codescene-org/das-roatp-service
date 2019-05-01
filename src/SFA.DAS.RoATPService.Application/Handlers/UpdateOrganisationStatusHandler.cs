@@ -1,4 +1,7 @@
-﻿using SFA.DAS.RoATPService.Application.Services;
+﻿using System.Linq;
+using System.Linq.Expressions;
+using System.Transactions;
+using SFA.DAS.RoATPService.Application.Services;
 
 namespace SFA.DAS.RoATPService.Application.Handlers
 {
@@ -24,7 +27,8 @@ namespace SFA.DAS.RoATPService.Application.Handlers
 
         public UpdateOrganisationStatusHandler(ILogger<UpdateOrganisationStatusHandler> logger,
             IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository,
-            ILookupDataRepository lookupDataRepository, IOrganisationRepository organisationRepository, IAuditLogService auditLogService)
+            ILookupDataRepository lookupDataRepository, IOrganisationRepository organisationRepository,
+            IAuditLogService auditLogService)
         {
             _logger = logger;
             _validator = validator;
@@ -38,45 +42,41 @@ namespace SFA.DAS.RoATPService.Application.Handlers
         {
             ValidateUpdateStatusRequest(request);
 
-            int existingStatusId = await _organisationRepository.GetOrganisationStatus(request.OrganisationId);
-            var removedReason = await _organisationRepository.GetRemovedReason(request.OrganisationId);
+            var auditData = _auditLogService.AuditOrganisationStatus(request.OrganisationId, request.UpdatedBy,
+                request.OrganisationStatusId, request.RemovedReasonId);
 
-            bool success = false;
+            var success = false;
 
-            var auditData = _auditLogService.CreateAuditData(request.OrganisationId, request.UpdatedBy);
-
-            if (existingStatusId != request.OrganisationStatusId)
+            if (!auditData.ChangesMade)
             {
-              _auditLogService.AddAuditEntry(auditData, "Organisation Status", StatusText(existingStatusId),
-                              StatusText(request.OrganisationStatusId));                   
+                return await Task.FromResult(false);
+
             }
-            
-            if (!request.RemovedReasonId.HasValue)
+           
+            if (auditData.FieldChanges.Any(x => x.FieldChanged == AuditLogField.RemovedReason))
+            {
+                success = await _updateOrganisationRepository.UpdateRemovedReason(request.OrganisationId, 
+                                                                                        request.RemovedReasonId, request.UpdatedBy);
+            }
+           
+            if (auditData.FieldChanges.Any(x => x.FieldChanged == AuditLogField.OrganisationStatus))
             {
                 success = await _updateOrganisationRepository.UpdateOrganisationStatus(request.OrganisationId,
-                                request.OrganisationStatusId,  request.UpdatedBy);
-            }
-            else
-            {
-                var reason = await _updateOrganisationRepository.UpdateStatusWithRemovedReason(
-                    request.OrganisationId, request.OrganisationStatusId, 
-                    request.RemovedReasonId.Value, request.UpdatedBy);
-
-                if (removedReason == null || request.RemovedReasonId.Value != removedReason.Id)
-                {
-                  _auditLogService.AddAuditEntry(auditData, "Removed Reason", removedReason?.Reason ?? "Not set", reason.Reason);
-                }
+                    request.OrganisationStatusId, request.UpdatedBy);
             }
             
-            success = await _updateOrganisationRepository.WriteFieldChangesToAuditLog(auditData);
 
-            if (success && UpdateStartDateRequired(existingStatusId, request.OrganisationStatusId))
+            if (success && auditData.FieldChanges.Any(x => x.FieldChanged == AuditLogField.StartDate))
             {
                 success = await _updateOrganisationRepository.UpdateStartDate(request.OrganisationId, DateTime.Today);
             }
 
-            return await Task.FromResult(success);
+            if (success)
+                return await _updateOrganisationRepository.WriteFieldChangesToAuditLog(auditData);
+
+            return await Task.FromResult(false);
         }
+
 
         private void ValidateUpdateStatusRequest(UpdateOrganisationStatusRequest request)
         {

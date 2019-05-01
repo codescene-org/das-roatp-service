@@ -28,7 +28,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         public void Audit_log_checks_trading_name_guarantee_audit_is_as_expected(long currentUkprn, long newUkprn, bool auditChangesMade)
         {
             _organisationRepository.Setup(x => x.GetUkprn(It.IsAny<Guid>())).ReturnsAsync(currentUkprn);
-            var auditLogService = new AuditLogService(_settings, _organisationRepository.Object);
+            var auditLogService = new AuditLogService(_settings, _organisationRepository.Object,null);
             var auditData = auditLogService.AuditUkprn(Guid.NewGuid(), "system", newUkprn);
 
             Assert.AreEqual(auditChangesMade, auditData.ChangesMade);
