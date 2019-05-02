@@ -3,6 +3,7 @@
     using System;
     using System.Data;
     using System.Data.SqlClient;
+    using System.Linq;
     using System.Threading.Tasks;
     using Application.Interfaces;
     using Dapper;
@@ -30,17 +31,15 @@
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();
 
-                var sql = "select LegalName FROM [Organisations] " +
+                var sql = "select LegalName AS DuplicateOrganisationName, " +
+                          "CASE WHEN LegalName IS NOT NULL THEN 1 ELSE 0 END AS DuplicateFound, " +
+                          "Id AS DuplicateOrganisationId " +
+                          "FROM [Organisations] " +
                           "WHERE UKPRN = @ukprn " +
                           "AND Id != @organisationId";
-                string duplicateLegalName = await connection.ExecuteScalarAsync<string>(sql, new { organisationId, ukprn });
+                var results = await connection.QueryAsync<DuplicateCheckResponse>(sql, new { organisationId, ukprn });
 
-                DuplicateCheckResponse response = new DuplicateCheckResponse
-                {
-                    DuplicateFound = !String.IsNullOrWhiteSpace(duplicateLegalName),
-                    DuplicateOrganisationName = duplicateLegalName
-                };
-                return response;
+                return results.FirstOrDefault();
             }
         }
 
