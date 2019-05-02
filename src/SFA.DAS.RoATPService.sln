@@ -27,6 +27,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.RoatpService.Data.I
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.RoATPService.Application.UnitTests", "SFA.DAS.RoATPService.Application.UnitTests\SFA.DAS.RoATPService.Application.UnitTests.csproj", "{4D88DF45-827C-4B87-BA0E-2CCA9F9264A2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.RoATPService.Api.UnitTests", "SFA.DAS.RoATPService.Api.UnitTests\SFA.DAS.RoATPService.Api.UnitTests.csproj", "{EB19F010-AFD9-4F17-878B-DAA1AB4B1C95}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -79,6 +81,10 @@ Global
 		{4D88DF45-827C-4B87-BA0E-2CCA9F9264A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D88DF45-827C-4B87-BA0E-2CCA9F9264A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D88DF45-827C-4B87-BA0E-2CCA9F9264A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB19F010-AFD9-4F17-878B-DAA1AB4B1C95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB19F010-AFD9-4F17-878B-DAA1AB4B1C95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB19F010-AFD9-4F17-878B-DAA1AB4B1C95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB19F010-AFD9-4F17-878B-DAA1AB4B1C95}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -87,6 +93,7 @@ Global
 		{C1A091FB-13EA-44E1-A873-685C9D2355FB} = {A41E0780-CADF-4AEC-B37C-D37DAB8A79E5}
 		{FC71C892-ADA2-4AE8-B475-5DC68CDCA54F} = {A41E0780-CADF-4AEC-B37C-D37DAB8A79E5}
 		{4D88DF45-827C-4B87-BA0E-2CCA9F9264A2} = {A41E0780-CADF-4AEC-B37C-D37DAB8A79E5}
+		{EB19F010-AFD9-4F17-878B-DAA1AB4B1C95} = {A41E0780-CADF-4AEC-B37C-D37DAB8A79E5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C5B677B2-0D72-4629-A5FD-F94B00EC858B}
