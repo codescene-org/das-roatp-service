@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.RoATPService.Application.UnitTests
+﻿using SFA.DAS.RoATPService.Api.Types.Models;
+
+namespace SFA.DAS.RoATPService.Application.UnitTests
 {
     using System;
     using System.Threading;
@@ -7,7 +9,6 @@
     using Microsoft.Extensions.Logging;
     using Moq;
     using NUnit.Framework;
-    using SFA.DAS.RoATPService.Api.Types.Models.UpdateOrganisation;
     using SFA.DAS.RoATPService.Application.Exceptions;
     using SFA.DAS.RoATPService.Application.Handlers;
     using SFA.DAS.RoATPService.Application.Interfaces;

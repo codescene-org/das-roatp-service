@@ -89,6 +89,15 @@
                 _logger.LogInformation(invalidRemovalReasonError);
                 throw new BadRequestException(invalidRemovalReasonError);
             }
+
+            if (!_validator.IsValidOrganisationStatusIdForOrganisation(request.OrganisationStatusId,
+                request.OrganisationId))
+            {
+                var invalidStatusForOrganisationError = $@"You cannot set the organisation status {request.OrganisationStatusId} for this organisation's provider type";
+
+                _logger.LogInformation(invalidStatusForOrganisationError);
+                throw new BadRequestException(invalidStatusForOrganisationError);
+            }
         }
 
         private bool UpdateStartDateRequired(int oldStatusId, int newStatusId)

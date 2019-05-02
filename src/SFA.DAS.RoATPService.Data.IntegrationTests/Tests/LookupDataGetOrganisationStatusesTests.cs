@@ -1,17 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Microsoft.Extensions.Logging;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using NUnit.Framework;
-using SFA.DAS.RoatpService.Data.DapperTypeHandlers;
 using SFA.DAS.RoatpService.Data.IntegrationTests.Handlers;
 using SFA.DAS.RoatpService.Data.IntegrationTests.Models;
 using SFA.DAS.RoatpService.Data.IntegrationTests.Services;
-using SFA.DAS.RoATPService.Application.Commands;
 using SFA.DAS.RoATPService.Data;
-using SFA.DAS.RoATPService.Domain;
 
 namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
 {
