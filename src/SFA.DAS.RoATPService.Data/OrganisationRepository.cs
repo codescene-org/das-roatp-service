@@ -155,5 +155,21 @@ namespace SFA.DAS.RoATPService.Data
                 return await Task.FromResult(organisationsUpdated > 0);
             }
         }
+
+        public async Task<OrganisationReapplyStatus> GetOrganisationReapplyStatus(Guid organisationId)
+        {
+            using (var connection = new SqlConnection(_configuration.SqlConnectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                var sql = "SELECT ProviderTypeId, StatusId FROM Organisations " +
+                          "WHERE Id = @organisationId";
+
+                var reapplyStatus = await connection.QueryAsync<OrganisationReapplyStatus>(sql, new {organisationId});
+
+                return reapplyStatus.FirstOrDefault();
+            }
+        }
     }
 }
