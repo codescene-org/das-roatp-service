@@ -161,8 +161,7 @@ namespace SFA.DAS.RoATPService.Data
 
                 var updatedAt = DateTime.Now;
 
-                var sql = "update [Organisations] SET StatusId = @organisationStatusId, " +
-                          "OrganisationData = JSON_MODIFY(OrganisationData, '$.RemovedReason', null), " +
+                var sql = "update [Organisations] SET StatusId = @organisationStatusId, " +    
                           "UpdatedBy = @updatedBy, UpdatedAt = @updatedAt, StatusDate = @updatedAt " +
                           "WHERE Id = @organisationId";
                 int recordsAffected = await connection.ExecuteAsync(sql, new { organisationStatusId, updatedBy, updatedAt, organisationId });
@@ -238,6 +237,8 @@ namespace SFA.DAS.RoATPService.Data
                 var reasonJson = JsonConvert.SerializeObject(removedReason,
                     new IsoDateTimeConverter() { DateTimeFormat = RoatpDateTimeFormat });
 
+                if (removedReason == null)
+                    reasonJson = null;
                 var updatedAt = DateTime.Now;
 
                 var updateSql =

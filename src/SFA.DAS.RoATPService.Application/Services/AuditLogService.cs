@@ -267,13 +267,12 @@ namespace SFA.DAS.RoATPService.Application.Services
         private bool UpdateStartDateRequired(int oldStatusId, int newStatusId, DateTime newStartDate, DateTime? existingStartDate)
         {
             if ((oldStatusId == OrganisationStatus.Removed || oldStatusId == OrganisationStatus.Onboarding) &&
-                (newStatusId == OrganisationStatus.Active || newStatusId == OrganisationStatus.ActiveNotTakingOnApprentices))
+                (newStatusId == OrganisationStatus.Active || newStatusId == OrganisationStatus.ActiveNotTakingOnApprentices)
+                && (!existingStartDate.HasValue || existingStartDate.Value.Date != newStartDate.Date))
             {
                 return true;
             }
 
-            if (!existingStartDate.HasValue || existingStartDate.Value.Date != newStartDate.Date)
-                return true;
 
             return false;
         }

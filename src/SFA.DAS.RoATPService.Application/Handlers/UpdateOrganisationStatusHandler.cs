@@ -52,19 +52,18 @@ namespace SFA.DAS.RoATPService.Application.Handlers
                 return await Task.FromResult(false);
 
             }
-           
-            if (auditData.FieldChanges.Any(x => x.FieldChanged == AuditLogField.RemovedReason))
-            {
-                success = await _updateOrganisationRepository.UpdateRemovedReason(request.OrganisationId, 
-                                                                                        request.RemovedReasonId, request.UpdatedBy);
-            }
-           
+
             if (auditData.FieldChanges.Any(x => x.FieldChanged == AuditLogField.OrganisationStatus))
             {
                 success = await _updateOrganisationRepository.UpdateOrganisationStatus(request.OrganisationId,
                     request.OrganisationStatusId, request.UpdatedBy);
             }
-            
+
+            if (auditData.FieldChanges.Any(x => x.FieldChanged == AuditLogField.RemovedReason))
+            {
+                success = await _updateOrganisationRepository.UpdateRemovedReason(request.OrganisationId, 
+                                                                                        request.RemovedReasonId, request.UpdatedBy);
+            }
 
             if (success && auditData.FieldChanges.Any(x => x.FieldChanged == AuditLogField.StartDate))
             {
