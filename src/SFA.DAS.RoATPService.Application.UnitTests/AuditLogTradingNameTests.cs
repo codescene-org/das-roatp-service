@@ -32,7 +32,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         [TestCase(null, null, false)]
         [TestCase(" ", "  ", false)]
 
-        public void Audit_log_checks_trading_name_guarantee_audit_is_as_expected(string currentName, string newName, bool auditChangesMade)
+        public void Audit_log_checks_trading_name_audit_is_as_expected(string currentName, string newName, bool auditChangesMade)
         {
             _organisationRepository.Setup(x => x.GetTradingName(It.IsAny<Guid>())).ReturnsAsync(currentName);
             var auditLogService = new AuditLogService(_settings, _organisationRepository.Object, null);

@@ -25,7 +25,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         [TestCase(11111111, 11111111, false)]
         [TestCase(22222222,22222222, false)]
 
-        public void Audit_log_checks_trading_name_guarantee_audit_is_as_expected(long currentUkprn, long newUkprn, bool auditChangesMade)
+        public void Audit_log_checks_ukprn_audit_is_as_expected(long currentUkprn, long newUkprn, bool auditChangesMade)
         {
             _organisationRepository.Setup(x => x.GetUkprn(It.IsAny<Guid>())).ReturnsAsync(currentUkprn);
             var auditLogService = new AuditLogService(_settings, _organisationRepository.Object,null);

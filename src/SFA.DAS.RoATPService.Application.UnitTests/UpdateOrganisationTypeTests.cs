@@ -1,4 +1,4 @@
-﻿using SFA.DAS.RoATPService.Application.Services;
+﻿using System.Collections.Generic;
 
 namespace SFA.DAS.RoATPService.Application.UnitTests
 {
@@ -22,8 +22,6 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         private Mock<ILogger<UpdateOrganisationTypeHandler>> _logger;
         private Mock<IOrganisationValidator> _validator;
         private Mock<IUpdateOrganisationRepository> _updateOrganisationRepository;
-        private Mock<ILookupDataRepository> _lookupDataRepository;
-        private Mock<IOrganisationRepository> _repository;
         private UpdateOrganisationTypeHandler _handler;
         private UpdateOrganisationTypeRequest _request;
         private Mock<IAuditLogService> _auditLogService;
@@ -36,11 +34,13 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _validator.Setup(x => x.IsValidOrganisationTypeId(It.IsAny<int>())).Returns(true);
             _validator.Setup(x => x.IsValidOrganisationTypeIdForOrganisation(It.IsAny<int>(), It.IsAny<Guid>())).Returns(true);
             _updateOrganisationRepository = new Mock<IUpdateOrganisationRepository>();
-            _repository = new Mock<IOrganisationRepository>();
             _auditLogService = new Mock<IAuditLogService>();
-            _lookupDataRepository = new Mock<ILookupDataRepository>();
+            _auditLogService.Setup(x => x.CreateAuditData(It.IsAny<Guid>(), It.IsAny<string>()))
+                .Returns(new AuditData { FieldChanges = new List<AuditLogEntry>() });
+            _auditLogService.Setup(x => x.AuditOrganisationType(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<int>()))
+                .Returns(new AuditData { FieldChanges = new List<AuditLogEntry>() });
             _handler = new UpdateOrganisationTypeHandler(_logger.Object, _validator.Object,
-                _updateOrganisationRepository.Object, _lookupDataRepository.Object, _repository.Object, _auditLogService.Object);
+                _updateOrganisationRepository.Object, _auditLogService.Object);
             _request = new UpdateOrganisationTypeRequest
             {
                 OrganisationId = Guid.NewGuid(),
@@ -81,9 +81,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
 
         [Test]
         public void Handler_updates_organisation_type_and_records_audit_history()
-        { 
-            _repository.Setup(x => x.GetOrganisationType(It.IsAny<Guid>())).ReturnsAsync(2);
-
+        {  
             _updateOrganisationRepository.Setup(x =>
                     x.UpdateOrganisationType(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ReturnsAsync(true).Verifiable();
@@ -91,10 +89,16 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _updateOrganisationRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()))
                 .ReturnsAsync(true).Verifiable();
 
-            var result = _handler.Handle(_request, new CancellationToken()).Result;
+            var fieldChanges = new List<AuditLogEntry>();
+            fieldChanges.Add(new AuditLogEntry { FieldChanged = "Organisation Type", NewValue = "Breach", PreviousValue = "GFE" });
+            _auditLogService.Setup(x => x.AuditOrganisationType(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<int>()))
+                .Returns(new AuditData { FieldChanges = fieldChanges });
 
+            var result = _handler.Handle(_request, new CancellationToken()).Result;
             result.Should().BeTrue();
             _updateOrganisationRepository.VerifyAll();
+            _auditLogService.Verify(x => x.AuditOrganisationType(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<int>()), Times.Once);
+
         }
 
         [Test]
@@ -106,8 +110,6 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
                 OrganisationTypeId = 3,
                 UpdatedBy = "test"
             };
-
-            _repository.Setup(x => x.GetOrganisationType(It.IsAny<Guid>())).ReturnsAsync(3);
 
             _updateOrganisationRepository.Setup(x =>
                     x.UpdateOrganisationType(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<string>()))

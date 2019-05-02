@@ -17,19 +17,15 @@ namespace SFA.DAS.RoATPService.Application.Handlers
         private readonly ILogger<UpdateOrganisationTypeHandler> _logger;
         private readonly IOrganisationValidator _validator;
         private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
-        private readonly ILookupDataRepository _lookupRepository;
-        private readonly IOrganisationRepository _organisationRepository;
         private readonly IAuditLogService _auditLogService;
 
         public UpdateOrganisationTypeHandler(ILogger<UpdateOrganisationTypeHandler> logger,
             IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository,
-            ILookupDataRepository lookupRepository, IOrganisationRepository organisationRepository, IAuditLogService auditLogService)
+            IAuditLogService auditLogService)
         {
             _logger = logger;
             _validator = validator;
             _updateOrganisationRepository = updateOrganisationRepository;
-            _lookupRepository = lookupRepository;
-            _organisationRepository = organisationRepository;
             _auditLogService = auditLogService;
         }
 
@@ -38,26 +34,21 @@ namespace SFA.DAS.RoATPService.Application.Handlers
 
             ValidateUpdateTypeRequest(request);
 
-            var existingTypeId = await _organisationRepository.GetOrganisationType(request.OrganisationId);
+            var auditRecord = _auditLogService.AuditOrganisationType(request.OrganisationId, request.UpdatedBy, request.OrganisationTypeId);
 
             var success = false;
 
-            var auditData = _auditLogService.CreateAuditData(request.OrganisationId, request.UpdatedBy);
-
-            if (existingTypeId != request.OrganisationTypeId)
+            if (auditRecord.ChangesMade && request.OrganisationTypeId!= OrganisationType.Unassigned)
             {
                 success = await _updateOrganisationRepository.UpdateOrganisationType(request.OrganisationId,
                     request.OrganisationTypeId, request.UpdatedBy);    
             }
-
-            if (success)
+            if (!success)
             {
-                _auditLogService.AddAuditEntry(auditData, "Organisation Type", ConvertTypeIdToText(existingTypeId),
-                    ConvertTypeIdToText(request.OrganisationTypeId));
-                success = await _updateOrganisationRepository.WriteFieldChangesToAuditLog(auditData);
+                return await Task.FromResult(false);
             }
 
-            return await Task.FromResult(success);
+            return await _updateOrganisationRepository.WriteFieldChangesToAuditLog(auditRecord);
         }
 
         private void ValidateUpdateTypeRequest(UpdateOrganisationTypeRequest request)
@@ -82,19 +73,6 @@ namespace SFA.DAS.RoATPService.Application.Handlers
                 _logger.LogInformation(organisationTypeIsNotAllowed);
                 throw new BadRequestException(organisationTypeIsNotAllowed);
             }
-        }
-
-        private string ConvertTypeIdToText(int typeId)
-        {
-            var organisationType = _lookupRepository.GetOrganisationType(typeId).Result;
-
-            if (organisationType == null)
-            {
-                _logger.LogError($"Lookup failed for organisation type id {typeId}");
-                return "(undefined)";
-            }
-
-            return organisationType.Type;
         }
     }
 }
