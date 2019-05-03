@@ -39,7 +39,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         public void Audit_log_checks_organisation_type_audit_is_as_expected(int currentOrganisationTypeId, int newOrganisationTypeId, bool auditChangesMade)
         {
             _organisationRepository.Setup(x => x.GetOrganisationType(It.IsAny<Guid>())).ReturnsAsync(currentOrganisationTypeId);
-            var auditLogService = new AuditLogService(_settings, _organisationRepository.Object, _lookupDataRepository.Object);
+            var auditLogService = new AuditLogService(_settings, _organisationRepository.Object, _lookupDataRepository.Object,null);
             var auditData = auditLogService.AuditOrganisationType(Guid.NewGuid(), "system", newOrganisationTypeId);
 
             Assert.AreEqual(auditChangesMade, auditData.ChangesMade);

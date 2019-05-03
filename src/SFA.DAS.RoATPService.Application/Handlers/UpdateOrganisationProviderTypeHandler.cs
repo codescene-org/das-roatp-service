@@ -19,24 +19,17 @@
         private readonly ILogger<UpdateOrganisationProviderTypeHandler> _logger;
         private readonly IOrganisationValidator _validator;
         private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
-        private readonly ILookupDataRepository _lookupDataRepository;
-        private readonly IOrganisationStatusManager _organisationStatusManager;
-        private readonly IOrganisationRepository _organisationRepository;
         private readonly IAuditLogService _auditLogService;
 
         private const string FieldChanged = "Provider Type";
 
         public UpdateOrganisationProviderTypeHandler(ILogger<UpdateOrganisationProviderTypeHandler> logger,
             IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository,
-            ILookupDataRepository lookupDataRepository, 
-            IOrganisationStatusManager organisationStatusManager, IOrganisationRepository organisationRepository, IAuditLogService auditLogService)
+            IAuditLogService auditLogService)
         {
             _logger = logger;
             _validator = validator;
             _updateOrganisationRepository = updateOrganisationRepository;
-            _lookupDataRepository = lookupDataRepository;
-            _organisationStatusManager = organisationStatusManager;
-            _organisationRepository = organisationRepository;
             _auditLogService = auditLogService;
         }
 
@@ -45,123 +38,41 @@
             ValidateUpdateProviderTypeRequest(request);
             _logger.LogInformation($@"Handling Update '{FieldChanged}' for Organisation ID [{request.OrganisationId}]");
 
-            var previousProviderTypeId = await _organisationRepository.GetProviderType(request.OrganisationId);
-            var previousOrganisationStatusId = await _organisationRepository.GetOrganisationStatus(request.OrganisationId);
-            var previousStartDate = await _organisationRepository.GetStartDate(request.OrganisationId);
+            var auditData = _auditLogService.AuditProviderType(request.OrganisationId, request.UpdatedBy, request.ProviderTypeId, request.OrganisationTypeId);
 
-            if (previousProviderTypeId == request.ProviderTypeId)
+            var success = false;
+
+            if (!auditData.ChangesMade)
             {
                 return await Task.FromResult(false);
             }
-               var success = await _updateOrganisationRepository.UpdateProviderTypeAndOrganisationType(request.OrganisationId, request.ProviderTypeId, request.OrganisationTypeId, request.UpdatedBy);
-            if (!success) return await Task.FromResult(false);
 
-            var auditData = _auditLogService.CreateAuditData(request.OrganisationId, request.UpdatedBy);
-
-            auditData.FieldChanges.Add(AuditProviderType(request.ProviderTypeId, previousProviderTypeId));
-            var previousOrganisationTypeId = await _organisationRepository.GetOrganisationType(request.OrganisationId);
-
-            var auditLog = AuditOrganisationType(request.OrganisationTypeId, previousOrganisationTypeId, request.ProviderTypeId, previousProviderTypeId);
-            if (auditLog.IsValid)
-                auditData.FieldChanges.Add(auditLog);
-
-            success = await ProcessOrganisationsDetailsAndUpdateAuditStatusAndStartDate(request.OrganisationId, request.UpdatedBy, request.ProviderTypeId, 
-                                                                            previousProviderTypeId, previousOrganisationStatusId, previousStartDate, auditData);
-            if (!success) return await Task.FromResult(false);
-
-            success = await _updateOrganisationRepository.WriteFieldChangesToAuditLog(auditData);
-            return await Task.FromResult(success);
-        }
-
-        private async Task<bool> ProcessOrganisationsDetailsAndUpdateAuditStatusAndStartDate(Guid organisationId, string updatedBy, int providerTypeId, int previousProviderTypeId, 
-            int previousOrganisationStatusId, DateTime? previousStartDate, AuditData auditData)
-        {
-            var changeStatusToActiveAndSetStartDate = 
-                _organisationStatusManager.ShouldChangeStatustoActiveAndSetStartDateToToday(providerTypeId, previousProviderTypeId, previousOrganisationStatusId);
-
-          
-            if (changeStatusToActiveAndSetStartDate)
+            if (auditData.FieldChanges.Any(x => x.FieldChanged == AuditLogField.ProviderType))
             {
-                if (previousOrganisationStatusId != OrganisationStatus.Active)
-                {
-                    var success = await _updateOrganisationRepository.UpdateOrganisationStatus(organisationId,
-                        OrganisationStatus.Active, updatedBy);
-
-                    if (!success)
-                    {
-                        return false;
-                    }
-
-                    _auditLogService.AddAuditEntry(
-                        auditData,
-                        "Organisation Status",
-                        GetOrganisationStatus(previousOrganisationStatusId).Result,
-                        GetOrganisationStatus(OrganisationStatus.Active).Result
-                    );
-                }
-           
-                if (previousStartDate == null || previousStartDate.Value.Date != DateTime.Today.Date)
-                {
-                    var success = await _updateOrganisationRepository.UpdateStartDate(organisationId, DateTime.Today);
-
-                    if (!success) { return false;}
-
-                    _auditLogService.AddAuditEntry(
-                        auditData,
-                        "Start Date",
-                        previousStartDate?.ToString(),
-                        DateTime.Today.ToString(CultureInfo.InvariantCulture)
-                    );
-                }
+                success = await _updateOrganisationRepository.UpdateProviderType(request.OrganisationId,
+                    request.ProviderTypeId, request.UpdatedBy);
             }
 
-            var changeStatusToOnboarding =  _organisationStatusManager.ShouldChangeStatusToOnboarding(providerTypeId, previousProviderTypeId, previousOrganisationStatusId);
-
-            if (changeStatusToOnboarding && _organisationStatusManager.IsOrganisationStatusActive(previousOrganisationStatusId))
-                {
-                    var success = await _updateOrganisationRepository.UpdateOrganisationStatus(organisationId,
-                        OrganisationStatus.Onboarding, updatedBy);
-
-                    if (!success) return await Task.FromResult(false);
-
-                    _auditLogService.AddAuditEntry(
-                        auditData,
-                        "Organisation Status",
-                        GetOrganisationStatus(previousOrganisationStatusId).Result,
-                        GetOrganisationStatus(OrganisationStatus.Onboarding).Result
-                    );
-                }
-            
-            return true;
-        }
-
-        private AuditLogEntry AuditProviderType(int providerTypeId, int previousProviderTypeId)
-        {;
-            var entry = new AuditLogEntry
+            if (success && auditData.FieldChanges.Any(x => x.FieldChanged == AuditLogField.OrganisationType))
             {
-                FieldChanged = "Provider Type",
-                PreviousValue = GetProviderType(previousProviderTypeId).Result,
-                NewValue = GetProviderType(providerTypeId).Result
-            };
-
-            return entry;
-        }
-
-
-        private AuditLogEntry AuditOrganisationType(int organisationTypeId, int previousOrganisationTypeId, int providerTypeId, int previousProviderTypeId)
-        {
-            var entry = new AuditLogEntry();
-
-            if (previousOrganisationTypeId != organisationTypeId)
-            {
-                entry = new AuditLogEntry
-                {
-                    FieldChanged = "Organisation Type",
-                    PreviousValue = GetOrganisationType(previousOrganisationTypeId, previousProviderTypeId).Result,
-                    NewValue = GetOrganisationType(organisationTypeId, providerTypeId).Result
-                };
+                success = await _updateOrganisationRepository.UpdateOrganisationType(request.OrganisationId,
+                    request.OrganisationTypeId, request.UpdatedBy);
             }
-            return entry;
+
+            if (success && auditData.FieldChanges.Any(x => x.FieldChanged == AuditLogField.OrganisationStatus))
+            {
+                success = await _updateOrganisationRepository.UpdateOrganisationStatus(request.OrganisationId, OrganisationStatus.Active, request.UpdatedBy);
+            }
+
+            if (success && auditData.FieldChanges.Any(x => x.FieldChanged == AuditLogField.StartDate))
+            {
+                success = await _updateOrganisationRepository.UpdateStartDate(request.OrganisationId, DateTime.Today, request.UpdatedBy);
+            }
+
+            if (success)
+                return await _updateOrganisationRepository.WriteFieldChangesToAuditLog(auditData);
+
+            return await Task.FromResult(false);
         }
 
         private void ValidateUpdateProviderTypeRequest(UpdateOrganisationProviderTypeRequest request)
@@ -179,45 +90,6 @@
                 _logger.LogInformation(invalidOrganisationTypeId);
                 throw new BadRequestException(invalidOrganisationTypeId);
             }
-        }
-
-        private async Task<string> GetProviderType(int providerTypeId)
-        {
-            var providerTypes = await _lookupDataRepository.GetProviderTypes();
-
-            var providerType = providerTypes.FirstOrDefault(x => x.Id == providerTypeId);
-            if (providerType != null)
-            {
-                return providerType.Type;
-            }
-
-            return string.Empty;
-        }
-
-        private async Task<string> GetOrganisationType(int organisationTypeId, int providerTypeId)
-        {
-            var organisationTypes = await _lookupDataRepository.GetOrganisationTypesForProviderTypeId(providerTypeId);
-
-            var organisationType = organisationTypes.FirstOrDefault(x => x.Id == organisationTypeId);
-            if (organisationType != null)
-            {
-                return organisationType.Type;
-            }
-
-            return string.Empty;
-        }
-
-        private async Task<string> GetOrganisationStatus(int organisationStatusId)
-        {
-            var organisationStatuses = await _lookupDataRepository.GetOrganisationStatusesForProviderTypeId(null);
-
-            var organisationType = organisationStatuses.FirstOrDefault(x => x.Id == organisationStatusId);
-            if (organisationType != null)
-            {
-                return organisationType.Status;
-            }
-
-            return string.Empty;
         }
     }
 }

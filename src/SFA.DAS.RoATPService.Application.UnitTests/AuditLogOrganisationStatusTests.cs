@@ -76,7 +76,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             if (currentRemovedReasonId.HasValue)
                 removedReasons.Add(new RemovedReason {CreatedAt = DateTime.Now,CreatedBy = "test", Description = $"desc {currentRemovedReasonId.Value}", Reason = $"Reason {currentRemovedReasonId.Value}",Id = currentRemovedReasonId.Value,Status=$"status {currentRemovedReasonId.Value}"});
             _lookupRepository.Setup(x => x.GetRemovedReasons()).ReturnsAsync(removedReasons);
-            var auditLogService = new AuditLogService(_settings, _organisationRepository.Object, _lookupRepository.Object);
+            var auditLogService = new AuditLogService(_settings, _organisationRepository.Object, _lookupRepository.Object,null);
             var auditData = auditLogService.AuditOrganisationStatus(Guid.NewGuid(), "system", newOrganisationStatusId, newRemovedReasonId);
 
             Assert.AreEqual(numberOfFieldsChanged, auditData.FieldChanges.Count);

@@ -129,22 +129,24 @@ namespace SFA.DAS.RoATPService.Data
             }
         }
 
-        public async Task<bool> UpdateStartDate(Guid organisationId, DateTime startDate)
+        public async Task<bool> UpdateStartDate(Guid organisationId, DateTime startDate, string updatedBy)
         {
             var connectionString = _configuration.SqlConnectionString;
 
-            string startDateValue = startDate.ToString(RoatpDateTimeFormat);
+            var startDateValue = startDate.ToString(RoatpDateTimeFormat);
 
             using (var connection = new SqlConnection(connectionString))
             {
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();
 
+                var updatedAt = DateTime.Now;
+
                 var updateSql =
-                    "update [Organisations] set OrganisationData = JSON_MODIFY(OrganisationData, '$.StartDate', @startDateValue) " +
+                    "update [Organisations] set OrganisationData = JSON_MODIFY(OrganisationData, '$.StartDate', @startDateValue), UpdatedBy = @updatedBy, UpdatedAt = @updatedAt " +
                     "WHERE Id = @organisationId";
 
-                int recordsAffected = await connection.ExecuteAsync(updateSql, new { startDateValue, organisationId });
+                int recordsAffected = await connection.ExecuteAsync(updateSql, new { startDateValue, organisationId, updatedBy, updatedAt });
 
                 return await Task.FromResult(recordsAffected > 0);
             }
@@ -165,6 +167,26 @@ namespace SFA.DAS.RoATPService.Data
                           "UpdatedBy = @updatedBy, UpdatedAt = @updatedAt, StatusDate = @updatedAt " +
                           "WHERE Id = @organisationId";
                 int recordsAffected = await connection.ExecuteAsync(sql, new { organisationStatusId, updatedBy, updatedAt, organisationId });
+
+                return await Task.FromResult(recordsAffected > 0);
+            }
+        }
+
+        public async Task<bool> UpdateProviderType(Guid organisationId, int providerTypeId, string updatedBy)
+        {
+            var connectionString = _configuration.SqlConnectionString;
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                var updatedAt = DateTime.Now;
+
+                var sql = "update [Organisations] SET ProviderTypeId = @providerTypeId, " +
+                          "UpdatedBy = @updatedBy, UpdatedAt = @updatedAt, StatusDate = @updatedAt " +
+                          "WHERE Id = @organisationId";
+                int recordsAffected = await connection.ExecuteAsync(sql, new { providerTypeId, updatedBy, updatedAt, organisationId });
 
                 return await Task.FromResult(recordsAffected > 0);
             }

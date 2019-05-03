@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using KellermanSoftware.CompareNetObjects;
@@ -14,11 +15,13 @@ namespace SFA.DAS.RoATPService.Application.Services
         private readonly RegisterAuditLogSettings _settings;
         private readonly IOrganisationRepository _organisationRepository;
         private readonly ILookupDataRepository _lookupDataRepository;
-        public AuditLogService(RegisterAuditLogSettings settings, IOrganisationRepository organisationRepository, ILookupDataRepository lookupDataRepository)
+        private readonly IOrganisationStatusManager _organisationStatusManager;
+        public AuditLogService(RegisterAuditLogSettings settings, IOrganisationRepository organisationRepository, ILookupDataRepository lookupDataRepository, IOrganisationStatusManager organisationStatusManager)
         {
             _settings = settings;
             _organisationRepository = organisationRepository;
             _lookupDataRepository = lookupDataRepository;
+            _organisationStatusManager = organisationStatusManager;
         }
 
         public async Task<AuditData> BuildListOfFieldsChanged(Organisation originalOrganisation, Organisation updatedOrganisation)
@@ -222,8 +225,8 @@ namespace SFA.DAS.RoATPService.Application.Services
             var auditData = new AuditData { FieldChanges = new List<AuditLogEntry>(), OrganisationId = organisationId, UpdatedAt = DateTime.Now, UpdatedBy = updatedBy };
             var previousOrganisationTypeId = _organisationRepository.GetOrganisationType(organisationId).Result;
             var organisationTypes = _lookupDataRepository.GetOrganisationTypes().Result.ToList();
-            var newOrganisationType = organisationTypes.FirstOrDefault(x => x.Id == newOrganisationTypeId)?.Type ?? "Undefined";
-            var previousOrganisationType = organisationTypes.FirstOrDefault(x => x.Id == previousOrganisationTypeId)?.Type ?? "Undefined";
+            var newOrganisationType = organisationTypes.FirstOrDefault(x => x.Id == newOrganisationTypeId)?.Type ?? "Not set";
+            var previousOrganisationType = organisationTypes.FirstOrDefault(x => x.Id == previousOrganisationTypeId)?.Type ?? "Not set";
 
             if (previousOrganisationTypeId != newOrganisationTypeId)
             {
@@ -272,7 +275,6 @@ namespace SFA.DAS.RoATPService.Application.Services
                 auditData.FieldChanges.Add(entry);
             }
 
-           
             if (auditData.FieldChanges.Any() && UpdateStartDateRequired(existingStatusId, newOrganisationStatusId, newStartDate, existingStartDate))
             {
                 var entry = new AuditLogEntry
@@ -283,7 +285,85 @@ namespace SFA.DAS.RoATPService.Application.Services
                 };
                 auditData.FieldChanges.Add(entry);
             }
+
             return auditData;
+        }
+
+        public AuditData AuditProviderType(Guid organisationId, string updatedBy, int newProviderTypeId, int newOrganisationTypeId)
+        {
+            var auditData = new AuditData { FieldChanges = new List<AuditLogEntry>(), OrganisationId = organisationId, UpdatedAt = DateTime.Now, UpdatedBy = updatedBy };
+
+            var previousProviderTypeId =  _organisationRepository.GetProviderType(organisationId).Result;
+            var previousOrganisationTypeId = _organisationRepository.GetOrganisationType(organisationId).Result;
+            var previousOrganisationStatusId = _organisationRepository.GetOrganisationStatus(organisationId).Result;
+
+            if (previousProviderTypeId == newProviderTypeId)
+                return auditData;
+
+            var providerTypes = _lookupDataRepository.GetProviderTypes().Result.ToList();
+            var organisationTypes = _lookupDataRepository.GetOrganisationTypes().Result.ToList();
+            var organisationStatuses = _lookupDataRepository.GetOrganisationStatuses().Result.ToList();
+            var previousProviderType = providerTypes.FirstOrDefault(x => x.Id == previousProviderTypeId)?.Type ?? "not defined";
+            var newProviderType = providerTypes.FirstOrDefault(x => x.Id == newProviderTypeId)?.Type ?? "not defined";
+            var previousOrganisationType = organisationTypes.FirstOrDefault(x => x.Id == previousOrganisationTypeId)?.Type ?? "not defined";
+            var newOrganisationType = organisationTypes.FirstOrDefault(x => x.Id == newOrganisationTypeId)?.Type ?? "not defined";
+            var previousOrganisationStatus =
+                organisationStatuses.FirstOrDefault(x => x.Id == previousOrganisationStatusId)?.Status ?? "not defined";
+            var activeOrganisationStatus = organisationStatuses.FirstOrDefault(x => x.Id == OrganisationStatus.Active)?.Status ?? "not defined";
+            var previousStartDate = _organisationRepository.GetStartDate(organisationId).Result;
+
+            if (previousOrganisationTypeId != newOrganisationTypeId)
+            {
+                var entry = new AuditLogEntry
+                {
+                    FieldChanged = AuditLogField.OrganisationType,
+                    PreviousValue = previousOrganisationType,
+                    NewValue = newOrganisationType
+                };
+                auditData.FieldChanges.Add(entry);
+            }
+
+            if (previousProviderTypeId != newProviderTypeId)
+            {
+                var entry = new AuditLogEntry
+                {
+                    FieldChanged = AuditLogField.ProviderType,
+                    PreviousValue = previousProviderType,
+                    NewValue = newProviderType
+                };
+                auditData.FieldChanges.Add(entry);
+            }
+
+            var changeStatusToActiveAndSetStartDate =
+                _organisationStatusManager.ShouldChangeStatustoActiveAndSetStartDateToToday(newProviderTypeId, previousProviderTypeId, previousOrganisationStatusId);
+
+            if (changeStatusToActiveAndSetStartDate)
+            {
+                if (previousOrganisationStatusId != OrganisationStatus.Active)
+                {
+
+                    var entry = new AuditLogEntry
+                    {
+                        FieldChanged = AuditLogField.OrganisationStatus,
+                        PreviousValue = previousOrganisationStatus,
+                        NewValue = activeOrganisationStatus
+                    };
+                    auditData.FieldChanges.Add(entry);
+                }
+
+                }
+
+                if (previousStartDate == null || previousStartDate.Value.Date != DateTime.Today.Date)
+                {
+                    var entry = new AuditLogEntry
+                    {
+                        FieldChanged = AuditLogField.StartDate,
+                        PreviousValue = previousStartDate?.ToShortDateString() ?? "Not set",
+                        NewValue = DateTime.Today.ToShortDateString()
+                    };
+                    auditData.FieldChanges.Add(entry);
+               }
+                return auditData;
         }
 
         private bool UpdateStartDateRequired(int oldStatusId, int newStatusId, DateTime newStartDate, DateTime? existingStartDate)
@@ -294,7 +374,6 @@ namespace SFA.DAS.RoATPService.Application.Services
             {
                 return true;
             }
-
 
             return false;
         }

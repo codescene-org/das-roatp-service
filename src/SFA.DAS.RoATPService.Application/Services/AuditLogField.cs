@@ -15,6 +15,7 @@ namespace SFA.DAS.RoATPService.Application.Services
         public static string RemovedReason => "Removed Reason";
         public static string StartDate => "Start Date";
         public static string OrganisationType => "Organisation Type";
+        public static string ProviderType => "Provider Type";
     };
 
 }

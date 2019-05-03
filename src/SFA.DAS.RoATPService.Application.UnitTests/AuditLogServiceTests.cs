@@ -1,4 +1,5 @@
-﻿using SFA.DAS.RoATPService.Application.Services;
+﻿using Moq;
+using SFA.DAS.RoATPService.Application.Services;
 
 namespace SFA.DAS.RoATPService.Application.UnitTests
 {
@@ -66,7 +67,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         [Test]
         public void Comparison_returns_empty_list_for_identical_organisations()
         {
-            var comparison = new AuditLogService(_settings, null, null);
+            var comparison = new AuditLogService(_settings, null, null,null);
 
             var results = comparison.BuildListOfFieldsChanged(_firstOrganisation, _secondOrganisation).Result.FieldChanges.ToList();
 
@@ -76,7 +77,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         [Test]
         public void Comparison_returns_empty_list_if_only_altered_fields_are_in_ignored_list()
         {
-            var comparison = new AuditLogService(_settings,null,null);
+            var comparison = new AuditLogService(_settings,null,null,null);
 
             _secondOrganisation.CreatedAt = DateTime.Now.AddDays(-10);
             _secondOrganisation.CreatedBy = "Unit test";
@@ -91,7 +92,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         [Test]
         public void Comparison_returns_single_field_change()
         {
-            var comparison = new AuditLogService(_settings,null,null);
+            var comparison = new AuditLogService(_settings,null,null,null);
 
             _secondOrganisation.UKPRN = 11112222;
 
@@ -110,7 +111,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         [Test]
         public void Comparison_returns_single_field_change_with_display_name_replacement()
         {
-            var comparison = new AuditLogService(_settings,null,null);
+            var comparison = new AuditLogService(_settings,null,null,null);
 
             _secondOrganisation.LegalName = "New Legal Name";
 
@@ -129,7 +130,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         [Test]
         public void Comparison_returns_multiple_field_changes()
         {
-            var comparison = new AuditLogService(_settings,null,null);
+            var comparison = new AuditLogService(_settings,null,null,null);
 
             _secondOrganisation.UKPRN = 11112222;
             _secondOrganisation.OrganisationData.CompanyNumber = "AB112233";
@@ -153,7 +154,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         [Test]
         public void Comparison_handles_multiple_field_changes_where_one_field_is_ignored()
         {
-            var comparison = new AuditLogService(_settings,null,null);
+            var comparison = new AuditLogService(_settings,null,null,null);
 
             _secondOrganisation.UpdatedAt = DateTime.Now;
             _secondOrganisation.OrganisationData.CompanyNumber = "AB112233";
@@ -173,7 +174,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         [Test]
         public void Comparison_handles_field_changes_where_update_fields_not_populated()
         {
-            var comparison = new AuditLogService(_settings,null,null);
+            var comparison = new AuditLogService(_settings,null,null,null);
 
             _secondOrganisation.UpdatedAt = DateTime.Now;
             _secondOrganisation.OrganisationData.CompanyNumber = "AB112233";

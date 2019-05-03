@@ -67,7 +67,7 @@ namespace SFA.DAS.RoATPService.Application.Handlers
 
             if (success && auditData.FieldChanges.Any(x => x.FieldChanged == AuditLogField.StartDate))
             {
-                success = await _updateOrganisationRepository.UpdateStartDate(request.OrganisationId, DateTime.Today);
+                success = await _updateOrganisationRepository.UpdateStartDate(request.OrganisationId, DateTime.Today, request.UpdatedBy);
             }
 
             if (success)

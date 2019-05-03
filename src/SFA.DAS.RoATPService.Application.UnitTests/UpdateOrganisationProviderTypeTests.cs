@@ -23,8 +23,6 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         private Mock<ILogger<UpdateOrganisationProviderTypeHandler>> _logger;
         private Mock<IOrganisationValidator> _validator;
         private Mock<IUpdateOrganisationRepository> _updateOrganisationRepository;
-        private Mock<IOrganisationRepository> _repository;
-        private Mock<ILookupDataRepository> _lookupDataRepository;
         private UpdateOrganisationProviderTypeHandler _handler;
         private UpdateOrganisationProviderTypeRequest _request;
         private Mock<IAuditLogService> _auditLogService;
@@ -37,13 +35,13 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _validator.Setup(x => x.IsValidOrganisationTypeIdForProvider(It.IsAny<int>(), It.IsAny<int>()))
                 .ReturnsAsync(true);
             _updateOrganisationRepository = new Mock<IUpdateOrganisationRepository>();
-            _repository = new Mock<IOrganisationRepository>();
-            _lookupDataRepository = new Mock<ILookupDataRepository>();
             _auditLogService = new Mock<IAuditLogService>();
             _auditLogService.Setup(x => x.CreateAuditData(It.IsAny<Guid>(), It.IsAny<string>()))
                 .Returns(new AuditData{FieldChanges = new List<AuditLogEntry>()});
+            _auditLogService.Setup(x => x.AuditProviderType(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+                .Returns(new AuditData { FieldChanges = new List<AuditLogEntry>() });
             _handler = new UpdateOrganisationProviderTypeHandler(_logger.Object, _validator.Object, 
-                _updateOrganisationRepository.Object, _lookupDataRepository.Object, new OrganisationStatusManager(), _repository.Object, _auditLogService.Object);
+                _updateOrganisationRepository.Object, _auditLogService.Object);
             _request = new UpdateOrganisationProviderTypeRequest
             {
                 OrganisationId = Guid.NewGuid(),
@@ -77,12 +75,21 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         [Test]
         public void Handler_updates_provider_type_and_organisation_type_and_records_audit_history()
         {
-            _repository.Setup(x => x.GetProviderType(It.IsAny<Guid>())).ReturnsAsync(1);
-            _repository.Setup(x => x.GetOrganisationType(It.IsAny<Guid>())).ReturnsAsync(2);
+            var fieldChanges = new List<AuditLogEntry>();
+            fieldChanges.Add(new AuditLogEntry { FieldChanged = AuditLogField.OrganisationType, NewValue = "GFE", PreviousValue = "School" });
+            fieldChanges.Add(new AuditLogEntry { FieldChanged = AuditLogField.ProviderType, NewValue = "Employer", PreviousValue = "Main" });
+
+            _auditLogService.Setup(x => x.AuditProviderType(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+                .Returns(new AuditData { FieldChanges = fieldChanges });
+
 
             _updateOrganisationRepository.Setup(x =>
-                    x.UpdateProviderTypeAndOrganisationType(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(),
-                        It.IsAny<string>()))
+                    x.UpdateProviderType(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<string>()))
+                .ReturnsAsync(true).Verifiable();
+
+
+            _updateOrganisationRepository.Setup(x =>
+                    x.UpdateOrganisationType(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ReturnsAsync(true).Verifiable();
 
             _updateOrganisationRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()))
@@ -104,9 +111,6 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
                 ProviderTypeId = ProviderType.MainProvider,
                 UpdatedBy = "test"
             };
-
-            _repository.Setup(x => x.GetProviderType(It.IsAny<Guid>())).ReturnsAsync(1);
-            _repository.Setup(x => x.GetOrganisationType(It.IsAny<Guid>())).ReturnsAsync(3);
 
             _updateOrganisationRepository.Setup(x =>
                     x.UpdateProviderTypeAndOrganisationType(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
