@@ -1,6 +1,4 @@
-﻿using SFA.DAS.RoATPService.Application.Services;
-
-namespace SFA.DAS.RoATPService.Application.Handlers
+﻿namespace SFA.DAS.RoATPService.Application.Handlers
 {
     using System.Threading;
     using System.Threading.Tasks;

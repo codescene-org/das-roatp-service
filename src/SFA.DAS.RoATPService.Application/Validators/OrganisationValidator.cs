@@ -1,10 +1,7 @@
-﻿using System.Xml.XPath;
-using SFA.DAS.RoATPService.Application.Interfaces;
-
-namespace SFA.DAS.RoATPService.Application.Validators
+﻿namespace SFA.DAS.RoATPService.Application.Validators
 {
-    using SFA.DAS.RoATPService.Api.Types.Models;
-    using SFA.DAS.RoATPService.Domain;
+    using Api.Types.Models;
+    using Domain;
     using System;
     using System.Linq;
     using System.Text.RegularExpressions;

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SFA.DAS.RoATPService.Application.Services
+﻿namespace SFA.DAS.RoATPService.Application.Services
 {
     public static class AuditLogField
     {
@@ -17,6 +13,5 @@ namespace SFA.DAS.RoATPService.Application.Services
         public static string OrganisationType => "Organisation Type";
         public static string ProviderType => "Provider Type";
     };
-
 }
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using KellermanSoftware.CompareNetObjects;
@@ -84,7 +83,6 @@ namespace SFA.DAS.RoATPService.Application.Services
 
             return await Task.FromResult(auditData);
         }
-
 
         public AuditData CreateAuditLogEntry(Guid organisationId, string updatedBy, string fieldName, string oldValue,
             string newValue)
@@ -360,6 +358,7 @@ namespace SFA.DAS.RoATPService.Application.Services
             }
             return auditData;
         }
+
 
         private bool UpdateStartDateRequired(int oldStatusId, int newStatusId, DateTime newStartDate, DateTime? existingStartDate)
         {

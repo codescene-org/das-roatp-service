@@ -6,7 +6,7 @@
     using Microsoft.Extensions.Logging;
     using Moq;
     using NUnit.Framework;
-    using SFA.DAS.RoATPService.Domain;
+    using RoATPService.Domain;
     using System.Collections.Generic;
     using System.Threading;
     using Api.Types.Models;

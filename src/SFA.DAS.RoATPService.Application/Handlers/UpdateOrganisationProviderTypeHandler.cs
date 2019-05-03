@@ -1,7 +1,6 @@
 ﻿namespace SFA.DAS.RoATPService.Application.Handlers
 {
     using System;
-    using System.Globalization;
     using Services;
     using Domain;
     using System.Linq;

@@ -26,7 +26,7 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
         [OneTimeSetUp]
         public void Before_the_tests()
         {
-            _lookupRepository = new LookupDataRepository(null, _databaseService.WebConfiguration, _cacheHelper);
+            _lookupRepository = new LookupDataRepository(_databaseService.WebConfiguration, _cacheHelper);
             _organisationValidator = new OrganisationValidator(null, _lookupRepository, null);
             _organisationStatusId1 = 10;
             _organisationStatusId2 = 20;
@@ -61,7 +61,6 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
         [TestCase(20, true)]
         [TestCase(30, true)]
         [TestCase(40, false)]
-
         public void Check_organisation_status_valid_is_returning_expected_result(int organisationStatusId, bool expectedResult)
         {
             var result = _organisationValidator.IsValidStatusId(organisationStatusId);

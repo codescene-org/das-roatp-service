@@ -1,5 +1,4 @@
-﻿using Moq;
-using SFA.DAS.RoATPService.Application.Services;
+﻿using SFA.DAS.RoATPService.Application.Services;
 
 namespace SFA.DAS.RoATPService.Application.UnitTests
 {
@@ -68,9 +67,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         public void Comparison_returns_empty_list_for_identical_organisations()
         {
             var comparison = new AuditLogService(_settings, null, null,null);
-
             var results = comparison.BuildListOfFieldsChanged(_firstOrganisation, _secondOrganisation).Result.FieldChanges.ToList();
-
             results.Should().BeEmpty();
         }
 
@@ -85,7 +82,6 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _secondOrganisation.UpdatedBy = "Unit test";
 
             var results = comparison.BuildListOfFieldsChanged(_firstOrganisation, _secondOrganisation).Result.FieldChanges.ToList();
-
             results.Should().BeEmpty();
         }
 

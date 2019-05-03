@@ -1,6 +1,4 @@
-﻿using SFA.DAS.RoATPService.Application.Services;
-
-namespace SFA.DAS.RoATPService.Application.Handlers
+﻿namespace SFA.DAS.RoATPService.Application.Handlers
 {
     using System.Threading;
     using System.Threading.Tasks;
@@ -8,8 +6,6 @@ namespace SFA.DAS.RoATPService.Application.Handlers
     using Interfaces;
     using MediatR;
     using Microsoft.Extensions.Logging;
-    using SFA.DAS.RoATPService.Application.Exceptions;
-    using Validators;
 
     public class UpdateOrganisationParentCompanyGuaranteeHandler : IRequestHandler<UpdateOrganisationParentCompanyGuaranteeRequest, bool>
     {

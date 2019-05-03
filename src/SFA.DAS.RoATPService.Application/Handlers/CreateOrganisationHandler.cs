@@ -8,7 +8,6 @@
     using Interfaces;
     using MediatR;
     using Microsoft.Extensions.Logging;
-    using Services;
     using Validators;
 
     public class CreateOrganisationHandler : IRequestHandler<CreateOrganisationRequest, Guid?>

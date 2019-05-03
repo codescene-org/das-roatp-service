@@ -1,6 +1,4 @@
 ﻿using System.Linq;
-using System.Linq.Expressions;
-using System.Transactions;
 using SFA.DAS.RoATPService.Application.Services;
 
 namespace SFA.DAS.RoATPService.Application.Handlers
@@ -12,8 +10,8 @@ namespace SFA.DAS.RoATPService.Application.Handlers
     using Domain;
     using MediatR;
     using Microsoft.Extensions.Logging;
-    using SFA.DAS.RoATPService.Application.Exceptions;
-    using SFA.DAS.RoATPService.Application.Interfaces;
+    using Exceptions;
+    using Interfaces;
     using Validators;
 
     public class UpdateOrganisationStatusHandler : IRequestHandler<UpdateOrganisationStatusRequest, bool>

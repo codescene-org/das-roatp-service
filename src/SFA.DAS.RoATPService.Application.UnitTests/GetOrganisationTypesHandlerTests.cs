@@ -12,8 +12,8 @@
     using Microsoft.Extensions.Logging;
     using Moq;
     using NUnit.Framework;
-    using SFA.DAS.RoATPService.Application.Exceptions;
-    using SFA.DAS.RoATPService.Application.Validators;
+    using Exceptions;
+    using Validators;
 
     [TestFixture]
     public class GetOrganisationTypesHandlerTests

@@ -1,10 +1,8 @@
-﻿using Newtonsoft.Json;
-
-namespace SFA.DAS.RoATPService.Domain
+﻿namespace SFA.DAS.RoATPService.Domain
 {
     using System;
     using System.Collections.Generic;
-    using System.Text;
+    using Newtonsoft.Json;
 
     public class AuditData
     {

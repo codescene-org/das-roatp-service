@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using SFA.DAS.RoATPService.Api.Types.Models;
-using SFA.DAS.RoATPService.Application.Services;
 
 namespace SFA.DAS.RoATPService.Application.UnitTests
 {
@@ -15,7 +14,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
     using Handlers;
     using Interfaces;
     using Validators;
-    using SFA.DAS.RoATPService.Domain;
+    using Domain;
 
     [TestFixture]
     public class UpdateOrganisationTradingNameHandlerTests

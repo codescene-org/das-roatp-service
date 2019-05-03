@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using SFA.DAS.RoATPService.Application.Services;
 
 namespace SFA.DAS.RoATPService.Application.UnitTests
 {
@@ -7,13 +6,12 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
     using Microsoft.Extensions.Logging;
     using Moq;
     using NUnit.Framework;
-    using SFA.DAS.RoATPService.Application.Handlers;
-    using SFA.DAS.RoATPService.Domain;
+    using Handlers;
+    using Domain;
     using System;
     using System.Threading;
     using Api.Types.Models;
     using FluentAssertions;
-    using Validators;
 
     [TestFixture]
     public class UpdateOrganisationParentCompanyGuaranteeHandlerTests

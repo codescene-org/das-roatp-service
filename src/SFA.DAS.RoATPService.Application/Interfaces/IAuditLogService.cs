@@ -12,9 +12,7 @@ namespace SFA.DAS.RoATPService.Application.Interfaces
         AuditData CreateAuditLogEntry(Guid organisationId, string updatedBy, string fieldName,
             string oldValue, string newValue);
         AuditData CreateAuditData(Guid organisationId, string updatedBy);
-
         void AddAuditEntry(AuditData auditData, string fieldChanged, string previousValue, string newValue);
-
         AuditData AuditFinancialTrackRecord(Guid organisationId, string updatedBy, bool newFinancialTrackRecord);
         AuditData AuditParentCompanyGuarantee(Guid organisationId, string updatedBy, bool newParentCompanyGuarantee);
         AuditData AuditLegalName(Guid organisationId, string updatedBy, string newLegalName);
@@ -23,10 +21,6 @@ namespace SFA.DAS.RoATPService.Application.Interfaces
         AuditData AuditOrganisationType(Guid organisationId, string updatedBy, int newOrganisationTypeId);
         AuditData AuditOrganisationStatus(Guid organisationId, string updatedBy, int newOrganisationStatusId,
             int? newRemovedReasonId);
-
-        //AuditData AuditProviderType(Guid organisationId, string updatedBy, int newProviderTypeId, int newOrganisationStatusId,
-        //    DateTime? newStartDate);
-
         AuditData AuditProviderType(Guid organisationId, string updatedBy, int newProviderTypeId, int newOrganisationTypeId);
     }
 }

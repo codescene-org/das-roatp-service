@@ -235,7 +235,7 @@ namespace SFA.DAS.RoATPService.Data
                     "StatusId = @organisationStatusId, UpdatedBy = @updatedBy, UpdatedAt = @updatedAt, StatusDate = @updatedAt " +
                     "WHERE Id = @organisationId";
 
-                int recordsAffected = await connection.ExecuteAsync(updateSql,
+                var recordsAffected = await connection.ExecuteAsync(updateSql,
                     new { reasonJson, organisationStatusId, updatedBy, updatedAt, organisationId });
 
                 return await Task.FromResult(removedReason);

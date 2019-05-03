@@ -1,7 +1,4 @@
-﻿using Newtonsoft.Json;
-using SFA.DAS.RoATPService.Application.Commands;
-
-namespace SFA.DAS.RoATPService.Data
+﻿namespace SFA.DAS.RoATPService.Data
 {
     using System;
     using System.Data;
@@ -13,6 +10,7 @@ namespace SFA.DAS.RoATPService.Data
     using Domain;
     using Settings;
     using RoatpService.Data.DapperTypeHandlers;
+    using Newtonsoft.Json;
 
     public class OrganisationRepository : IOrganisationRepository
     {
@@ -213,8 +211,5 @@ namespace SFA.DAS.RoATPService.Data
                 return await connection.ExecuteScalarAsync<long>(sql, new { organisationId });
             }
         }
-
-
-
     }
 }

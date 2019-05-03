@@ -20,14 +20,10 @@ namespace SFA.DAS.RoATPService.Data
     {
         private readonly IWebConfiguration _configuration;
 
-        //MFCMFC add logging? Or remove logger
-        private ILogger<LookupDataRepository> _logger;
-
         private readonly ICacheHelper _cacheHelper;
      
-        public LookupDataRepository(ILogger<LookupDataRepository> logger, IWebConfiguration configuration, ICacheHelper cacheHelper)
+        public LookupDataRepository( IWebConfiguration configuration, ICacheHelper cacheHelper)
         {
-            _logger = logger;
             _configuration = configuration;
             _cacheHelper = cacheHelper;
         }

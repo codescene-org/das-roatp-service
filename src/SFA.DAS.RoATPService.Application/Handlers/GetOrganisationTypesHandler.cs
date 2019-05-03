@@ -9,14 +9,14 @@
     using Interfaces;
     using MediatR;
     using Microsoft.Extensions.Logging;
-    using SFA.DAS.RoATPService.Application.Exceptions;
-    using SFA.DAS.RoATPService.Application.Validators;
+    using Exceptions;
+    using Validators;
 
     public class GetOrganisationTypesHandler : IRequestHandler<GetOrganisationTypesRequest, IEnumerable<OrganisationType>>
     {
-        private ILookupDataRepository _repository;
-        private ILogger<GetOrganisationTypesHandler> _logger;
-        private IProviderTypeValidator _providerTypeValidator;
+        private readonly ILookupDataRepository _repository;
+        private readonly ILogger<GetOrganisationTypesHandler> _logger;
+        private readonly IProviderTypeValidator _providerTypeValidator;
 
         public GetOrganisationTypesHandler(ILookupDataRepository repository,
             ILogger<GetOrganisationTypesHandler> logger, IProviderTypeValidator providerTypeValidator)

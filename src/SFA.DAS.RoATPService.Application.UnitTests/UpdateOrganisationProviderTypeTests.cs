@@ -13,8 +13,8 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
     using Microsoft.Extensions.Logging;
     using Moq;
     using NUnit.Framework;
-    using SFA.DAS.RoATPService.Application.Exceptions;
-    using SFA.DAS.RoATPService.Domain;
+    using Exceptions;
+    using Domain;
     using Validators;
 
     [TestFixture]
@@ -126,6 +126,5 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
                 It.IsAny<int>(), It.IsAny<string>()), Times.Never());
             _updateOrganisationRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
         }
-
     }
 }

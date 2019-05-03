@@ -10,7 +10,6 @@ using SFA.DAS.RoATPService.Api.Types.Models;
 using SFA.DAS.RoATPService.Application.Exceptions;
 using SFA.DAS.RoATPService.Application.Handlers;
 using SFA.DAS.RoATPService.Application.Interfaces;
-using SFA.DAS.RoATPService.Application.Services;
 using SFA.DAS.RoATPService.Application.Validators;
 using SFA.DAS.RoATPService.Domain;
 
