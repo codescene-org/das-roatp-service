@@ -39,7 +39,13 @@
                           "AND Id != @organisationId";
                 var results = await connection.QueryAsync<DuplicateCheckResponse>(sql, new { organisationId, ukprn });
 
-                return results.FirstOrDefault();
+                var duplicate = results.FirstOrDefault();
+                if (duplicate == null)
+                {
+                    return new DuplicateCheckResponse {DuplicateFound = false};
+                }
+
+                return duplicate;
             }
         }
 
