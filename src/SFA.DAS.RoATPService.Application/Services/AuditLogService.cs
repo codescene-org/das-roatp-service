@@ -296,10 +296,6 @@ namespace SFA.DAS.RoATPService.Application.Services
             var previousProviderTypeId =  _organisationRepository.GetProviderType(organisationId).Result;
             var previousOrganisationTypeId = _organisationRepository.GetOrganisationType(organisationId).Result;
             var previousOrganisationStatusId = _organisationRepository.GetOrganisationStatus(organisationId).Result;
-
-            if (previousProviderTypeId == newProviderTypeId)
-                return auditData;
-
             var providerTypes = _lookupDataRepository.GetProviderTypes().Result.ToList();
             var organisationTypes = _lookupDataRepository.GetOrganisationTypes().Result.ToList();
             var organisationStatuses = _lookupDataRepository.GetOrganisationStatuses().Result.ToList();
@@ -351,8 +347,6 @@ namespace SFA.DAS.RoATPService.Application.Services
                     auditData.FieldChanges.Add(entry);
                 }
 
-                }
-
                 if (previousStartDate == null || previousStartDate.Value.Date != DateTime.Today.Date)
                 {
                     var entry = new AuditLogEntry
@@ -362,8 +356,9 @@ namespace SFA.DAS.RoATPService.Application.Services
                         NewValue = DateTime.Today.ToShortDateString()
                     };
                     auditData.FieldChanges.Add(entry);
-               }
-                return auditData;
+                }
+            }
+            return auditData;
         }
 
         private bool UpdateStartDateRequired(int oldStatusId, int newStatusId, DateTime newStartDate, DateTime? existingStartDate)
