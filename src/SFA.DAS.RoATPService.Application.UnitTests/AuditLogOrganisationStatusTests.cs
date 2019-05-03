@@ -35,18 +35,18 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             );
         }
 
-        [TestCase(1, 2, null,null, null, 1, true, false,false)]
-        [TestCase(2,1, null, null, null, 1, true, false,false)]
-        [TestCase(3, 0, null, 1, null, 2, true, true, false)]
-        [TestCase(3, 1, null, 1, null, 3, true, true, true)]
-        [TestCase(3, 2, null, 1, null, 3, true, true, true)]
-        [TestCase(0, 3, null, null, null, 1, true, false, false)]
-        [TestCase(1, 3, null, null, null, 1, true, false, false)]
-        [TestCase(2, 3, null, null, null, 1, true, false, false)]
-        [TestCase(1,1, null, null, null, 0, false, false, false)]
-        [TestCase(2,2, null, null, null, 0, false, false, false)]
-        [TestCase(0,0, null, null, null, 0, false, false, false)]
-        [TestCase(3, 3, null, null, null, 0, false, false, false)]
+        [TestCase(OrganisationStatus.Active, OrganisationStatus.ActiveNotTakingOnApprentices, null,null, null, 1, true, false,false)]
+        [TestCase(OrganisationStatus.ActiveNotTakingOnApprentices, OrganisationStatus.Active, null, null, null, 1, true, false,false)]
+        [TestCase(OrganisationStatus.Onboarding, OrganisationStatus.Removed, null, 1, null, 2, true, true, false)]
+        [TestCase(OrganisationStatus.Onboarding, OrganisationStatus.Active, null, 1, null, 3, true, true, true)]
+        [TestCase(OrganisationStatus.Onboarding, OrganisationStatus.ActiveNotTakingOnApprentices, null, 1, null, 3, true, true, true)]
+        [TestCase(OrganisationStatus.Removed, OrganisationStatus.Onboarding, null, null, null, 1, true, false, false)]
+        [TestCase(OrganisationStatus.Active, OrganisationStatus.Onboarding, null, null, null, 1, true, false, false)]
+        [TestCase(OrganisationStatus.ActiveNotTakingOnApprentices, OrganisationStatus.Onboarding, null, null, null, 1, true, false, false)]
+        [TestCase(OrganisationStatus.Active,OrganisationStatus.Active, null, null, null, 0, false, false, false)]
+        [TestCase(OrganisationStatus.ActiveNotTakingOnApprentices, OrganisationStatus.ActiveNotTakingOnApprentices, null, null, null, 0, false, false, false)]
+        [TestCase(OrganisationStatus.Removed, OrganisationStatus.Removed, null, null, null, 0, false, false, false)]
+        [TestCase(OrganisationStatus.Onboarding, OrganisationStatus.Onboarding, null, null, null, 0, false, false, false)]
 
         public void Audit_log_checks_organisation_status_audit_is_as_expected(int currentOrganisationStatusId, int newOrganisationStatusId, int? currentRemovedReasonId, int? newRemovedReasonId, DateTime? currentStartDate, int numberOfFieldsChanged, bool statusAudit, bool removedReasonAudit, bool startDateAudit)
         {
