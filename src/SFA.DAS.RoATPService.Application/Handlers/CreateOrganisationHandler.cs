@@ -12,14 +12,14 @@
 
     public class CreateOrganisationHandler : IRequestHandler<CreateOrganisationRequest, Guid?>
     {
-        private readonly IUpdateOrganisationRepository _organisationRepository;
+        private readonly ICreateOrganisationRepository _organisationRepository;
         private readonly ILogger<CreateOrganisationHandler> _logger;
         private readonly IOrganisationValidator _organisationValidator;
         private readonly IProviderTypeValidator _providerTypeValidator;
         private readonly IMapCreateOrganisationRequestToCommand _mapper;
         private readonly ITextSanitiser _textSanitiser;
 
-        public CreateOrganisationHandler(IUpdateOrganisationRepository repository, ILogger<CreateOrganisationHandler> logger, 
+        public CreateOrganisationHandler(ICreateOrganisationRepository repository, ILogger<CreateOrganisationHandler> logger, 
                                          IOrganisationValidator organisationValidator, IProviderTypeValidator providerTypeValidator, 
                                          IMapCreateOrganisationRequestToCommand mapper, ITextSanitiser textSanitiser)
         {

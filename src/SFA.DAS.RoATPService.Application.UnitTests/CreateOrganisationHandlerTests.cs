@@ -21,7 +21,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
     {
         private CreateOrganisationRequest _request;
         private CreateOrganisationHandler _handler;
-        private Mock<IUpdateOrganisationRepository> _repository;
+        private Mock<ICreateOrganisationRepository> _repository;
         private Mock<ILogger<CreateOrganisationHandler>> _logger;
         private Mock<IOrganisationValidator> _validator;
         private Mock<IDuplicateCheckRepository> _duplicateCheckRepository;
@@ -33,7 +33,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         public void Before_each_test()
         {
             _organisationId = Guid.NewGuid();
-            _repository = new Mock<IUpdateOrganisationRepository>();
+            _repository = new Mock<ICreateOrganisationRepository>();
             _repository.Setup(x => x.CreateOrganisation(It.IsAny<CreateOrganisationCommand>()))
                 .ReturnsAsync(_organisationId);
             _duplicateCheckRepository = new Mock<IDuplicateCheckRepository>();

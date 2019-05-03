@@ -3,11 +3,9 @@
     using System;
     using System.Threading.Tasks;
     using Domain;
-    using Commands;
 
     public interface IUpdateOrganisationRepository
     {
-        Task<Guid?> CreateOrganisation(CreateOrganisationCommand command);    
         Task<bool> UpdateLegalName(Guid organisationId, string legalName, string updatedBy);
         Task<bool> UpdateFinancialTrackRecord(Guid organisationId, bool financialTrackRecord, string updatedBy);
         Task<bool> UpdateUkprn(Guid organisationId, long ukprn, string updatedBy);
