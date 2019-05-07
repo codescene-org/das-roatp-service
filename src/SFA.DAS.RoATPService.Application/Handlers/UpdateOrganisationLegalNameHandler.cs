@@ -50,7 +50,7 @@
                 return await Task.FromResult(false);
             }
    
-            var success = await _updateOrganisationRepository.UpdateLegalName(request.OrganisationId, request.LegalName, request.UpdatedBy);
+            var success = await _updateOrganisationRepository.UpdateLegalName(request.OrganisationId, legalName, request.UpdatedBy);
 
             if (!success)
             {
