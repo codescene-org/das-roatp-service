@@ -250,8 +250,6 @@ namespace SFA.DAS.RoATPService.Data
             }
         }
 
-
-
         public async Task<bool> UpdateFinancialTrackRecord(Guid organisationId, bool financialTrackRecord, string updatedBy)
         {
             var connectionString = _configuration.SqlConnectionString;
