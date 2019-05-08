@@ -12,7 +12,6 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
 {
     public class UpdateOrganisationUpdateCompanyNumberTests : TestBase
     {
-
         private readonly DatabaseService _databaseService = new DatabaseService();
         private UpdateOrganisationRepository _updateOrganisationRepository;
         private OrganisationRepository _repository;
@@ -25,14 +24,10 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
         private OrganisationModel _organisation;
         private long _organisationUkprn;
         private Guid _organisationId;
-        private bool _originalParentCompanyGuarantee;
         private string _changedBy;
         private bool _successfulUpdate;
         private string _newCompanyNumber;
         private string _companyNumber;
-        private bool _parentCompanyGuarantee;
-        private bool _newParentCompanyGuarantee;
-        private bool _parentCompanyGuaranteeAfterChange;
         private string _originalCompanyNumber;
 
         [OneTimeSetUp]
@@ -44,8 +39,6 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
             _companyNumber = "44443333";
             _organisationUkprn = 11114433;
             _organisationId = Guid.NewGuid();
-            _parentCompanyGuarantee = true;
-            _parentCompanyGuaranteeAfterChange = false;
             _updateOrganisationRepository = new UpdateOrganisationRepository(_databaseService.WebConfiguration);
             _repository = new OrganisationRepository(_databaseService.WebConfiguration);
             _status1 = new OrganisationStatusModel { Id = _organisationStatusId1, Status = "Live", CreatedAt = DateTime.Now, CreatedBy = "TestSystem" };
@@ -54,7 +47,7 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
             ProviderTypeHandler.InsertRecord(_providerType1);
             _organisationTypeModel1 = new OrganisationTypeModel { Id = _organisationTypeId1, Type = "organisation type 10", Description = "organisation type description", CreatedAt = DateTime.Now, CreatedBy = "TestSystem", Status = "Live" };
             OrganisationTypeHandler.InsertRecord(_organisationTypeModel1);
-            var organisationData = new OrganisationData { ParentCompanyGuarantee = _parentCompanyGuarantee, CompanyNumber = _companyNumber};
+            var organisationData = new OrganisationData { CompanyNumber = _companyNumber};
             _organisation = new OrganisationModel
             {
                 UKPRN = _organisationUkprn,
