@@ -6,50 +6,42 @@
     using Interfaces;
     using MediatR;
     using Microsoft.Extensions.Logging;
-    using SFA.DAS.RoATPService.Application.Exceptions;
-    using Validators;
 
-    public class UpdateOrganisationParentCompanyGuaranteeHandler : UpdateOrganisationHandlerBase, IRequestHandler<UpdateOrganisationParentCompanyGuaranteeRequest, bool>
+    public class UpdateOrganisationParentCompanyGuaranteeHandler : IRequestHandler<UpdateOrganisationParentCompanyGuaranteeRequest, bool>
     {
-        private ILogger<UpdateOrganisationParentCompanyGuaranteeHandler> _logger;
-        private IOrganisationValidator _validator;
-        private IUpdateOrganisationRepository _updateOrganisationRepository;
-        private IAuditLogRepository _auditLogRepository;
+        private readonly ILogger<UpdateOrganisationParentCompanyGuaranteeHandler> _logger;
+        private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
+        private readonly IAuditLogService _auditLogService;
 
         private const string FieldChanged = "Parent Company Guarantee";
 
         public UpdateOrganisationParentCompanyGuaranteeHandler(ILogger<UpdateOrganisationParentCompanyGuaranteeHandler> logger,
-            IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository,
-            IAuditLogRepository auditLogRepository)
+            IUpdateOrganisationRepository updateOrganisationRepository,  IAuditLogService auditLogService)
         {
             _logger = logger;
-            _validator = validator;
             _updateOrganisationRepository = updateOrganisationRepository;
-            _auditLogRepository = auditLogRepository;
+            _auditLogService = auditLogService;
         }
 
         public async Task<bool> Handle(UpdateOrganisationParentCompanyGuaranteeRequest request, CancellationToken cancellationToken)
         {
             _logger.LogInformation($@"Handling Update '{FieldChanged}' for Organisation ID [{request.OrganisationId}]");
 
-            var previousParentCompanyGuarantee = await _updateOrganisationRepository.GetParentCompanyGuarantee(request.OrganisationId);
+            var auditRecord = _auditLogService.AuditParentCompanyGuarantee(request.OrganisationId, request.UpdatedBy, request.ParentCompanyGuarantee);
 
-            if (previousParentCompanyGuarantee == request.ParentCompanyGuarantee)
+            if (!auditRecord.ChangesMade)
             {
                 return await Task.FromResult(false);
             }
 
-            bool success = await _updateOrganisationRepository.UpdateParentCompanyGuarantee(request.OrganisationId, request.ParentCompanyGuarantee, request.UpdatedBy);
+            var success = await _updateOrganisationRepository.UpdateParentCompanyGuarantee(request.OrganisationId, request.ParentCompanyGuarantee, request.UpdatedBy);
 
             if (!success)
             {
                 return await Task.FromResult(false);
             }
 
-            var auditRecord = CreateAuditLogEntry(request.OrganisationId, request.UpdatedBy,
-                FieldChanged, previousParentCompanyGuarantee.ToString(), request.ParentCompanyGuarantee.ToString());
-
-            return await _auditLogRepository.WriteFieldChangesToAuditLog(auditRecord);
+            return await _updateOrganisationRepository.WriteFieldChangesToAuditLog(auditRecord);
         }
     }
 }

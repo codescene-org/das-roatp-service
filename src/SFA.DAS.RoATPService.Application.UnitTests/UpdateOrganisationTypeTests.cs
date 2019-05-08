@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.RoATPService.Application.UnitTests
+﻿using System.Collections.Generic;
+
+namespace SFA.DAS.RoATPService.Application.UnitTests
 {
     using System;
     using System.Threading;
@@ -20,10 +22,9 @@
         private Mock<ILogger<UpdateOrganisationTypeHandler>> _logger;
         private Mock<IOrganisationValidator> _validator;
         private Mock<IUpdateOrganisationRepository> _updateOrganisationRepository;
-        private Mock<IAuditLogRepository> _auditLogRepository;
-        private Mock<ILookupDataRepository> _lookupDataRepository;
         private UpdateOrganisationTypeHandler _handler;
         private UpdateOrganisationTypeRequest _request;
+        private Mock<IAuditLogService> _auditLogService;
 
         [SetUp]
         public void Before_each_test()
@@ -33,10 +34,13 @@
             _validator.Setup(x => x.IsValidOrganisationTypeId(It.IsAny<int>())).Returns(true);
             _validator.Setup(x => x.IsValidOrganisationTypeIdForOrganisation(It.IsAny<int>(), It.IsAny<Guid>())).Returns(true);
             _updateOrganisationRepository = new Mock<IUpdateOrganisationRepository>();
-            _auditLogRepository = new Mock<IAuditLogRepository>();
-            _lookupDataRepository = new Mock<ILookupDataRepository>();
+            _auditLogService = new Mock<IAuditLogService>();
+            _auditLogService.Setup(x => x.CreateAuditData(It.IsAny<Guid>(), It.IsAny<string>()))
+                .Returns(new AuditData { FieldChanges = new List<AuditLogEntry>() });
+            _auditLogService.Setup(x => x.AuditOrganisationType(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<int>()))
+                .Returns(new AuditData { FieldChanges = new List<AuditLogEntry>() });
             _handler = new UpdateOrganisationTypeHandler(_logger.Object, _validator.Object,
-                _updateOrganisationRepository.Object, _auditLogRepository.Object, _lookupDataRepository.Object);
+                _updateOrganisationRepository.Object, _auditLogService.Object);
             _request = new UpdateOrganisationTypeRequest
             {
                 OrganisationId = Guid.NewGuid(),
@@ -77,21 +81,24 @@
 
         [Test]
         public void Handler_updates_organisation_type_and_records_audit_history()
-        { 
-            _updateOrganisationRepository.Setup(x => x.GetOrganisationType(It.IsAny<Guid>())).ReturnsAsync(2);
-
+        {  
             _updateOrganisationRepository.Setup(x =>
-                    x.UpdateType(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<string>()))
+                    x.UpdateOrganisationType(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ReturnsAsync(true).Verifiable();
 
-            _auditLogRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()))
+            _updateOrganisationRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()))
                 .ReturnsAsync(true).Verifiable();
+
+            var fieldChanges = new List<AuditLogEntry>();
+            fieldChanges.Add(new AuditLogEntry { FieldChanged = "Organisation Type", NewValue = "Breach", PreviousValue = "GFE" });
+            _auditLogService.Setup(x => x.AuditOrganisationType(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<int>()))
+                .Returns(new AuditData { FieldChanges = fieldChanges });
 
             var result = _handler.Handle(_request, new CancellationToken()).Result;
-
             result.Should().BeTrue();
             _updateOrganisationRepository.VerifyAll();
-            _auditLogRepository.VerifyAll();
+            _auditLogService.Verify(x => x.AuditOrganisationType(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<int>()), Times.Once);
+
         }
 
         [Test]
@@ -104,21 +111,19 @@
                 UpdatedBy = "test"
             };
 
-            _updateOrganisationRepository.Setup(x => x.GetOrganisationType(It.IsAny<Guid>())).ReturnsAsync(3);
-
             _updateOrganisationRepository.Setup(x =>
-                    x.UpdateType(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<string>()))
+                    x.UpdateOrganisationType(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<string>()))
                     .ReturnsAsync(true).Verifiable();
 
-            _auditLogRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()))
+            _updateOrganisationRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()))
                 .ReturnsAsync(true).Verifiable();
 
             var result = _handler.Handle(_request, new CancellationToken()).Result;
 
             result.Should().BeFalse();
-            _updateOrganisationRepository.Verify(x => x.UpdateType(It.IsAny<Guid>(), It.IsAny<int>(),
+            _updateOrganisationRepository.Verify(x => x.UpdateOrganisationType(It.IsAny<Guid>(), It.IsAny<int>(),
                 It.IsAny<string>()), Times.Never());
-            _auditLogRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
+            _updateOrganisationRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
         }
     }
 }

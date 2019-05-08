@@ -12,8 +12,8 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
     using Microsoft.Extensions.Logging;
     using Moq;
     using NUnit.Framework;
-    using SFA.DAS.RoATPService.Api.Types.Models;
-    using SFA.DAS.RoATPService.Application.Exceptions;
+    using Api.Types.Models;
+    using Exceptions;
     using Validators;
 
     [TestFixture]
@@ -21,12 +21,11 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
     {
         private CreateOrganisationRequest _request;
         private CreateOrganisationHandler _handler;
-        private Mock<IOrganisationRepository> _repository;
+        private Mock<ICreateOrganisationRepository> _repository;
         private Mock<ILogger<CreateOrganisationHandler>> _logger;
-        private Mock<ILookupDataRepository> _lookupDataRepository;
         private Mock<IOrganisationValidator> _validator;
         private Mock<IDuplicateCheckRepository> _duplicateCheckRepository;
-
+        private Mock<ITextSanitiser> _textSanitiser;
         private Guid _organisationId;
 
         private IMapCreateOrganisationRequestToCommand _mapper;
@@ -34,14 +33,13 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         public void Before_each_test()
         {
             _organisationId = Guid.NewGuid();
-            _repository = new Mock<IOrganisationRepository>();
+            _repository = new Mock<ICreateOrganisationRepository>();
             _repository.Setup(x => x.CreateOrganisation(It.IsAny<CreateOrganisationCommand>()))
                 .ReturnsAsync(_organisationId);
             _duplicateCheckRepository = new Mock<IDuplicateCheckRepository>();
             _duplicateCheckRepository.Setup(x => x.DuplicateUKPRNExists(It.IsAny<Guid>(), It.IsAny<long>()))
                 .ReturnsAsync(new DuplicateCheckResponse {DuplicateOrganisationName = "",DuplicateFound = false});
             _logger = new Mock<ILogger<CreateOrganisationHandler>>();
-            _lookupDataRepository = new Mock<ILookupDataRepository>();
             _mapper = new MapCreateOrganisationRequestToCommand();
              _validator = new Mock<IOrganisationValidator>();
             _validator.Setup(x => x.IsValidOrganisationTypeId(It.IsAny<int>())).Returns(true);
@@ -56,7 +54,10 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _validator.Setup(x => x.IsValidCharityNumber(It.IsAny<string>())).Returns(true);
             _validator.Setup(x => x.DuplicateUkprnInAnotherOrganisation(It.IsAny<long>(), It.IsAny<Guid>()))
                 .Returns(new DuplicateCheckResponse {DuplicateFound = false, DuplicateOrganisationName = ""});
-            _handler = new CreateOrganisationHandler(_repository.Object, _logger.Object, _validator.Object, new ProviderTypeValidator(), _mapper);
+            _textSanitiser = new Mock<ITextSanitiser>();
+            _textSanitiser.Setup(x => x.SanitiseInputText(It.IsAny<string>())).Returns<string>(x => x);
+
+            _handler = new CreateOrganisationHandler(_repository.Object, _logger.Object, _validator.Object, new ProviderTypeValidator(), _mapper, _textSanitiser.Object);
 
             _request = new CreateOrganisationRequest
             {                                                                       

@@ -11,7 +11,8 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
     public class UpdateOrganisationUpdateStatusTests : TestBase
     {
         private readonly DatabaseService _databaseService = new DatabaseService();
-        private UpdateOrganisationRepository _repository;
+        private UpdateOrganisationRepository _updateOrganisationRepository;
+        private OrganisationRepository _repository;
         private OrganisationStatusModel _status1;
         private OrganisationStatusModel _status2;
         private int _organisationStatusId1;
@@ -38,7 +39,8 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
             _organisationUkprn = 11114433;
             _legalName = "Legal name 1";
             _organisationId = Guid.NewGuid();
-            _repository = new UpdateOrganisationRepository(_databaseService.WebConfiguration);
+            _updateOrganisationRepository = new UpdateOrganisationRepository(_databaseService.WebConfiguration);
+            _repository = new OrganisationRepository(_databaseService.WebConfiguration);
             _status1 = new OrganisationStatusModel { Id = _organisationStatusId1, Status = "Live", CreatedAt = DateTime.Now, CreatedBy = "TestSystem" };
             OrganisationStatusHandler.InsertRecord(_status1);
             _status2 = new OrganisationStatusModel { Id = _organisationStatusId2, Status = "Live", CreatedAt = DateTime.Now, CreatedBy = "TestSystem" };
@@ -62,8 +64,8 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
             OrganisationHandler.InsertRecord(_organisation);
             _changedBy = "SystemChange";
 
-            _successfulUpdate = _repository.UpdateStatus(_organisationId, _organisationStatusId2, _changedBy).Result;
-            _newOrganisationStatusId = _repository.GetStatus(_organisationId).Result;
+            _successfulUpdate = _updateOrganisationRepository.UpdateOrganisationStatus(_organisationId, _organisationStatusId2, _changedBy).Result;
+            _newOrganisationStatusId = _repository.GetOrganisationStatus(_organisationId).Result;
         }
 
         [Test]
