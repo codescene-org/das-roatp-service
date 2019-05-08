@@ -9,6 +9,7 @@
         Task<bool> UpdateLegalName(Guid organisationId, string legalName, string updatedBy);
         Task<bool> UpdateFinancialTrackRecord(Guid organisationId, bool financialTrackRecord, string updatedBy);
         Task<bool> UpdateUkprn(Guid organisationId, long ukprn, string updatedBy);
+        Task<bool> UpdateCompanyNumber(Guid organisationId, string companyNumber, string updatedBy);
         Task<bool> UpdateParentCompanyGuarantee(Guid organisationId, bool parentCompanyGuarantee, string updatedBy);
         Task<bool> UpdateTradingName(Guid organisationId, string tradingName, string updatedBy);
         Task<bool> UpdateOrganisationStatus(Guid organisationId, int organisationStatusId, string updatedBy);

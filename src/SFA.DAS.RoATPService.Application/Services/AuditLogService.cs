@@ -218,6 +218,24 @@ namespace SFA.DAS.RoATPService.Application.Services
             return auditData;
         }
 
+        public AuditData AuditCompanyNumber(Guid organisationId, string updatedBy, string newCompanyNumber)
+        {
+            var auditData = new AuditData { FieldChanges = new List<AuditLogEntry>(), OrganisationId = organisationId, UpdatedAt = DateTime.Now, UpdatedBy = updatedBy };
+            var previousCompanyNumber = _organisationRepository.GetCompanyNumber(organisationId).Result;
+
+            if (previousCompanyNumber != newCompanyNumber)
+            {
+                var entry = new AuditLogEntry
+                {
+                    FieldChanged = AuditLogField.CompanyNumber,
+                    PreviousValue = previousCompanyNumber,
+                    NewValue = newCompanyNumber
+                };
+                auditData.FieldChanges.Add(entry);
+            }
+            return auditData;
+        }
+
         public AuditData AuditOrganisationType(Guid organisationId, string updatedBy, int newOrganisationTypeId)
         {
             var auditData = new AuditData { FieldChanges = new List<AuditLogEntry>(), OrganisationId = organisationId, UpdatedAt = DateTime.Now, UpdatedBy = updatedBy };
