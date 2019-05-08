@@ -211,5 +211,19 @@
                 return await connection.ExecuteScalarAsync<long>(sql, new { organisationId });
             }
         }
+
+        public async Task<string> GetCharityNumber(Guid organisationId)
+        {
+            var connectionString = _configuration.SqlConnectionString;
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                const string sql = "SELECT Json_value(organisationData,'$.CharityNumber') FROM [Organisations] WHERE Id = @organisationId";
+                return await connection.ExecuteScalarAsync<string>(sql, new { organisationId });
+            }
+        }
     }
 }

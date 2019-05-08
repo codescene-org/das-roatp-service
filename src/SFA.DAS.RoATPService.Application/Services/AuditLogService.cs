@@ -240,6 +240,24 @@ namespace SFA.DAS.RoATPService.Application.Services
             return auditData;
         }
 
+        public AuditData AuditCharityNumber(Guid organisationId, string updatedBy, string newCharityNumber)
+        {
+            var auditData = new AuditData { FieldChanges = new List<AuditLogEntry>(), OrganisationId = organisationId, UpdatedAt = DateTime.Now, UpdatedBy = updatedBy };
+            var previousCharityNumber = _organisationRepository.GetCharityNumber(organisationId).Result;
+
+            if (previousCharityNumber != newCharityNumber)
+            {
+                var entry = new AuditLogEntry
+                {
+                    FieldChanged = AuditLogField.CharityNumber,
+                    PreviousValue = previousCharityNumber,
+                    NewValue = newCharityNumber
+                };
+                auditData.FieldChanges.Add(entry);
+            }
+            return auditData;
+        }
+
         public AuditData AuditOrganisationStatus(Guid organisationId, string updatedBy, int newOrganisationStatusId, int? newRemovedReasonId)
         {
             var auditData = new AuditData { FieldChanges = new List<AuditLogEntry>(), OrganisationId = organisationId, UpdatedAt = DateTime.Now, UpdatedBy = updatedBy };
@@ -358,7 +376,6 @@ namespace SFA.DAS.RoATPService.Application.Services
             }
             return auditData;
         }
-
 
         private bool UpdateStartDateRequired(int oldStatusId, int newStatusId, DateTime newStartDate, DateTime? existingStartDate)
         {
