@@ -18,7 +18,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
 {
 
     [TestFixture]
-    public class UpdateOrganisationCompanyNameHandlerTests
+    public class UpdateOrganisationCompanyNumberHandlerTests
     {
         private Mock<ILogger<UpdateOrganisationCompanyNumberHandler>> _logger;
         private Mock<IOrganisationValidator> _validator;
