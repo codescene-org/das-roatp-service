@@ -167,6 +167,20 @@
             return response.DuplicateOrganisationName;
         }
 
+        public DuplicateCheckResponse DuplicateCompanyNumberInAnotherOrganisation(string companyNumber, Guid organisationId)
+        {
+            return string.IsNullOrEmpty(companyNumber) 
+                ? new DuplicateCheckResponse {DuplicateFound = false, DuplicateOrganisationName = ""} 
+                : _duplicateCheckRepository.DuplicateCompanyNumberExists(organisationId, companyNumber).Result;
+        }
+
+        public DuplicateCheckResponse DuplicateCharityNumberInAnotherOrganisation(string charityNumber, Guid organisationId)
+        {
+            return string.IsNullOrEmpty(charityNumber)
+                ? new DuplicateCheckResponse { DuplicateFound = false, DuplicateOrganisationName = "" }
+                : _duplicateCheckRepository.DuplicateCharityNumberExists(organisationId, charityNumber).Result;
+        }
+
         DuplicateCheckResponse IOrganisationValidator.DuplicateUkprnInAnotherOrganisation(long ukprn, Guid organisationId)
         {
             return _duplicateCheckRepository.DuplicateUKPRNExists(organisationId, ukprn).Result;

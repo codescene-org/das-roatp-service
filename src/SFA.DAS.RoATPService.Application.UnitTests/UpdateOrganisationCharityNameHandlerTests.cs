@@ -34,7 +34,8 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _validator = new Mock<IOrganisationValidator>();
             _repository = new Mock<IOrganisationRepository>();
             _validator.Setup(x => x.IsValidCharityNumber(It.IsAny<string>())).Returns(true);
-
+            _validator.Setup(x => x.DuplicateCharityNumberInAnotherOrganisation(It.IsAny<string>(), It.IsAny<Guid>()))
+                .Returns(new DuplicateCheckResponse { DuplicateFound = false, DuplicateOrganisationName = "" });
             _updateOrganisationRepository = new Mock<IUpdateOrganisationRepository>();
             _repository.Setup(x => x.GetCharityNumber(It.IsAny<Guid>())).ReturnsAsync("11111111").Verifiable();
             _updateOrganisationRepository.Setup(x => x.UpdateCharityNumber(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(true).Verifiable();
@@ -77,10 +78,13 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
                 UpdatedBy = "unit test"
             };
 
-            var result = _handler.Handle(request, new CancellationToken()).GetAwaiter().GetResult();
-            result.Should().BeFalse();
+            _validator.Setup(x => x.DuplicateCharityNumberInAnotherOrganisation(It.IsAny<string>(), It.IsAny<Guid>()))
+                .Returns(new DuplicateCheckResponse { DuplicateFound = true, DuplicateOrganisationName = "Duplicate organisation name" });
+            Func<Task> result = async () => await
+                _handler.Handle(request, new CancellationToken());
+            result.Should().Throw<BadRequestException>();
 
-            _auditLogService.Verify(x => x.AuditCharityNumber(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _auditLogService.Verify(x => x.AuditCharityNumber(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
             _updateOrganisationRepository.Verify(x => x.UpdateCharityNumber(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
             _updateOrganisationRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
         }
@@ -111,7 +115,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         }
 
         [Test]
-        public void Handler_writes_updated_Charity_number_and_audit_log_entry_to_database()
+        public void Handler_writes_updated_charity_number_and_audit_log_entry_to_database()
         {
             var request = new UpdateOrganisationCharityNumberRequest
             {

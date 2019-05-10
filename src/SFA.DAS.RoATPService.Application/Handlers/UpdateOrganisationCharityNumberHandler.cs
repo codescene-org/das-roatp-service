@@ -37,6 +37,14 @@
                 throw new BadRequestException(invalidCharityNumberError);
             }
 
+            var duplicateCompanyNumberDetails = _validator.DuplicateCharityNumberInAnotherOrganisation(request.CharityNumber, request.OrganisationId);
+
+            if (duplicateCompanyNumberDetails.DuplicateFound)
+            {
+                var duplicateCompanyNumerMessage = $@"Charity number '{request.CharityNumber}' already used against organisation '{duplicateCompanyNumberDetails.DuplicateOrganisationName}'";
+                _logger.LogInformation(duplicateCompanyNumerMessage);
+                throw new BadRequestException(duplicateCompanyNumerMessage);
+            }
             _logger.LogInformation($@"Handling Update '{FieldChanged}' for Organisation ID [{request.OrganisationId}]");
 
             var auditRecord = _auditLogService.AuditCharityNumber(request.OrganisationId, request.UpdatedBy, request.CharityNumber);
