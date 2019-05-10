@@ -167,6 +167,11 @@
             return response.DuplicateOrganisationName;
         }
 
+        public DuplicateCheckResponse DuplicateCompanyNumberInAnotherOrganisation(string companyNumber, Guid organisationId)
+        {
+            return _duplicateCheckRepository.DuplicateCompanyNumberExists(organisationId, companyNumber).Result;
+        }
+
         DuplicateCheckResponse IOrganisationValidator.DuplicateUkprnInAnotherOrganisation(long ukprn, Guid organisationId)
         {
             return _duplicateCheckRepository.DuplicateUKPRNExists(organisationId, ukprn).Result;

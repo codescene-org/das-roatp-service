@@ -37,6 +37,16 @@
                 throw new BadRequestException(invalidCompanyNumberError);
             }
 
+
+            var duplicateCompanyNumberDetails = _validator.DuplicateCompanyNumberInAnotherOrganisation(request.CompanyNumber, request.OrganisationId);
+
+            if (duplicateCompanyNumberDetails.DuplicateFound)
+            {
+                var duplicateCompanyNumerMessage = $@"Company number '{request.CompanyNumber}' already used against organisation '{duplicateCompanyNumberDetails.DuplicateOrganisationName}'";
+                _logger.LogInformation(duplicateCompanyNumerMessage);
+                throw new BadRequestException(duplicateCompanyNumerMessage);
+            }
+
             _logger.LogInformation($@"Handling Update '{FieldChanged}' for Organisation ID [{request.OrganisationId}]");
 
             var auditRecord = _auditLogService.AuditCompanyNumber(request.OrganisationId, request.UpdatedBy, request.CompanyNumber);

@@ -34,7 +34,8 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _validator = new Mock<IOrganisationValidator>();
             _repository = new Mock<IOrganisationRepository>();
             _validator.Setup(x => x.IsValidCompanyNumber(It.IsAny<string>())).Returns(true);
-       
+            _validator.Setup(x => x.DuplicateCompanyNumberInAnotherOrganisation(It.IsAny<string>(), It.IsAny<Guid>()))
+                .Returns(new DuplicateCheckResponse { DuplicateFound = false, DuplicateOrganisationName = "" });
             _updateOrganisationRepository = new Mock<IUpdateOrganisationRepository>();
             _repository.Setup(x => x.GetCompanyNumber(It.IsAny<Guid>())).ReturnsAsync("11111111").Verifiable();
             _updateOrganisationRepository.Setup(x => x.UpdateCompanyNumber(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(true).Verifiable();
@@ -76,11 +77,13 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
                 OrganisationId = Guid.NewGuid(),
                 UpdatedBy = "unit test"
             };
+            _validator.Setup(x => x.DuplicateCompanyNumberInAnotherOrganisation(It.IsAny<string>(), It.IsAny<Guid>()))
+                .Returns(new DuplicateCheckResponse { DuplicateFound = true, DuplicateOrganisationName = "Duplicate organisation name" });
+            Func<Task> result = async () => await
+                _handler.Handle(request, new CancellationToken());
+            result.Should().Throw<BadRequestException>();
 
-            var result = _handler.Handle(request, new CancellationToken()).GetAwaiter().GetResult();
-            result.Should().BeFalse();
-
-            _auditLogService.Verify(x => x.AuditCompanyNumber(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _auditLogService.Verify(x => x.AuditCompanyNumber(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
             _updateOrganisationRepository.Verify(x => x.UpdateCompanyNumber(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
             _updateOrganisationRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
         }
