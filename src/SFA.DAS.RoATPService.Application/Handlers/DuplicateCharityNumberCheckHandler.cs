@@ -29,7 +29,7 @@
             }
             catch (Exception ex)
             {
-                _logger.LogError("Unable to perform charity number duplicate check", ex);
+                _logger.LogError("Unable to perform charity registration number duplicate check", ex);
                 throw new ApplicationException(ex.Message);
             }
         }

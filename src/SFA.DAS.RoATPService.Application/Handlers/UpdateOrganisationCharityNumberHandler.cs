@@ -16,7 +16,7 @@
         private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
         private readonly IAuditLogService _auditLogService;
 
-        private const string FieldChanged = "Charity Number";
+        private const string FieldChanged = "Charity Registration Number";
 
         public UpdateOrganisationCharityNumberHandler(ILogger<UpdateOrganisationCharityNumberHandler> logger,
             IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository,
@@ -32,7 +32,7 @@
         {
             if (!_validator.IsValidCharityNumber(request.CharityNumber))
             {
-                var invalidCharityNumberError = $@"Invalid Organisation Charity Nummber '{request.CharityNumber}'";
+                var invalidCharityNumberError = $@"Invalid Organisation Charity Registration Nummber '{request.CharityNumber}'";
                 _logger.LogInformation(invalidCharityNumberError);
                 throw new BadRequestException(invalidCharityNumberError);
             }
@@ -41,7 +41,7 @@
 
             if (duplicateCompanyNumberDetails.DuplicateFound)
             {
-                var duplicateCompanyNumerMessage = $@"Charity number '{request.CharityNumber}' already used against organisation '{duplicateCompanyNumberDetails.DuplicateOrganisationName}'";
+                var duplicateCompanyNumerMessage = $@"Charity registration number '{request.CharityNumber}' already used against organisation '{duplicateCompanyNumberDetails.DuplicateOrganisationName}'";
                 _logger.LogInformation(duplicateCompanyNumerMessage);
                 throw new BadRequestException(duplicateCompanyNumerMessage);
             }

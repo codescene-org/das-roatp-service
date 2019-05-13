@@ -79,7 +79,7 @@
 
              
                 if (!_organisationValidator.IsValidCharityNumber(request.CharityNumber))
-                    invalidOrganisationError = $"{invalidOrganisationError}: Invalid charity number [{request.CharityNumber}]";
+                    invalidOrganisationError = $"{invalidOrganisationError}: Invalid charity registration number [{request.CharityNumber}]";
 
                 if (!string.IsNullOrEmpty(request.CharityNumber))
                 {
@@ -89,7 +89,7 @@
 
                     if (duplicateCharityNumber.DuplicateFound)
                         invalidOrganisationError =
-                            $"{invalidOrganisationError}: Duplicate ukprn '{request.CharityNumber}' already exists against [{duplicateCharityNumber.DuplicateOrganisationName}]";
+                            $"{invalidOrganisationError}: Duplicate charity registration number '{request.CharityNumber}' already exists against [{duplicateCharityNumber.DuplicateOrganisationName}]";
                 }
 
                 _logger.LogInformation(invalidOrganisationError);
