@@ -60,13 +60,37 @@
                 var duplicateUkrnDetails = _organisationValidator.DuplicateUkprnInAnotherOrganisation(request.Ukprn, Guid.NewGuid());
 
                 if (duplicateUkrnDetails.DuplicateFound)
-                    invalidOrganisationError = $"{invalidOrganisationError}: Duplicate ukprn '{request.Ukprn}' already exists against [{duplicateUkrnDetails}]";
+                    invalidOrganisationError = $"{invalidOrganisationError}: Duplicate ukprn '{request.Ukprn}' already exists against [{duplicateUkrnDetails.DuplicateOrganisationName}]";
+
 
                 if (!_organisationValidator.IsValidCompanyNumber(request.CompanyNumber))
                     invalidOrganisationError = $"{invalidOrganisationError}: Invalid company number [{request.CompanyNumber}]";
 
+                if (!string.IsNullOrEmpty(request.CompanyNumber))
+                {
+                    var duplicateCompanyNumber =
+                        _organisationValidator.DuplicateCompanyNumberInAnotherOrganisation(request.CompanyNumber,
+                            Guid.NewGuid());
+
+                    if (duplicateCompanyNumber.DuplicateFound)
+                        invalidOrganisationError =
+                            $"{invalidOrganisationError}: Duplicate company number '{request.CompanyNumber}' already exists against [{duplicateCompanyNumber.DuplicateOrganisationName}]";
+                }
+
+             
                 if (!_organisationValidator.IsValidCharityNumber(request.CharityNumber))
-                    invalidOrganisationError = $"{invalidOrganisationError}: Invalid charity number [{request.CharityNumber}]";
+                    invalidOrganisationError = $"{invalidOrganisationError}: Invalid charity registration number [{request.CharityNumber}]";
+
+                if (!string.IsNullOrEmpty(request.CharityNumber))
+                {
+                    var duplicateCharityNumber =
+                        _organisationValidator.DuplicateCharityNumberInAnotherOrganisation(request.CharityNumber,
+                            Guid.NewGuid());
+
+                    if (duplicateCharityNumber.DuplicateFound)
+                        invalidOrganisationError =
+                            $"{invalidOrganisationError}: Duplicate charity registration number '{request.CharityNumber}' already exists against [{duplicateCharityNumber.DuplicateOrganisationName}]";
+                }
 
                 _logger.LogInformation(invalidOrganisationError);
                 throw new BadRequestException(invalidOrganisationError);
@@ -86,6 +110,8 @@
                     && _providerTypeValidator.IsValidProviderTypeId(request.ProviderTypeId)        
                     && _organisationValidator.IsValidOrganisationTypeId(request.OrganisationTypeId)
                     && !_organisationValidator.DuplicateUkprnInAnotherOrganisation(request.Ukprn, Guid.NewGuid()).DuplicateFound
+                    && !_organisationValidator.DuplicateCompanyNumberInAnotherOrganisation(request.CompanyNumber, Guid.NewGuid()).DuplicateFound
+                    && !_organisationValidator.DuplicateCharityNumberInAnotherOrganisation(request.CharityNumber, Guid.NewGuid()).DuplicateFound
                     && _organisationValidator.IsValidStatusDate(request.StatusDate)
                     && _organisationValidator.IsValidUKPRN(request.Ukprn)  
                     && _organisationValidator.IsValidCompanyNumber(request.CompanyNumber)  

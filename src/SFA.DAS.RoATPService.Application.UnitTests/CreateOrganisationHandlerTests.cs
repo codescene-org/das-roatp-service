@@ -54,6 +54,10 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _validator.Setup(x => x.IsValidCharityNumber(It.IsAny<string>())).Returns(true);
             _validator.Setup(x => x.DuplicateUkprnInAnotherOrganisation(It.IsAny<long>(), It.IsAny<Guid>()))
                 .Returns(new DuplicateCheckResponse {DuplicateFound = false, DuplicateOrganisationName = ""});
+            _validator.Setup(x => x.DuplicateCompanyNumberInAnotherOrganisation(It.IsAny<string>(), It.IsAny<Guid>()))
+                .Returns(new DuplicateCheckResponse {DuplicateFound = false, DuplicateOrganisationName = ""});
+            _validator.Setup(x => x.DuplicateCharityNumberInAnotherOrganisation(It.IsAny<string>(), It.IsAny<Guid>()))
+                .Returns(new DuplicateCheckResponse { DuplicateFound = false, DuplicateOrganisationName = "" });
             _textSanitiser = new Mock<ITextSanitiser>();
             _textSanitiser.Setup(x => x.SanitiseInputText(It.IsAny<string>())).Returns<string>(x => x);
 
@@ -168,6 +172,35 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
                 _handler.Handle(_request, new CancellationToken());
             result.Should().Throw<BadRequestException>();
         }
+
+        [Test]
+        public void Create_organisation_rejects_duplicate_company_number()
+        {
+            _duplicateCheckRepository.Setup(x => x.DuplicateCompanyNumberExists(It.IsAny<Guid>(), It.IsAny<string>()))
+                .ReturnsAsync(new DuplicateCheckResponse { DuplicateOrganisationName = "name", DuplicateFound = true });
+
+            _validator.Setup(x => x.DuplicateCompanyNumberInAnotherOrganisation(It.IsAny<string>(), It.IsAny<Guid>()))
+                .Returns(new DuplicateCheckResponse { DuplicateFound = true, DuplicateOrganisationName = "name" });
+
+            Func<Task> result = async () => await
+                _handler.Handle(_request, new CancellationToken());
+            result.Should().Throw<BadRequestException>();
+        }
+
+        [Test]
+        public void Create_organisation_rejects_duplicate_charity_number()
+        {
+            _duplicateCheckRepository.Setup(x => x.DuplicateCharityNumberExists(It.IsAny<Guid>(), It.IsAny<string>()))
+                .ReturnsAsync(new DuplicateCheckResponse { DuplicateOrganisationName = "name", DuplicateFound = true });
+
+            _validator.Setup(x => x.DuplicateCharityNumberInAnotherOrganisation(It.IsAny<string>(), It.IsAny<Guid>()))
+                .Returns(new DuplicateCheckResponse { DuplicateFound = true, DuplicateOrganisationName = "name" });
+
+            Func<Task> result = async () => await
+                _handler.Handle(_request, new CancellationToken());
+            result.Should().Throw<BadRequestException>();
+        }
+
 
         [TestCase("1234567")]
         [TestCase("ABC12345")]

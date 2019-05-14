@@ -26,6 +26,7 @@ namespace SFA.DAS.RoATPService.Application.Validators
         Task<bool> IsValidOrganisationTypeIdForProvider(int organisationTypeId, int providerTypeId);
         DuplicateCheckResponse DuplicateUkprnInAnotherOrganisation(long ukprn, Guid organisationId);
         DuplicateCheckResponse DuplicateCompanyNumberInAnotherOrganisation(string companyNumber, Guid organisationId);
+        DuplicateCheckResponse DuplicateCharityNumberInAnotherOrganisation(string charityNumber, Guid organisationId);
 
     }
 }

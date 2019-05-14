@@ -21,6 +21,6 @@
         Task<int> GetOrganisationType(Guid organisationId);
         Task<DateTime?> GetStartDate(Guid organisationId);
         Task<int> GetProviderType(Guid organisationId);
-
+        Task<string> GetCharityNumber(Guid organisationId);
     }
 }

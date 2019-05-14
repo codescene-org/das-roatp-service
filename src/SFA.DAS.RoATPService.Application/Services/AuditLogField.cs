@@ -13,6 +13,7 @@
         public static string OrganisationType => "Organisation Type";
         public static string ProviderType => "Provider Type";
         public static string CompanyNumber => "Company Number";
+        public static string CharityNumber => "Charity Number";
     };
 }
 
