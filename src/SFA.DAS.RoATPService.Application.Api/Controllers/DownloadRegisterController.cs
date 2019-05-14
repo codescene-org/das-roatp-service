@@ -8,7 +8,7 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
     using OfficeOpenXml;
-    using SFA.DAS.RoATPService.Application.Api.Helpers;
+    using Api.Helpers;
     using SFA.DAS.RoATPService.Application.Api.Middleware;
     using SFA.DAS.RoATPService.Application.Interfaces;
     using Swashbuckle.AspNetCore.SwaggerGen;

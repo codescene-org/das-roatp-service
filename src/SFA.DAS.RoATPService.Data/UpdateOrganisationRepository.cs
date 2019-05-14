@@ -212,6 +212,25 @@ namespace SFA.DAS.RoATPService.Data
             }
         }
 
+        public async Task<bool> UpdateCompanyNumber(Guid organisationId, string companyNumber, string updatedBy)
+        {
+            var connectionString = _configuration.SqlConnectionString;
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                var updatedAt = DateTime.Now;
+
+                var sql = "update [Organisations] SET OrganisationData = JSON_MODIFY(OrganisationData,'$.CompanyNumber',@companyNumber), UpdatedBy = @updatedBy, UpdatedAt = @updatedAt " +
+                          "WHERE Id = @organisationId";
+                int recordsAffected = await connection.ExecuteAsync(sql, new { companyNumber, updatedBy, updatedAt, organisationId });
+
+                return await Task.FromResult(recordsAffected > 0);
+            }
+        }
+
         public async Task<bool> UpdateParentCompanyGuarantee(Guid organisationId, bool parentCompanyGuarantee, string updatedBy)
         {
             var connectionString = _configuration.SqlConnectionString;

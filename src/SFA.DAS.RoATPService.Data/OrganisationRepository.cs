@@ -116,6 +116,20 @@
             }
         }
 
+        public async Task<string> GetCompanyNumber(Guid organisationId)
+        {
+            var connectionString = _configuration.SqlConnectionString;
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                const string sql = "SELECT Json_value(organisationData,'$.CompanyNumber') FROM [Organisations] WHERE Id = @organisationId";
+                return await connection.ExecuteScalarAsync<string>(sql, new { organisationId });
+            }
+        }
+
         public async Task<bool> GetParentCompanyGuarantee(Guid organisationId)
         {
             var connectionString = _configuration.SqlConnectionString;
