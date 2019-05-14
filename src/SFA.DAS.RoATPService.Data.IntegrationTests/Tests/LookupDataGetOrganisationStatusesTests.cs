@@ -4,61 +4,81 @@ using NUnit.Framework;
 using SFA.DAS.RoatpService.Data.IntegrationTests.Handlers;
 using SFA.DAS.RoatpService.Data.IntegrationTests.Models;
 using SFA.DAS.RoatpService.Data.IntegrationTests.Services;
+using SFA.DAS.RoATPService.Application.Validators;
 using SFA.DAS.RoATPService.Data;
+using SFA.DAS.RoATPService.Data.Helpers;
 
 namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
 {
     public class LookupDataGetOrganisationStatusesTests : TestBase
     {
         private readonly DatabaseService _databaseService = new DatabaseService();
+        private readonly CacheHelper _cacheHelper = new CacheHelper();
         private LookupDataRepository _lookupRepository;
+        private OrganisationValidator _organisationValidator;
 
-        private int _providerTypeId2;
-        private int _providerTypeId1;
-        private int _organisationStatusId1WithProviderTypeId1;
-        private int _organisationStatusId4WithProviderTypeId2;
-        private int _organisationStatusId2WithProviderTypeId1;
-        private int _organisationStatusId3WithProviderTypeId1;
+        private int _organisationStatusId1;
+        private int _organisationStatusId2;
+        private int _organisationStatusId3;
+        private int _organisationStatusIdNonExistent;
+        private double _numberOfExpectedResults;
 
         [OneTimeSetUp]
         public void Before_the_tests()
         {
-            _lookupRepository = new LookupDataRepository(null, _databaseService.WebConfiguration);
-            _providerTypeId1 = 1;
-            _providerTypeId2 = 2;
-            _organisationStatusId1WithProviderTypeId1 = 10;
-            _organisationStatusId2WithProviderTypeId1 = 20;
-            _organisationStatusId3WithProviderTypeId1 = 30;
-            _organisationStatusId4WithProviderTypeId2 = 100;
+            _lookupRepository = new LookupDataRepository(_databaseService.WebConfiguration, _cacheHelper);
+            _organisationValidator = new OrganisationValidator(null, _lookupRepository, null);
+            _organisationStatusId1 = 10;
+            _organisationStatusId2 = 20;
+            _organisationStatusId3 = 30;
+            _organisationStatusIdNonExistent = 100;
+            _numberOfExpectedResults = 3;
+            _cacheHelper.PurgeAllCaches();
 
-            OrganisationStatusHandler.InsertRecord(new OrganisationStatusModel{Id=_organisationStatusId1WithProviderTypeId1, CreatedAt = DateTime.Now, CreatedBy="system", Status = "x"});
-            OrganisationStatusHandler.InsertRecord(new OrganisationStatusModel { Id = _organisationStatusId2WithProviderTypeId1, CreatedAt = DateTime.Now, CreatedBy = "system", Status = "x" });
-            OrganisationStatusHandler.InsertRecord(new OrganisationStatusModel { Id = _organisationStatusId3WithProviderTypeId1, CreatedAt = DateTime.Now, CreatedBy = "system", Status = "x" });
-            OrganisationStatusHandler.InsertRecord(new OrganisationStatusModel { Id = _organisationStatusId4WithProviderTypeId2, CreatedAt = DateTime.Now, CreatedBy = "system", Status = "x" });
-            ProviderTypeHandler.InsertRecord(new ProviderTypeModel {Id = _providerTypeId1, CreatedAt = DateTime.Now, CreatedBy = "system", Status = "x" , ProviderType = "a"});
-            ProviderTypeHandler.InsertRecord(new ProviderTypeModel { Id = _providerTypeId2, CreatedAt = DateTime.Now, CreatedBy = "system", Status = "x", ProviderType = "b"});
-            ProviderTypeOrganisationStatusHandler.InsertRecord(new ProviderTypeOrganisationStatusModel{Id=1, OrganisationStatusId = _organisationStatusId1WithProviderTypeId1, ProviderTypeId = _providerTypeId1});
-            ProviderTypeOrganisationStatusHandler.InsertRecord(new ProviderTypeOrganisationStatusModel { Id = 2, OrganisationStatusId = _organisationStatusId2WithProviderTypeId1, ProviderTypeId = _providerTypeId1 });
-            ProviderTypeOrganisationStatusHandler.InsertRecord(new ProviderTypeOrganisationStatusModel { Id = 3, OrganisationStatusId = _organisationStatusId3WithProviderTypeId1, ProviderTypeId = _providerTypeId1 });
-            ProviderTypeOrganisationStatusHandler.InsertRecord(new ProviderTypeOrganisationStatusModel { Id = 4, OrganisationStatusId = _organisationStatusId4WithProviderTypeId2, ProviderTypeId = _providerTypeId2 });
+            OrganisationStatusHandler.InsertRecord(new OrganisationStatusModel { Id = _organisationStatusId1, CreatedAt = DateTime.Now, CreatedBy = "system", Status = "a" });
+            OrganisationStatusHandler.InsertRecord(new OrganisationStatusModel { Id = _organisationStatusId2, CreatedAt = DateTime.Now, CreatedBy = "system", Status =  "b" });
+            OrganisationStatusHandler.InsertRecord(new OrganisationStatusModel { Id = _organisationStatusId3, CreatedAt = DateTime.Now, CreatedBy = "system", Status = "c" });
         }
 
-        [TestCase(null,4)]
-        [TestCase(1, 3)]
-        [TestCase(2, 1)]
-        [TestCase(3, 0)]
-        public void Get_organisation_statuses_for_provider_type_id_is_returning_correct_counts(int? providerTypeId, int numberOfExpectedResults)
+        [Test]
+        public void Get_organisation_statuses()
         {
-            var result = _lookupRepository.GetOrganisationStatuses(providerTypeId).Result;
-            Assert.AreEqual(numberOfExpectedResults, result.Count());
+            var result = _lookupRepository.GetOrganisationStatuses().Result;
+            Assert.AreEqual(_numberOfExpectedResults, result.Count());
+        }
+
+        [TestCase(10, "a")]
+        [TestCase(20, "b")]
+        [TestCase(30, "c")]
+        public void Get_organisation_status_for_valid_id(int organisationStatusId, string organisationStatus)
+        {
+            var result = _lookupRepository.GetOrganisationStatus(organisationStatusId).Result;
+            Assert.AreEqual(organisationStatusId, result.Id);
+            Assert.AreEqual(organisationStatus, result.Status);
+        }
+
+        [TestCase(10, true)]
+        [TestCase(20, true)]
+        [TestCase(30, true)]
+        [TestCase(40, false)]
+        public void Check_organisation_status_valid_is_returning_expected_result(int organisationStatusId, bool expectedResult)
+        {
+            var result = _organisationValidator.IsValidStatusId(organisationStatusId);
+            Assert.AreEqual(expectedResult, result);
+        }
+
+        [Test]
+        public void Get_null_provider_status_for_invalid_id()
+        {
+            var result = _lookupRepository.GetOrganisationStatus(_organisationStatusIdNonExistent).Result;
+            Assert.IsNull(result);
         }
 
         [OneTimeTearDown]
         public void Tear_down()
         {
-            ProviderTypeOrganisationStatusHandler.DeleteAllRecords();
-            ProviderTypeHandler.DeleteAllRecords();
             OrganisationStatusHandler.DeleteAllRecords();
         }
     }
 }
+

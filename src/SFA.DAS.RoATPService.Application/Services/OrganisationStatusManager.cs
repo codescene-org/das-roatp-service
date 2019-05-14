@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using SFA.DAS.RoATPService.Application.Interfaces;
 using SFA.DAS.RoATPService.Domain;
 
 namespace SFA.DAS.RoATPService.Application.Services

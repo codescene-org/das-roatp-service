@@ -1,4 +1,5 @@
-﻿using SFA.DAS.RoATPService.Application.Services;
+﻿using System.Collections.Generic;
+using SFA.DAS.RoATPService.Application.Services;
 
 namespace SFA.DAS.RoATPService.Application.UnitTests
 {
@@ -12,8 +13,8 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
     using Microsoft.Extensions.Logging;
     using Moq;
     using NUnit.Framework;
-    using SFA.DAS.RoATPService.Application.Exceptions;
-    using SFA.DAS.RoATPService.Domain;
+    using Exceptions;
+    using Domain;
     using Validators;
 
     [TestFixture]
@@ -22,11 +23,9 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         private Mock<ILogger<UpdateOrganisationProviderTypeHandler>> _logger;
         private Mock<IOrganisationValidator> _validator;
         private Mock<IUpdateOrganisationRepository> _updateOrganisationRepository;
-        private Mock<IAuditLogRepository> _auditLogRepository;
-        private Mock<ILookupDataRepository> _lookupDataRepository;
         private UpdateOrganisationProviderTypeHandler _handler;
         private UpdateOrganisationProviderTypeRequest _request;
-
+        private Mock<IAuditLogService> _auditLogService;
         [SetUp]
         public void Before_each_test()
         {
@@ -36,10 +35,13 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _validator.Setup(x => x.IsValidOrganisationTypeIdForProvider(It.IsAny<int>(), It.IsAny<int>()))
                 .ReturnsAsync(true);
             _updateOrganisationRepository = new Mock<IUpdateOrganisationRepository>();
-            _auditLogRepository = new Mock<IAuditLogRepository>();
-            _lookupDataRepository = new Mock<ILookupDataRepository>();
+            _auditLogService = new Mock<IAuditLogService>();
+            _auditLogService.Setup(x => x.CreateAuditData(It.IsAny<Guid>(), It.IsAny<string>()))
+                .Returns(new AuditData{FieldChanges = new List<AuditLogEntry>()});
+            _auditLogService.Setup(x => x.AuditProviderType(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+                .Returns(new AuditData { FieldChanges = new List<AuditLogEntry>() });
             _handler = new UpdateOrganisationProviderTypeHandler(_logger.Object, _validator.Object, 
-                _updateOrganisationRepository.Object, _auditLogRepository.Object, _lookupDataRepository.Object, new OrganisationStatusManager());
+                _updateOrganisationRepository.Object, _auditLogService.Object);
             _request = new UpdateOrganisationProviderTypeRequest
             {
                 OrganisationId = Guid.NewGuid(),
@@ -73,22 +75,30 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         [Test]
         public void Handler_updates_provider_type_and_organisation_type_and_records_audit_history()
         {
-            _updateOrganisationRepository.Setup(x => x.GetProviderType(It.IsAny<Guid>())).ReturnsAsync(1);
-            _updateOrganisationRepository.Setup(x => x.GetOrganisationType(It.IsAny<Guid>())).ReturnsAsync(2);
+            var fieldChanges = new List<AuditLogEntry>();
+            fieldChanges.Add(new AuditLogEntry { FieldChanged = AuditLogField.OrganisationType, NewValue = "GFE", PreviousValue = "School" });
+            fieldChanges.Add(new AuditLogEntry { FieldChanged = AuditLogField.ProviderType, NewValue = "Employer", PreviousValue = "Main" });
+
+            _auditLogService.Setup(x => x.AuditProviderType(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+                .Returns(new AuditData { FieldChanges = fieldChanges });
+
 
             _updateOrganisationRepository.Setup(x =>
-                    x.UpdateProviderTypeAndOrganisationType(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(),
-                        It.IsAny<string>()))
+                    x.UpdateProviderType(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ReturnsAsync(true).Verifiable();
 
-            _auditLogRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()))
+
+            _updateOrganisationRepository.Setup(x =>
+                    x.UpdateOrganisationType(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<string>()))
+                .ReturnsAsync(true).Verifiable();
+
+            _updateOrganisationRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()))
                 .ReturnsAsync(true).Verifiable();
 
             var result = _handler.Handle(_request, new CancellationToken()).Result;
 
             result.Should().BeTrue();
             _updateOrganisationRepository.VerifyAll();
-            _auditLogRepository.VerifyAll();
         }
 
         [Test]
@@ -102,14 +112,11 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
                 UpdatedBy = "test"
             };
 
-            _updateOrganisationRepository.Setup(x => x.GetProviderType(It.IsAny<Guid>())).ReturnsAsync(1);
-            _updateOrganisationRepository.Setup(x => x.GetOrganisationType(It.IsAny<Guid>())).ReturnsAsync(3);
-
             _updateOrganisationRepository.Setup(x =>
                     x.UpdateProviderTypeAndOrganisationType(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
                 .ReturnsAsync(true).Verifiable();
 
-            _auditLogRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()))
+            _updateOrganisationRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()))
                 .ReturnsAsync(true).Verifiable();
 
             var result = _handler.Handle(_request, new CancellationToken()).Result;
@@ -117,8 +124,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             result.Should().BeFalse();
             _updateOrganisationRepository.Verify(x => x.UpdateProviderTypeAndOrganisationType(It.IsAny<Guid>(), It.IsAny<int>(),
                 It.IsAny<int>(), It.IsAny<string>()), Times.Never());
-            _auditLogRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
+            _updateOrganisationRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
         }
-
     }
 }

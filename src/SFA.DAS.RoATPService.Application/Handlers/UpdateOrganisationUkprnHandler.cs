@@ -6,27 +6,27 @@
     using Interfaces;
     using MediatR;
     using Microsoft.Extensions.Logging;
-    using SFA.DAS.RoATPService.Application.Exceptions;
+    using Exceptions;
     using Validators;
 
     public class UpdateOrganisationUkprnHandler
-        : UpdateOrganisationHandlerBase, IRequestHandler<UpdateOrganisationUkprnRequest, bool>
+        : IRequestHandler<UpdateOrganisationUkprnRequest, bool>
     {
-        private ILogger<UpdateOrganisationUkprnHandler> _logger;
-        private IOrganisationValidator _validator;
-        private IUpdateOrganisationRepository _updateOrganisationRepository;
-        private IAuditLogRepository _auditLogRepository;
+        private readonly ILogger<UpdateOrganisationUkprnHandler> _logger;
+        private readonly IOrganisationValidator _validator;
+        private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
+        private readonly IAuditLogService _auditLogService;
 
         private const string FieldChanged = "UKPRN";
 
         public UpdateOrganisationUkprnHandler(ILogger<UpdateOrganisationUkprnHandler> logger,
-            IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository,
-            IAuditLogRepository auditLogRepository)
+            IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository, 
+            IAuditLogService auditLogService)
         {
             _logger = logger;
             _validator = validator;
             _updateOrganisationRepository = updateOrganisationRepository;
-            _auditLogRepository = auditLogRepository;
+            _auditLogService = auditLogService;
         }
 
         public async Task<bool> Handle(UpdateOrganisationUkprnRequest request, CancellationToken cancellationToken)
@@ -47,27 +47,24 @@
                 throw new BadRequestException(invalidUkprnError);
             }
 
-
             _logger.LogInformation($@"Handling Update '{FieldChanged}' for Organisation ID [{request.OrganisationId}]");
 
-            long previousUkprn = await _updateOrganisationRepository.GetUkprn(request.OrganisationId);
+            var auditRecord = _auditLogService.AuditUkprn(request.OrganisationId, request.UpdatedBy, request.Ukprn);
 
-            if (previousUkprn == request.Ukprn)
+
+            if (!auditRecord.ChangesMade)
             {
                 return await Task.FromResult(false);
             }
 
-            bool success = await _updateOrganisationRepository.UpdateUkprn(request.OrganisationId, request.Ukprn, request.UpdatedBy);
+            var success = await _updateOrganisationRepository.UpdateUkprn(request.OrganisationId, request.Ukprn, request.UpdatedBy);
 
             if (!success)
             {
                 return await Task.FromResult(false);
             }
 
-            var auditRecord = CreateAuditLogEntry(request.OrganisationId, request.UpdatedBy,
-                FieldChanged, previousUkprn.ToString(), request.Ukprn.ToString());
-
-            return await _auditLogRepository.WriteFieldChangesToAuditLog(auditRecord);
+            return await _updateOrganisationRepository.WriteFieldChangesToAuditLog(auditRecord);
         }
     }
 }

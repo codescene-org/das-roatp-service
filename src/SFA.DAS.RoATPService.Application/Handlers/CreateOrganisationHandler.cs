@@ -1,7 +1,6 @@
-﻿using System;
-
-namespace SFA.DAS.RoATPService.Application.Handlers
+﻿namespace SFA.DAS.RoATPService.Application.Handlers
 {
+    using System;
     using System.Threading;
     using System.Threading.Tasks;
     using Api.Types.Models;
@@ -9,30 +8,34 @@ namespace SFA.DAS.RoATPService.Application.Handlers
     using Interfaces;
     using MediatR;
     using Microsoft.Extensions.Logging;
-    using Services;
     using Validators;
 
     public class CreateOrganisationHandler : IRequestHandler<CreateOrganisationRequest, Guid?>
     {
-        private readonly IOrganisationRepository _organisationRepository;
+        private readonly ICreateOrganisationRepository _organisationRepository;
         private readonly ILogger<CreateOrganisationHandler> _logger;
         private readonly IOrganisationValidator _organisationValidator;
         private readonly IProviderTypeValidator _providerTypeValidator;
         private readonly IMapCreateOrganisationRequestToCommand _mapper;
+        private readonly ITextSanitiser _textSanitiser;
 
-        public CreateOrganisationHandler(IOrganisationRepository repository, ILogger<CreateOrganisationHandler> logger, 
+        public CreateOrganisationHandler(ICreateOrganisationRepository repository, ILogger<CreateOrganisationHandler> logger, 
                                          IOrganisationValidator organisationValidator, IProviderTypeValidator providerTypeValidator, 
-                                         IMapCreateOrganisationRequestToCommand mapper)
+                                         IMapCreateOrganisationRequestToCommand mapper, ITextSanitiser textSanitiser)
         {
             _organisationRepository = repository;
             _logger = logger;
             _organisationValidator = organisationValidator;
             _providerTypeValidator = providerTypeValidator;
             _mapper = mapper;
+            _textSanitiser = textSanitiser;
         }
 
         public Task<Guid?> Handle(CreateOrganisationRequest request, CancellationToken cancellationToken)
         {
+            request.LegalName = _textSanitiser.SanitiseInputText(request.LegalName);
+            request.TradingName = _textSanitiser.SanitiseInputText(request.TradingName);
+
             if (!IsValidCreateOrganisation(request))
             {
                 string invalidOrganisationError = $@"Invalid Organisation data";
@@ -70,11 +73,9 @@ namespace SFA.DAS.RoATPService.Application.Handlers
             }
 
             _logger.LogInformation($@"Handling Create Organisation Search for UKPRN [{request.Ukprn}]");
-
-            request.LegalName = TextSanitiser.SanitiseText(request.LegalName);
-            request.TradingName = TextSanitiser.SanitiseText(request.TradingName);
-
+  
             var command = _mapper.Map(request);
+
             return _organisationRepository.CreateOrganisation(command);
         }
 
