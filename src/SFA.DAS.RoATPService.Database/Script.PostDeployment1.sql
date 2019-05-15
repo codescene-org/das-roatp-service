@@ -355,6 +355,9 @@ BEGIN
 	SET IDENTITY_INSERT dbo.[ProviderTypeOrganisationStatus] OFF
 END
 
+-- APR-474 update any non-set SourceIsUKRLP to true for Organisations.OrganisationData
+update organisations set OrganisationData = JSON_Modify(OrganisationData,'$.SourceIsUKRLP',CAST(1 as BIT)) where JSON_VALUE(OrganisationData,'$.SourceIsUKRLP') is null
+
 -- load the Company House and Charity Numbers (assumes Register has already been imported)
 :r SaveCompanyandCharityNumber.sql
 :r UpdateStartDateForUkprns.sql

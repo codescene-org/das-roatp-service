@@ -43,7 +43,8 @@ namespace SFA.DAS.RoATPService.Data
                     ParentCompanyGuarantee = command.ParentCompanyGuarantee,
                     FinancialTrackRecord = command.FinancialTrackRecord,
                     NonLevyContract = command.NonLevyContract,
-                    StartDate = startDate
+                    StartDate = startDate,
+                    SourceIsUKRLP = null // Needs to be determined by source being UKRLP or not in future story - see APR-474 for setup
                 };
 
                 string sql = $"INSERT INTO [dbo].[Organisations] " +

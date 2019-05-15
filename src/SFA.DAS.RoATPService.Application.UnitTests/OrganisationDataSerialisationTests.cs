@@ -42,6 +42,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             data.NonLevyContract.Should().BeFalse();
             data.StartDate.Should().Be(new DateTime(2019, 03, 27));
             data.RemovedReason.Id.Should().Be(5);
+            data.SourceIsUKRLP.Should().BeNull();
         }
     }
 }
