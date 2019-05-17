@@ -32,7 +32,7 @@
         {
             if (!_validator.IsValidCharityNumber(request.CharityNumber))
             {
-                var invalidCharityNumberError = $@"Invalid Organisation Charity Registration Nummber '{request.CharityNumber}'";
+                var invalidCharityNumberError = $@"Invalid Organisation Charity Registration Number '{request.CharityNumber}'";
                 _logger.LogInformation(invalidCharityNumberError);
                 throw new BadRequestException(invalidCharityNumberError);
             }

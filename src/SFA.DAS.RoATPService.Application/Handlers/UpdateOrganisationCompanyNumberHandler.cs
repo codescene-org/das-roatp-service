@@ -32,7 +32,7 @@
         {
             if (!_validator.IsValidCompanyNumber(request.CompanyNumber))
             {
-                var invalidCompanyNumberError = $@"Invalid Organisation Company Nummber '{request.CompanyNumber}'";
+                var invalidCompanyNumberError = $@"Invalid Organisation Company Number '{request.CompanyNumber}'";
                 _logger.LogInformation(invalidCompanyNumberError);
                 throw new BadRequestException(invalidCompanyNumberError);
             }
