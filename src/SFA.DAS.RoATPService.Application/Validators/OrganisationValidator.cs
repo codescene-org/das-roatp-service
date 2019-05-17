@@ -114,6 +114,10 @@
                 return false;
             }
 
+
+            if (charityNumber.Length < 6 || charityNumber?.Length > 14)
+                return false;
+
             return true;
         }
 
