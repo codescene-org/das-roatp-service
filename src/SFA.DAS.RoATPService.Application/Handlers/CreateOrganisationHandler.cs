@@ -1,7 +1,6 @@
-﻿using System;
-
-namespace SFA.DAS.RoATPService.Application.Handlers
+﻿namespace SFA.DAS.RoATPService.Application.Handlers
 {
+    using System;
     using System.Threading;
     using System.Threading.Tasks;
     using Api.Types.Models;
@@ -9,30 +8,34 @@ namespace SFA.DAS.RoATPService.Application.Handlers
     using Interfaces;
     using MediatR;
     using Microsoft.Extensions.Logging;
-    using Services;
     using Validators;
 
     public class CreateOrganisationHandler : IRequestHandler<CreateOrganisationRequest, Guid?>
     {
-        private readonly IOrganisationRepository _organisationRepository;
+        private readonly ICreateOrganisationRepository _organisationRepository;
         private readonly ILogger<CreateOrganisationHandler> _logger;
         private readonly IOrganisationValidator _organisationValidator;
         private readonly IProviderTypeValidator _providerTypeValidator;
         private readonly IMapCreateOrganisationRequestToCommand _mapper;
+        private readonly ITextSanitiser _textSanitiser;
 
-        public CreateOrganisationHandler(IOrganisationRepository repository, ILogger<CreateOrganisationHandler> logger, 
+        public CreateOrganisationHandler(ICreateOrganisationRepository repository, ILogger<CreateOrganisationHandler> logger, 
                                          IOrganisationValidator organisationValidator, IProviderTypeValidator providerTypeValidator, 
-                                         IMapCreateOrganisationRequestToCommand mapper)
+                                         IMapCreateOrganisationRequestToCommand mapper, ITextSanitiser textSanitiser)
         {
             _organisationRepository = repository;
             _logger = logger;
             _organisationValidator = organisationValidator;
             _providerTypeValidator = providerTypeValidator;
             _mapper = mapper;
+            _textSanitiser = textSanitiser;
         }
 
         public Task<Guid?> Handle(CreateOrganisationRequest request, CancellationToken cancellationToken)
         {
+            request.LegalName = _textSanitiser.SanitiseInputText(request.LegalName);
+            request.TradingName = _textSanitiser.SanitiseInputText(request.TradingName);
+
             if (!IsValidCreateOrganisation(request))
             {
                 string invalidOrganisationError = $@"Invalid Organisation data";
@@ -57,24 +60,46 @@ namespace SFA.DAS.RoATPService.Application.Handlers
                 var duplicateUkrnDetails = _organisationValidator.DuplicateUkprnInAnotherOrganisation(request.Ukprn, Guid.NewGuid());
 
                 if (duplicateUkrnDetails.DuplicateFound)
-                    invalidOrganisationError = $"{invalidOrganisationError}: Duplicate ukprn '{request.Ukprn}' already exists against [{duplicateUkrnDetails}]";
+                    invalidOrganisationError = $"{invalidOrganisationError}: Duplicate ukprn '{request.Ukprn}' already exists against [{duplicateUkrnDetails.DuplicateOrganisationName}]";
+
 
                 if (!_organisationValidator.IsValidCompanyNumber(request.CompanyNumber))
                     invalidOrganisationError = $"{invalidOrganisationError}: Invalid company number [{request.CompanyNumber}]";
 
+                if (!string.IsNullOrEmpty(request.CompanyNumber))
+                {
+                    var duplicateCompanyNumber =
+                        _organisationValidator.DuplicateCompanyNumberInAnotherOrganisation(request.CompanyNumber,
+                            Guid.NewGuid());
+
+                    if (duplicateCompanyNumber.DuplicateFound)
+                        invalidOrganisationError =
+                            $"{invalidOrganisationError}: Duplicate company number '{request.CompanyNumber}' already exists against [{duplicateCompanyNumber.DuplicateOrganisationName}]";
+                }
+
+             
                 if (!_organisationValidator.IsValidCharityNumber(request.CharityNumber))
-                    invalidOrganisationError = $"{invalidOrganisationError}: Invalid charity number [{request.CharityNumber}]";
+                    invalidOrganisationError = $"{invalidOrganisationError}: Invalid charity registration number [{request.CharityNumber}]";
+
+                if (!string.IsNullOrEmpty(request.CharityNumber))
+                {
+                    var duplicateCharityNumber =
+                        _organisationValidator.DuplicateCharityNumberInAnotherOrganisation(request.CharityNumber,
+                            Guid.NewGuid());
+
+                    if (duplicateCharityNumber.DuplicateFound)
+                        invalidOrganisationError =
+                            $"{invalidOrganisationError}: Duplicate charity registration number '{request.CharityNumber}' already exists against [{duplicateCharityNumber.DuplicateOrganisationName}]";
+                }
 
                 _logger.LogInformation(invalidOrganisationError);
                 throw new BadRequestException(invalidOrganisationError);
             }
 
             _logger.LogInformation($@"Handling Create Organisation Search for UKPRN [{request.Ukprn}]");
-
-            request.LegalName = TextSanitiser.SanitiseText(request.LegalName);
-            request.TradingName = TextSanitiser.SanitiseText(request.TradingName);
-
+  
             var command = _mapper.Map(request);
+
             return _organisationRepository.CreateOrganisation(command);
         }
 
@@ -85,6 +110,8 @@ namespace SFA.DAS.RoATPService.Application.Handlers
                     && _providerTypeValidator.IsValidProviderTypeId(request.ProviderTypeId)        
                     && _organisationValidator.IsValidOrganisationTypeId(request.OrganisationTypeId)
                     && !_organisationValidator.DuplicateUkprnInAnotherOrganisation(request.Ukprn, Guid.NewGuid()).DuplicateFound
+                    && !_organisationValidator.DuplicateCompanyNumberInAnotherOrganisation(request.CompanyNumber, Guid.NewGuid()).DuplicateFound
+                    && !_organisationValidator.DuplicateCharityNumberInAnotherOrganisation(request.CharityNumber, Guid.NewGuid()).DuplicateFound
                     && _organisationValidator.IsValidStatusDate(request.StatusDate)
                     && _organisationValidator.IsValidUKPRN(request.Ukprn)  
                     && _organisationValidator.IsValidCompanyNumber(request.CompanyNumber)  

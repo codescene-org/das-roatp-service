@@ -2,7 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Text;
+    using Newtonsoft.Json;
 
     public class AuditData
     {
@@ -11,5 +11,8 @@
         public DateTime? UpdatedAt { get; set; }
 
         public List<AuditLogEntry> FieldChanges { get; set; }
+
+        [JsonIgnore]
+        public bool ChangesMade => FieldChanges.Count>0;
     }
 }

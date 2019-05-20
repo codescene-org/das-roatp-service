@@ -14,7 +14,8 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
     {
 
         private readonly DatabaseService _databaseService = new DatabaseService();
-        private UpdateOrganisationRepository _repository;
+        private UpdateOrganisationRepository _updateOrganisationRepository;
+        private OrganisationRepository _repository;
         private OrganisationStatusModel _status1;
         private int _organisationStatusId1;
         private ProviderTypeModel _providerType1;
@@ -42,7 +43,8 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
             _organisationId = Guid.NewGuid();
             _financialTrackRecord = true;
             _financialTrackRecordAfterChange = false;
-            _repository = new UpdateOrganisationRepository(_databaseService.WebConfiguration);
+            _updateOrganisationRepository = new UpdateOrganisationRepository(_databaseService.WebConfiguration);
+            _repository = new OrganisationRepository(_databaseService.WebConfiguration);
             _status1 = new OrganisationStatusModel { Id = _organisationStatusId1, Status = "Live", CreatedAt = DateTime.Now, CreatedBy = "TestSystem" };
             OrganisationStatusHandler.InsertRecord(_status1);
             _providerType1 = new ProviderTypeModel { Id = _providerTypeId1, ProviderType = "provider type 10", Description = "provider type description", CreatedAt = DateTime.Now, CreatedBy = "TestSystem", Status = "Live" };
@@ -67,7 +69,7 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
             _originalFinancialTrackRecord = _repository.GetFinancialTrackRecord(_organisationId).Result;
             _changedBy = "SystemChange";
 
-            _successfulUpdate = _repository.UpdateFinancialTrackRecord(_organisationId, _financialTrackRecordAfterChange, _changedBy).Result;
+            _successfulUpdate = _updateOrganisationRepository.UpdateFinancialTrackRecord(_organisationId, _financialTrackRecordAfterChange, _changedBy).Result;
             _newFinancialTrackRecord = _repository.GetFinancialTrackRecord(_organisationId).Result;
 
         }

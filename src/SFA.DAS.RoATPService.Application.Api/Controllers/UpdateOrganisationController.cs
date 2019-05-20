@@ -1,6 +1,4 @@
-﻿using SFA.DAS.RoATPService.Api.Types.Models.UpdateOrganisation;
-
-namespace SFA.DAS.RoATPService.Application.Api.Controllers
+﻿namespace SFA.DAS.RoATPService.Application.Api.Controllers
 {
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
@@ -55,13 +53,33 @@ namespace SFA.DAS.RoATPService.Application.Api.Controllers
         {
             return Ok(await _mediator.Send(updateUkprnRequest));
         }
-        
+
+        [HttpPut]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(bool))]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, typeof(IDictionary<string, string>))]
+        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
+        [Route("companyNumber")]
+        public async Task<IActionResult> UpdateCompanyNumber([FromBody] UpdateOrganisationCompanyNumberRequest updateCompanyNumberRequest)
+        {
+            return Ok(await _mediator.Send(updateCompanyNumberRequest));
+        }
+
         [HttpPut]
         [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(bool))]
         [SwaggerResponse((int)HttpStatusCode.BadRequest, typeof(IDictionary<string, string>))]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
         [Route("status")]
         public async Task<IActionResult> UpdateStatus([FromBody] UpdateOrganisationStatusRequest updateStatusRequest)
+        {
+            return Ok(await _mediator.Send(updateStatusRequest));
+        }
+
+        [HttpPut]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(bool))]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, typeof(IDictionary<string, string>))]
+        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
+        [Route("type")]
+        public async Task<IActionResult> UpdateType([FromBody] UpdateOrganisationTypeRequest updateStatusRequest)
         {
             return Ok(await _mediator.Send(updateStatusRequest));
         }
@@ -94,6 +112,17 @@ namespace SFA.DAS.RoATPService.Application.Api.Controllers
         public async Task<IActionResult> UpdateProviderType([FromBody] UpdateOrganisationProviderTypeRequest updateProviderTypeRequest)
         {
             return Ok(await _mediator.Send(updateProviderTypeRequest));
+        }
+
+
+        [HttpPut]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(bool))]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, typeof(IDictionary<string, string>))]
+        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
+        [Route("charityNumber")]
+        public async Task<IActionResult> UpdateCharityNumber([FromBody] UpdateOrganisationCharityNumberRequest updateCharityNumberRequest)
+        {
+            return Ok(await _mediator.Send(updateCharityNumberRequest));
         }
     }
 }

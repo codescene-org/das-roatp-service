@@ -12,9 +12,9 @@
 
     public class GetOrganisationHandler : IRequestHandler<GetOrganisationRequest, Organisation>
     {
-        private IOrganisationRepository _organisationRepository;
-        private ILogger<GetOrganisationHandler> _logger;
-        private IOrganisationValidator _organisationValidator;
+        private readonly IOrganisationRepository _organisationRepository;
+        private readonly ILogger<GetOrganisationHandler> _logger;
+        private readonly IOrganisationValidator _organisationValidator;
 
         public GetOrganisationHandler(IOrganisationRepository repository, ILogger<GetOrganisationHandler> logger,
             IOrganisationValidator organisationValidator)

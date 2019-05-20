@@ -10,13 +10,13 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Handlers
     {
         private static readonly DatabaseService DatabaseService = new DatabaseService();
 
-        public static void InsertRecord(OrganisationTypeModel providerType)
+        public static void InsertRecord(OrganisationTypeModel organisationType)
         {
             var sql =
                 @"set identity_insert [OrganisationTypes] ON; INSERT INTO [OrganisationTypes] ([id], [Type], [Description],[CreatedAt],[CreatedBy] ,[UpdatedAt],[UpdatedBy], [Status]) VALUES " +
                 $@"(@id, @type, @description, @createdAt, @createdBy, @updatedAt, @updatedBy,@status); set identity_insert [OrganisationTypes] OFF; ";
 
-            DatabaseService.Execute(sql, providerType);
+            DatabaseService.Execute(sql, organisationType);
         }
 
         public static void InsertRecords(List<OrganisationTypeModel> organisationTypes)

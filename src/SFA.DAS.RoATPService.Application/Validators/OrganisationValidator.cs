@@ -1,9 +1,7 @@
-﻿using SFA.DAS.RoATPService.Application.Interfaces;
-
-namespace SFA.DAS.RoATPService.Application.Validators
+﻿namespace SFA.DAS.RoATPService.Application.Validators
 {
-    using SFA.DAS.RoATPService.Api.Types.Models;
-    using SFA.DAS.RoATPService.Domain;
+    using Api.Types.Models;
+    using Domain;
     using System;
     using System.Linq;
     using System.Text.RegularExpressions;
@@ -15,21 +13,20 @@ namespace SFA.DAS.RoATPService.Application.Validators
         private const string CompaniesHouseNumberRegex = "[A-Za-z0-9]{2}[0-9]{6}";
         private const string CharityNumberInvalidCharactersRegex = "[^a-zA-Z0-9\\-]";
         private readonly IDuplicateCheckRepository _duplicateCheckRepository;
-        private readonly ILookupDataRepository _lookupDataRepository;
-        public OrganisationValidator(IDuplicateCheckRepository duplicateCheckRepository, ILookupDataRepository lookupDataRepository)
+        private readonly ILookupDataRepository _lookupRepository;
+        private readonly IOrganisationRepository _organisationRepository;
+
+        public OrganisationValidator(IDuplicateCheckRepository duplicateCheckRepository, ILookupDataRepository lookupRepository, IOrganisationRepository organisationRepository)
         {
             _duplicateCheckRepository = duplicateCheckRepository;
-            _lookupDataRepository = lookupDataRepository;
+            _lookupRepository = lookupRepository;
+            _organisationRepository = organisationRepository;
         }
+
 
         public bool IsValidOrganisationId(Guid organisationId)
         {
-            if (organisationId == null || organisationId == Guid.Empty)
-            {
-                return false;
-            }
-
-            return true;
+            return organisationId != Guid.Empty;
         }
 
         public bool IsValidProviderType(ProviderType providerType)
@@ -44,17 +41,18 @@ namespace SFA.DAS.RoATPService.Application.Validators
 
         public bool IsValidProviderTypeId(int providerTypeId)
         {
-            return (providerTypeId >= 1 && providerTypeId <= 3);
+            var providerTypes = _lookupRepository.GetProviderTypes().Result;
+            return providerTypes.Any(x => x.Id == providerTypeId);
         }
 
         public bool IsValidUKPRN(long ukPrn)
         {
-            return (ukPrn >= 10000000 && ukPrn <= 99999999);
+            return ukPrn >= 10000000 && ukPrn <= 99999999;
         }
 
         public bool IsValidLegalName(string legalName)
         {
-            if (String.IsNullOrWhiteSpace(legalName))
+            if (string.IsNullOrWhiteSpace(legalName))
             {
                 return false;
             }
@@ -64,7 +62,7 @@ namespace SFA.DAS.RoATPService.Application.Validators
 
         public bool IsValidTradingName(string tradingName)
         {
-            if (String.IsNullOrWhiteSpace(tradingName))
+            if (string.IsNullOrWhiteSpace(tradingName))
             {
                 return true;
             }
@@ -74,7 +72,7 @@ namespace SFA.DAS.RoATPService.Application.Validators
 
         public bool IsValidStatusDate(DateTime statusDate)
         {
-            return (statusDate > DateTime.MinValue);
+            return statusDate > DateTime.MinValue;
         }
 
         public bool IsValidStatus(OrganisationStatus status)
@@ -84,20 +82,18 @@ namespace SFA.DAS.RoATPService.Application.Validators
 
         public bool IsValidStatusId(int statusId)
         {
-            return statusId == OrganisationStatus.Removed
-                   || statusId == OrganisationStatus.Active
-                   || statusId == OrganisationStatus.ActiveNotTakingOnApprentices
-                   || statusId == OrganisationStatus.Onboarding;
+            var organisationStatuses = _lookupRepository.GetOrganisationStatuses().Result;
+            return organisationStatuses.Any(x => x.Id == statusId);
         }
 
         public bool IsValidCompanyNumber(string companyNumber)
         {
-            if (String.IsNullOrWhiteSpace(companyNumber))
+            if (string.IsNullOrWhiteSpace(companyNumber))
             {
                 return true;
             }
 
-            if ((companyNumber.Length != 8) ||
+            if (companyNumber.Length != 8 ||
                 !Regex.IsMatch(companyNumber, CompaniesHouseNumberRegex))
             {
                 return false;
@@ -108,7 +104,7 @@ namespace SFA.DAS.RoATPService.Application.Validators
 
         public bool IsValidCharityNumber(string charityNumber)
         {
-            if (String.IsNullOrWhiteSpace(charityNumber))
+            if (string.IsNullOrWhiteSpace(charityNumber))
             {
                 return true;
             }
@@ -133,7 +129,22 @@ namespace SFA.DAS.RoATPService.Application.Validators
 
         public bool IsValidOrganisationTypeId(int organisationTypeId)
         {
-            return organisationTypeId >= 0 && organisationTypeId <= 20;
+            var organisationTypes = _lookupRepository.GetOrganisationTypes().Result;
+            return organisationTypes.Any(x => x.Id == organisationTypeId);
+        }
+
+        public bool IsValidOrganisationStatusIdForOrganisation(int organisationStatusId, Guid organisationId)
+        {
+             var providerTypeId = _organisationRepository.GetProviderType(organisationId).Result;
+     
+            if (!IsValidStatusId(organisationStatusId))
+            {
+                return false;
+            }
+
+            var organisationStatuses = _lookupRepository.GetOrganisationStatusesForProviderTypeId(providerTypeId).Result;
+            var organisationStatus = organisationStatuses.FirstOrDefault(x => x.Id == organisationStatusId);
+            return organisationStatus != null;
         }
 
         public async Task<bool> IsValidOrganisationTypeIdForProvider(int organisationTypeId, int providerTypeId)
@@ -143,11 +154,11 @@ namespace SFA.DAS.RoATPService.Application.Validators
                 return false;
             }
 
-            var organisationTypes = await _lookupDataRepository.GetOrganisationTypes(providerTypeId);
+            var organisationTypes = await _lookupRepository.GetOrganisationTypesForProviderTypeId(providerTypeId);
 
             var organisationType = organisationTypes.FirstOrDefault(x => x.Id == organisationTypeId);
 
-            return (organisationType != null);
+            return organisationType != null;
         }
 
         public string DuplicateUkprnInAnotherOrganisation(long ukprn, Guid organisationId)
@@ -156,9 +167,29 @@ namespace SFA.DAS.RoATPService.Application.Validators
             return response.DuplicateOrganisationName;
         }
 
+        public DuplicateCheckResponse DuplicateCompanyNumberInAnotherOrganisation(string companyNumber, Guid organisationId)
+        {
+            return string.IsNullOrEmpty(companyNumber) 
+                ? new DuplicateCheckResponse {DuplicateFound = false, DuplicateOrganisationName = ""} 
+                : _duplicateCheckRepository.DuplicateCompanyNumberExists(organisationId, companyNumber).Result;
+        }
+
+        public DuplicateCheckResponse DuplicateCharityNumberInAnotherOrganisation(string charityNumber, Guid organisationId)
+        {
+            return string.IsNullOrEmpty(charityNumber)
+                ? new DuplicateCheckResponse { DuplicateFound = false, DuplicateOrganisationName = "" }
+                : _duplicateCheckRepository.DuplicateCharityNumberExists(organisationId, charityNumber).Result;
+        }
+
         DuplicateCheckResponse IOrganisationValidator.DuplicateUkprnInAnotherOrganisation(long ukprn, Guid organisationId)
         {
             return _duplicateCheckRepository.DuplicateUKPRNExists(organisationId, ukprn).Result;
+        }
+
+        public bool IsValidOrganisationTypeIdForOrganisation(int organisationTypeId, Guid organisationId)
+        {
+            var providerTypeId = _organisationRepository.GetProviderType(organisationId).Result;
+            return IsValidOrganisationTypeIdForProvider(organisationTypeId, providerTypeId).Result;
         }
     }
 }

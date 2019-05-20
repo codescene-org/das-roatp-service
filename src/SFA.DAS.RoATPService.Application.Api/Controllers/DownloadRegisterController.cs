@@ -1,7 +1,4 @@
-﻿using OfficeOpenXml;
-using SFA.DAS.RoATPService.Application.Api.Helpers;
-
-namespace SFA.DAS.RoATPService.Application.Api.Controllers
+﻿namespace SFA.DAS.RoATPService.Application.Api.Controllers
 {
     using System.Collections.Generic;
     using System.Data.SqlClient;
@@ -10,6 +7,8 @@ namespace SFA.DAS.RoATPService.Application.Api.Controllers
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
+    using OfficeOpenXml;
+    using Api.Helpers;
     using SFA.DAS.RoATPService.Application.Api.Middleware;
     using SFA.DAS.RoATPService.Application.Interfaces;
     using Swashbuckle.AspNetCore.SwaggerGen;
@@ -70,15 +69,14 @@ namespace SFA.DAS.RoATPService.Application.Api.Controllers
                 return NoContent();
             }
         }
-
-
+        
         [HttpGet("roatp-summary")]
         [SwaggerResponse((int) HttpStatusCode.OK, Type = typeof(IEnumerable<IDictionary<string, object>>))]
         [SwaggerResponse((int) HttpStatusCode.BadRequest, typeof(IDictionary<string, string>))]
         [SwaggerResponse((int) HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
         public async Task<IActionResult> RoatpSummary()
         {
-            _logger.LogInformation($"Received request to download complete register");
+            _logger.LogInformation($"Received request to download roatp summary");
 
             try
             {
@@ -91,11 +89,10 @@ namespace SFA.DAS.RoATPService.Application.Api.Controllers
             }
         }
 
-
         [HttpGet("roatp-summary-xlsx")]
-        [SwaggerResponse((int) HttpStatusCode.OK, Type = typeof(IEnumerable<IDictionary<string, object>>))]
-        [SwaggerResponse((int) HttpStatusCode.BadRequest, typeof(IDictionary<string, string>))]
-        [SwaggerResponse((int) HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(IEnumerable<IDictionary<string, object>>))]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, typeof(IDictionary<string, string>))]
+        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
         public async Task<IActionResult> RoatpSummaryExcel()
         {
             _logger.LogInformation($"Received request to download complete register xlsx");
@@ -108,7 +105,7 @@ namespace SFA.DAS.RoATPService.Application.Api.Controllers
                     var worksheetToAdd = package.Workbook.Worksheets.Add("RoATP");
                     worksheetToAdd.Cells.LoadFromDataTable(_dataTableHelper.ToDataTable(resultsSummary), true);
                     return File(package.GetAsByteArray(), "application/excel", $"roatp.xlsx");
-                }        
+                }
             }
             catch (SqlException sqlEx)
             {

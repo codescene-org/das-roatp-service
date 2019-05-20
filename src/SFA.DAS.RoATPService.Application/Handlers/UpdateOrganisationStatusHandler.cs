@@ -1,4 +1,7 @@
-﻿namespace SFA.DAS.RoATPService.Application.Handlers
+﻿using System.Linq;
+using SFA.DAS.RoATPService.Application.Services;
+
+namespace SFA.DAS.RoATPService.Application.Handlers
 {
     using System;
     using System.Threading;
@@ -7,72 +10,70 @@
     using Domain;
     using MediatR;
     using Microsoft.Extensions.Logging;
-    using SFA.DAS.RoATPService.Application.Exceptions;
-    using SFA.DAS.RoATPService.Application.Interfaces;
+    using Exceptions;
+    using Interfaces;
     using Validators;
 
-    public class UpdateOrganisationStatusHandler : UpdateOrganisationHandlerBase, IRequestHandler<UpdateOrganisationStatusRequest, bool>
+    public class UpdateOrganisationStatusHandler : IRequestHandler<UpdateOrganisationStatusRequest, bool>
     {
-        private ILogger<UpdateOrganisationStatusHandler> _logger;
-        private IOrganisationValidator _validator;
-        private IUpdateOrganisationRepository _updateOrganisationRepository;
-        private IAuditLogRepository _auditLogRepository;
-        private IOrganisationStatusRepository _organisationStatusRepository;
+        private readonly ILogger<UpdateOrganisationStatusHandler> _logger;
+        private readonly IOrganisationValidator _validator;
+        private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
+        private readonly ILookupDataRepository _lookupDataRepository;
+        private readonly IOrganisationRepository _organisationRepository;
+        private readonly IAuditLogService _auditLogService;
 
         public UpdateOrganisationStatusHandler(ILogger<UpdateOrganisationStatusHandler> logger,
             IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository,
-            IAuditLogRepository auditLogRepository, IOrganisationStatusRepository organisationStatusRepository)
+            ILookupDataRepository lookupDataRepository, IOrganisationRepository organisationRepository,
+            IAuditLogService auditLogService)
         {
             _logger = logger;
             _validator = validator;
             _updateOrganisationRepository = updateOrganisationRepository;
-            _auditLogRepository = auditLogRepository;
-            _organisationStatusRepository = organisationStatusRepository;
+            _lookupDataRepository = lookupDataRepository;
+            _organisationRepository = organisationRepository;
+            _auditLogService = auditLogService;
         }
 
         public async Task<bool> Handle(UpdateOrganisationStatusRequest request, CancellationToken cancellationToken)
         {
             ValidateUpdateStatusRequest(request);
 
-            int existingStatusId = await _updateOrganisationRepository.GetStatus(request.OrganisationId);
-            var removedReason = await _updateOrganisationRepository.GetRemovedReason(request.OrganisationId);
+            var auditData = _auditLogService.AuditOrganisationStatus(request.OrganisationId, request.UpdatedBy,
+                request.OrganisationStatusId, request.RemovedReasonId);
 
-            bool success = false;
+            var success = false;
 
-            var auditData = CreateAuditData(request.OrganisationId, request.UpdatedBy);
-
-            if (existingStatusId != request.OrganisationStatusId)
+            if (!auditData.ChangesMade)
             {
-                AddAuditEntry(auditData, "Organisation Status", StatusText(existingStatusId),
-                              StatusText(request.OrganisationStatusId));                   
-            }
-            
-            if (!request.RemovedReasonId.HasValue)
-            {
-                success = await _updateOrganisationRepository.UpdateStatus(request.OrganisationId,
-                                request.OrganisationStatusId,  request.UpdatedBy);
-            }
-            else
-            {
-                var reason = await _updateOrganisationRepository.UpdateStatusWithRemovedReason(
-                    request.OrganisationId, request.OrganisationStatusId, 
-                    request.RemovedReasonId.Value, request.UpdatedBy);
+                return await Task.FromResult(false);
 
-                if (removedReason == null || request.RemovedReasonId.Value != removedReason.Id)
-                {
-                    AddAuditEntry(auditData, "Removed Reason", removedReason?.Reason ?? "Not set", reason.Reason);
-                }
-            }
-            
-            success = await _auditLogRepository.WriteFieldChangesToAuditLog(auditData);
-
-            if (success && UpdateStartDateRequired(existingStatusId, request.OrganisationStatusId))
-            {
-                success = await _updateOrganisationRepository.UpdateStartDate(request.OrganisationId, DateTime.Today);
             }
 
-            return await Task.FromResult(success);
+            if (auditData.FieldChanges.Any(x => x.FieldChanged == AuditLogField.OrganisationStatus))
+            {
+                success = await _updateOrganisationRepository.UpdateOrganisationStatus(request.OrganisationId,
+                    request.OrganisationStatusId, request.UpdatedBy);
+            }
+
+            if (auditData.FieldChanges.Any(x => x.FieldChanged == AuditLogField.RemovedReason))
+            {
+                success = await _updateOrganisationRepository.UpdateRemovedReason(request.OrganisationId, 
+                                                                                        request.RemovedReasonId, request.UpdatedBy);
+            }
+
+            if (success && auditData.FieldChanges.Any(x => x.FieldChanged == AuditLogField.StartDate))
+            {
+                success = await _updateOrganisationRepository.UpdateStartDate(request.OrganisationId, DateTime.Today, request.UpdatedBy);
+            }
+
+            if (success)
+                return await _updateOrganisationRepository.WriteFieldChangesToAuditLog(auditData);
+
+            return await Task.FromResult(false);
         }
+
 
         private void ValidateUpdateStatusRequest(UpdateOrganisationStatusRequest request)
         {
@@ -83,11 +84,20 @@
                 throw new BadRequestException(invalidStatusError);
             }
 
-            if (request.OrganisationStatusId != 0 && request.RemovedReasonId.HasValue)
+            if (request.OrganisationStatusId != OrganisationStatus.Removed && request.RemovedReasonId.HasValue)
             {
-                string invalidRemovalReasonError = $@"Invalid Removal Reason for '{request.OrganisationStatusId}'";
+                var invalidRemovalReasonError = $@"Invalid Removal Reason for '{request.OrganisationStatusId}'";
                 _logger.LogInformation(invalidRemovalReasonError);
                 throw new BadRequestException(invalidRemovalReasonError);
+            }
+
+            if (!_validator.IsValidOrganisationStatusIdForOrganisation(request.OrganisationStatusId,
+                request.OrganisationId))
+            {
+                var invalidStatusForOrganisationError = $@"You cannot set the organisation status {request.OrganisationStatusId} for this organisation's provider type";
+
+                _logger.LogInformation(invalidStatusForOrganisationError);
+                throw new BadRequestException(invalidStatusForOrganisationError);
             }
         }
 
@@ -104,7 +114,7 @@
 
         private string StatusText(int statusId)
         {
-            var organisationStatus = _organisationStatusRepository.GetOrganisationStatus(statusId).Result;
+            var organisationStatus = _lookupDataRepository.GetOrganisationStatus(statusId).Result;
 
             if (organisationStatus == null)
             {
