@@ -32,7 +32,7 @@
         {
             if (!_validator.IsValidCharityNumber(request.CharityNumber))
             {
-                var invalidCharityNumberError = $@"Invalid Organisation Charity Registration Nummber '{request.CharityNumber}'";
+                var invalidCharityNumberError = $@"Invalid Organisation Charity Registration Number '{request.CharityNumber}'";
                 _logger.LogInformation(invalidCharityNumberError);
                 throw new BadRequestException(invalidCharityNumberError);
             }
@@ -45,6 +45,15 @@
                 _logger.LogInformation(duplicateCompanyNumerMessage);
                 throw new BadRequestException(duplicateCompanyNumerMessage);
             }
+
+            if (request?.CharityNumber?.Length < 6 || request?.CharityNumber?.Length > 14)
+            {
+                var wrongLengthMessage = $@"Charity registration number '{request.CharityNumber}' should be between 6 and 14 characters'";
+                _logger.LogInformation(wrongLengthMessage);
+                throw new BadRequestException(wrongLengthMessage);
+            }
+
+
             _logger.LogInformation($@"Handling Update '{FieldChanged}' for Organisation ID [{request.OrganisationId}]");
 
             var auditRecord = _auditLogService.AuditCharityNumber(request.OrganisationId, request.UpdatedBy, request.CharityNumber);
