@@ -20,5 +20,7 @@ namespace SFA.DAS.RoATPService.Api.Types.Models
         public DateTime StatusDate { get; set; }
 
         public string Username { get; set; }
+        public bool? SourceIsUKRLP { get; set; }
+
     }
 }
