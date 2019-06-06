@@ -13,6 +13,6 @@ namespace SFA.DAS.RoATPService.Domain
         public DateTime? StartDate { get; set; }
         public bool? SourceIsUKRLP { get; set; }
 
-        public DateTime? RefreshDate { get; set; }
+        public DateTime? ApplicationDeterminedDate { get; set; }
     }
 }
