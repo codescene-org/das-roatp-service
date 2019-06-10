@@ -44,7 +44,8 @@ namespace SFA.DAS.RoATPService.Data
                     FinancialTrackRecord = command.FinancialTrackRecord,
                     NonLevyContract = command.NonLevyContract,
                     StartDate = startDate,
-                    SourceIsUKRLP = command.SourceIsUKRLP
+                    SourceIsUKRLP = command.SourceIsUKRLP,
+                    ApplicationDeterminedDate = command.ApplicationDeterminedDate
                 };
 
                 string sql = $"INSERT INTO [dbo].[Organisations] " +

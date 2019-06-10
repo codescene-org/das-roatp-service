@@ -44,7 +44,8 @@ namespace SFA.DAS.RoATPService.Application.Mappers
                 TradingName = request.TradingName,
                 StartDate = startDate,
                 Username = request.Username,
-                SourceIsUKRLP = request.SourceIsUKRLP
+                SourceIsUKRLP = request.SourceIsUKRLP,
+                ApplicationDeterminedDate = request.ApplicationDeterminedDate
             };
 
             return command;
