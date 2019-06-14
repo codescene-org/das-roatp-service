@@ -367,6 +367,9 @@ UPDATE dbo.ProviderTypes
 SET Description = 'Your organisation will act as a subcontractor for main and employer providers to train apprentices up to a maximum of £500,000 per year. If your organisation is new on the register, this will be limited to £100,000 in its first year.'
 WHERE Id = 3
 
+-- APR-474 update any non-set SourceIsUKRLP to true for Organisations.OrganisationData
+update organisations set OrganisationData = JSON_Modify(OrganisationData,'$.SourceIsUKRLP',CAST(1 as BIT)) where JSON_VALUE(OrganisationData,'$.SourceIsUKRLP') is null
+
 -- load the Company House and Charity Numbers (assumes Register has already been imported)
 :r SaveCompanyandCharityNumber.sql
 :r UpdateStartDateForUkprns.sql
