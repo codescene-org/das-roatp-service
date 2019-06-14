@@ -75,6 +75,11 @@
             return statusDate > DateTime.MinValue;
         }
 
+        public bool IsValidApplicationDeterminedDate(DateTime? applicationDeterminedDate)
+        {
+            return applicationDeterminedDate.HasValue && applicationDeterminedDate.Value > DateTime.MinValue && applicationDeterminedDate.Value <= DateTime.Today;
+        }
+
         public bool IsValidStatus(OrganisationStatus status)
         {
             return status != null && IsValidStatusId(status.Id);
