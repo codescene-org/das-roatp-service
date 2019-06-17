@@ -124,5 +124,17 @@
         {
             return Ok(await _mediator.Send(updateCharityNumberRequest));
         }
+
+
+
+        [HttpPut]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(bool))]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, typeof(IDictionary<string, string>))]
+        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
+        [Route("applicationDeterminedDate")]
+        public async Task<IActionResult> UpdateApplicationDeterminedDate([FromBody] UpdateOrganisationApplicationDeterminedDateRequest request)
+        {
+            return Ok(await _mediator.Send(request));
+        }
     }
 }
