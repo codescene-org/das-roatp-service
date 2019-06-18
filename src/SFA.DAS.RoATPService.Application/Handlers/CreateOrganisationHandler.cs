@@ -99,7 +99,6 @@
             _logger.LogInformation($@"Handling Create Organisation Search for UKPRN [{request.Ukprn}]");
   
             var command = _mapper.Map(request);
-
             return _organisationRepository.CreateOrganisation(command);
         }
 
