@@ -283,7 +283,7 @@ namespace SFA.DAS.RoATPService.Data
                 var updatedAt = DateTime.Now;
 
                 var updateSql =
-                    "update [Organisations] set OrganisationData = JSON_MODIFY(OrganisationData, '$.applicationDeterminedDate', @applicationDeterminedDateValue), UpdatedBy = @updatedBy, UpdatedAt = @updatedAt " +
+                    "update [Organisations] set OrganisationData = JSON_MODIFY(OrganisationData, '$.ApplicationDeterminedDate', @applicationDeterminedDateValue), UpdatedBy = @updatedBy, UpdatedAt = @updatedAt " +
                     "WHERE Id = @organisationId";
 
                 int recordsAffected = await connection.ExecuteAsync(updateSql, new { applicationDeterminedDateValue = applicationDeterminedDateValue, organisationId, updatedBy, updatedAt });

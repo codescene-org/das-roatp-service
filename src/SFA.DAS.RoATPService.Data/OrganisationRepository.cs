@@ -239,5 +239,19 @@
                 return await connection.ExecuteScalarAsync<string>(sql, new { organisationId });
             }
         }
+
+        public async Task<DateTime?> GetApplicationDeterminedDate(Guid organisationId)
+        {
+            var connectionString = _configuration.SqlConnectionString;
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                const string sql = "SELECT Json_value(organisationData,'$.ApplicationDeterminedDate') FROM [Organisations] WHERE Id = @organisationId";
+                return await connection.ExecuteScalarAsync<DateTime?>(sql, new { organisationId });
+            }
+        }
     }
 }

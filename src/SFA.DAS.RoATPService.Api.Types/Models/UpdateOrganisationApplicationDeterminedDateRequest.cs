@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using MediatR;
 
 namespace SFA.DAS.RoATPService.Api.Types.Models
