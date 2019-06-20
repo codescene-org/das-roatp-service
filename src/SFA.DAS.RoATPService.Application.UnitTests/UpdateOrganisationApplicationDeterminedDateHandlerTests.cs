@@ -34,10 +34,12 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _logger = new Mock<ILogger<UpdateOrganisationApplicationDeterminedDateHandler>>();
             _validator = new Mock<IOrganisationValidator>();
             _validator.Setup(x => x.IsValidApplicationDeterminedDate(It.IsAny<DateTime?>())).Returns(true);
-
+            _repository = new Mock<IOrganisationRepository>();
             _repository.Setup(x => x.GetApplicationDeterminedDate(It.IsAny<Guid>())).ReturnsAsync(DateTime.Today).Verifiable();
 
             _updateOrganisationRepository = new Mock<IUpdateOrganisationRepository>();
+            _updateOrganisationRepository.Setup(x => x.UpdateApplicationDeterminedDate(It.IsAny<Guid>(), It.IsAny<DateTime>(), It.IsAny<string>())).ReturnsAsync(true).Verifiable();
+            _updateOrganisationRepository.Setup(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>())).ReturnsAsync(true).Verifiable();
             _auditLogService = new Mock<IAuditLogService>();
             _auditLogService.Setup(x => x.CreateAuditData(It.IsAny<Guid>(), It.IsAny<string>()))
                 .Returns(new AuditData { FieldChanges = new List<AuditLogEntry>() });
@@ -85,28 +87,63 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
                 UpdatedBy = "unit test"
             };
            
-            Func<Task> result = async () => await
-                _handler.Handle(request, new CancellationToken());
-            result.Should().Throw<BadRequestException>();
+            var result = _handler.Handle(request, new CancellationToken()).Result;
+            result.Should().BeFalse();
 
-            _auditLogService.Verify(x => x.AuditApplicationDeterminedDate(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<DateTime>()), Times.Never);
+            _auditLogService.Verify(x => x.AuditApplicationDeterminedDate(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<DateTime>()), Times.Once);
             _updateOrganisationRepository.Verify(x => x.UpdateApplicationDeterminedDate(It.IsAny<Guid>(), It.IsAny<DateTime>(), It.IsAny<string>()), Times.Never);
             _updateOrganisationRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
         }
 
-        //[Test]
-        //public void Handler_updates_application_determined_date()
-        //{
 
-        //    _updateOrganisationRepository.Setup(x =>
-        //            x.UpdateApplicationDeterminedDate(It.IsAny<Guid>(), It.IsAny<DateTime>(), It.IsAny<string>()))
-        //        .ReturnsAsync(true).Verifiable();
+        [Test]
+        public void Handler_does_not_write_audit_log_entry_if_save_operation_fails()
+        {
+            _updateOrganisationRepository.Setup(x => x.UpdateApplicationDeterminedDate(It.IsAny<Guid>(), It.IsAny<DateTime>(), It.IsAny<string>())).ReturnsAsync(false).Verifiable();
 
-        //    var result = _handler.Handle(_request, new CancellationToken()).Result;
+            var request = new UpdateOrganisationApplicationDeterminedDateRequest
+            {
+                ApplicationDeterminedDate = DateTime.Today.AddDays(-2),
+                OrganisationId = Guid.NewGuid(),
+                UpdatedBy = "unit test"
+            };
 
-        //    result.Should().BeTrue();
-        //    _updateOrganisationRepository.VerifyAll();
-        //}
+            var fieldChanges = new List<AuditLogEntry>();
+            fieldChanges.Add(new AuditLogEntry { FieldChanged = AuditLogField.ApplicationDeterminedDate, NewValue = DateTime.Today.AddDays(-2).ToShortDateString(), PreviousValue = DateTime.Today.ToShortDateString() });
+            _auditLogService.Setup(x => x.AuditApplicationDeterminedDate(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<DateTime>()))
+                .Returns(new AuditData { FieldChanges = fieldChanges });
+
+            var result = _handler.Handle(request, new CancellationToken()).GetAwaiter().GetResult();
+            result.Should().BeFalse();
+
+            _auditLogService.Verify(x => x.AuditApplicationDeterminedDate(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<DateTime>()), Times.Once);
+            _updateOrganisationRepository.Verify(x => x.UpdateApplicationDeterminedDate(It.IsAny<Guid>(), It.IsAny<DateTime>(), It.IsAny<string>()), Times.Once);
+            _updateOrganisationRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Never);
+        }
+
+        [Test]
+        public void Handler_writes_updated_application_determined_date_and_audit_log_entry_to_database()
+        {
+            var request = new UpdateOrganisationApplicationDeterminedDateRequest
+            {
+                ApplicationDeterminedDate = DateTime.Today.AddDays(-2),
+                OrganisationId = Guid.NewGuid(),
+                UpdatedBy = "unit test"
+            };
+
+
+            var fieldChanges = new List<AuditLogEntry>();
+            fieldChanges.Add(new AuditLogEntry { FieldChanged = AuditLogField.ApplicationDeterminedDate, NewValue = DateTime.Today.AddDays(-2).ToShortDateString(), PreviousValue = DateTime.Today.ToShortDateString() });
+            _auditLogService.Setup(x => x.AuditApplicationDeterminedDate(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<DateTime>()))
+                .Returns(new AuditData { FieldChanges = fieldChanges });
+
+            var result = _handler.Handle(request, new CancellationToken()).GetAwaiter().GetResult();
+            result.Should().BeTrue();
+
+            _auditLogService.Verify(x => x.AuditApplicationDeterminedDate(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<DateTime>()), Times.Once);
+            _updateOrganisationRepository.Verify(x => x.UpdateApplicationDeterminedDate(It.IsAny<Guid>(), It.IsAny<DateTime>(), It.IsAny<string>()), Times.Once);
+            _updateOrganisationRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Once);
+        }
     }
 }
 

@@ -69,7 +69,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         }
 
         [Test]
-        public void Handler_does_not_update_database_if_company_number_unchanged()
+        public void Handler_does_not_update_database_if_company_number_duplicated()
         {
             var request = new UpdateOrganisationCompanyNumberRequest
             {
