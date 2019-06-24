@@ -276,6 +276,24 @@ namespace SFA.DAS.RoATPService.Application.Services
             return auditData;
         }
 
+        public AuditData AuditApplicationDeterminedDate(Guid organisationId, string updatedBy, DateTime applicationDeterminedDate)
+        {
+            var auditData = new AuditData { FieldChanges = new List<AuditLogEntry>(), OrganisationId = organisationId, UpdatedAt = DateTime.Now, UpdatedBy = updatedBy };
+            var previousApplicationDeterminedDate = _organisationRepository.GetApplicationDeterminedDate(organisationId).Result;
+
+            if (previousApplicationDeterminedDate != applicationDeterminedDate)
+            {
+                var entry = new AuditLogEntry
+                {
+                    FieldChanged = AuditLogField.ApplicationDeterminedDate,
+                    PreviousValue = previousApplicationDeterminedDate?.ToShortDateString(),
+                    NewValue = applicationDeterminedDate.ToShortDateString()
+                };
+                auditData.FieldChanges.Add(entry);
+            }
+            return auditData;
+        }
+
         public AuditData AuditOrganisationStatus(Guid organisationId, string updatedBy, int newOrganisationStatusId, int? newRemovedReasonId)
         {
             var auditData = new AuditData { FieldChanges = new List<AuditLogEntry>(), OrganisationId = organisationId, UpdatedAt = DateTime.Now, UpdatedBy = updatedBy };
