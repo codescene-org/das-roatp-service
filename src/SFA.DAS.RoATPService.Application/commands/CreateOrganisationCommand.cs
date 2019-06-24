@@ -20,5 +20,6 @@ namespace SFA.DAS.RoATPService.Application.Commands
         public string Username { get; set; }
 
         public bool? SourceIsUKRLP { get; set; }
+        public DateTime? ApplicationDeterminedDate { get; set; }
     }
 }
