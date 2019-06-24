@@ -8,7 +8,7 @@ using SFA.DAS.RoatpService.Data.IntegrationTests.Services;
 using SFA.DAS.RoATPService.Data;
 using SFA.DAS.RoATPService.Domain;
 
-namespace SFA.DAS.RoatpService.Data.IntegrationTests
+namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
 {
     public class UpdateOrganisationUpdateCharityNumberTests : TestBase
     {
