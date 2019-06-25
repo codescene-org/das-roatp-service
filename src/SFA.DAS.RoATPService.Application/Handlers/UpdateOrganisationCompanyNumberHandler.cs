@@ -57,7 +57,7 @@
                 return await Task.FromResult(false);
             }
 
-            var success = await _updateOrganisationRepository.UpdateCompanyNumber(request.OrganisationId, request.CompanyNumber, request.UpdatedBy);
+            var success = await _updateOrganisationRepository.UpdateCompanyNumber(request.OrganisationId, request.CompanyNumber?.ToUpper(), request.UpdatedBy);
 
             if (!success)
             {
