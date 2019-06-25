@@ -5,5 +5,6 @@
         ApiAuthentication ApiAuthentication { get; set; }
         string SqlConnectionString { get; set; }
         string SessionRedisConnectionString { get; set; }
+        UkrlpApiAuthentication UkrlpApiAuthentication { get; set; }
     }
 }

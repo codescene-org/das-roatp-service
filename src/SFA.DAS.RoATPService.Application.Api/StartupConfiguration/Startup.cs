@@ -157,6 +157,8 @@
         {
             try
             {
+                MappingStartup.AddMappings();
+
                 if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
 
                 app.UseSwagger()
