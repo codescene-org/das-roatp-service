@@ -3,7 +3,6 @@
     using System;
     using System.Threading.Tasks;
     using Domain;
-    using SFA.DAS.RoATPService.Application.Commands;
 
     public interface IOrganisationRepository
     {
@@ -22,5 +21,6 @@
         Task<DateTime?> GetStartDate(Guid organisationId);
         Task<int> GetProviderType(Guid organisationId);
         Task<string> GetCharityNumber(Guid organisationId);
+        Task<DateTime?> GetApplicationDeterminedDate(Guid organisationId);
     }
 }

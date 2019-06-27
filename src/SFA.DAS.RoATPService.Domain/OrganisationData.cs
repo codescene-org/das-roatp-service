@@ -11,5 +11,8 @@ namespace SFA.DAS.RoATPService.Domain
         public bool FinancialTrackRecord { get; set; }
         public bool NonLevyContract { get; set; }
         public DateTime? StartDate { get; set; }
+        public bool? SourceIsUKRLP { get; set; }
+
+        public DateTime? ApplicationDeterminedDate { get; set; }
     }
 }

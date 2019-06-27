@@ -75,6 +75,11 @@
             return statusDate > DateTime.MinValue;
         }
 
+        public bool IsValidApplicationDeterminedDate(DateTime? applicationDeterminedDate)
+        {
+            return applicationDeterminedDate.HasValue && applicationDeterminedDate.Value > DateTime.MinValue && applicationDeterminedDate.Value <= DateTime.Today;
+        }
+
         public bool IsValidStatus(OrganisationStatus status)
         {
             return status != null && IsValidStatusId(status.Id);
@@ -113,6 +118,10 @@
             {
                 return false;
             }
+
+
+            if (charityNumber.Length < 6 || charityNumber?.Length > 14)
+                return false;
 
             return true;
         }

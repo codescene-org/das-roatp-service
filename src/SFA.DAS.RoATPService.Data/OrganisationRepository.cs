@@ -240,19 +240,35 @@
             }
         }
 
+
         public async Task<OrganisationReapplyStatus> GetOrganisationReapplyStatus(Guid organisationId)
         {
             using (var connection = new SqlConnection(_configuration.SqlConnectionString))
             {
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();
-
+                
                 var sql = "SELECT ProviderTypeId, StatusId FROM Organisations " +
                           "WHERE Id = @organisationId";
 
                 var reapplyStatus = await connection.QueryAsync<OrganisationReapplyStatus>(sql, new {organisationId});
 
                 return reapplyStatus.FirstOrDefault();
+            }
+        }
+        
+        public async Task<DateTime?> GetApplicationDeterminedDate(Guid organisationId)
+        {
+            var connectionString = _configuration.SqlConnectionString;
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                const string sql = "SELECT Json_value(organisationData,'$.ApplicationDeterminedDate') FROM [Organisations] WHERE Id = @organisationId";
+                return await connection.ExecuteScalarAsync<DateTime?>(sql, new { organisationId });
+
             }
         }
     }

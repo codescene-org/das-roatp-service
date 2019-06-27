@@ -52,6 +52,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _validator.Setup(x => x.IsValidUKPRN(It.IsAny<long>())).Returns(true);
             _validator.Setup(x => x.IsValidCompanyNumber(It.IsAny<string>())).Returns(true);
             _validator.Setup(x => x.IsValidCharityNumber(It.IsAny<string>())).Returns(true);
+            _validator.Setup(x => x.IsValidApplicationDeterminedDate(It.IsAny<DateTime?>())).Returns(true);
             _validator.Setup(x => x.DuplicateUkprnInAnotherOrganisation(It.IsAny<long>(), It.IsAny<Guid>()))
                 .Returns(new DuplicateCheckResponse {DuplicateFound = false, DuplicateOrganisationName = ""});
             _validator.Setup(x => x.DuplicateCompanyNumberInAnotherOrganisation(It.IsAny<string>(), It.IsAny<Guid>()))
