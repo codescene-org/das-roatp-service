@@ -38,7 +38,7 @@ namespace SFA.DAS.RoATPService.Data
                 var statusId = command.OrganisationStatusId;
                 var organisationData = new OrganisationData
                 {
-                    CompanyNumber = command.CompanyNumber,
+                    CompanyNumber = command.CompanyNumber?.ToUpper(),
                     CharityNumber = command.CharityNumber,
                     ParentCompanyGuarantee = command.ParentCompanyGuarantee,
                     FinancialTrackRecord = command.FinancialTrackRecord,
