@@ -18,5 +18,10 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Services
             get => throw new NotImplementedException();
             set => throw new NotImplementedException();
         }
+        public UkrlpApiAuthentication UkrlpApiAuthentication
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
     }
 }
