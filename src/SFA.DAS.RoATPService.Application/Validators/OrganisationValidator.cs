@@ -10,7 +10,7 @@
 
     public class OrganisationValidator : IOrganisationValidator
     {
-        private const string CompaniesHouseNumberRegex = "[A-Za-z0-9]{2}[0-9]{6}";
+        private const string CompaniesHouseNumberRegex = "[A-Za-z0-9]{2}[0-9]{5}[A-Za-z0-9]{1}";
         private const string CharityNumberInvalidCharactersRegex = "[^a-zA-Z0-9\\-]";
         private readonly IDuplicateCheckRepository _duplicateCheckRepository;
         private readonly ILookupDataRepository _lookupRepository;
@@ -73,6 +73,11 @@
         public bool IsValidStatusDate(DateTime statusDate)
         {
             return statusDate > DateTime.MinValue;
+        }
+
+        public bool IsValidApplicationDeterminedDate(DateTime? applicationDeterminedDate)
+        {
+            return applicationDeterminedDate.HasValue && applicationDeterminedDate.Value > DateTime.MinValue && applicationDeterminedDate.Value <= DateTime.Today;
         }
 
         public bool IsValidStatus(OrganisationStatus status)

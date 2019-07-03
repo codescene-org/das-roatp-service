@@ -24,5 +24,6 @@ namespace SFA.DAS.RoATPService.Application.Interfaces
             int? newRemovedReasonId);
         AuditData AuditProviderType(Guid organisationId, string updatedBy, int newProviderTypeId, int newOrganisationTypeId);
         AuditData AuditCharityNumber(Guid organisationId, string updatedBy, string charityNumber);
+        AuditData AuditApplicationDeterminedDate(Guid organisationId, string updatedBy, DateTime applicationDeterminedDate);
     }
 }

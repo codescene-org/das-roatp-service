@@ -66,6 +66,9 @@
                 if (!_organisationValidator.IsValidCompanyNumber(request.CompanyNumber))
                     invalidOrganisationError = $"{invalidOrganisationError}: Invalid company number [{request.CompanyNumber}]";
 
+                if (!_organisationValidator.IsValidApplicationDeterminedDate(request.ApplicationDeterminedDate))
+                    invalidOrganisationError = $"{invalidOrganisationError}: Invalid Application Determined Date [{request.ApplicationDeterminedDate}]";
+
                 if (!string.IsNullOrEmpty(request.CompanyNumber))
                 {
                     var duplicateCompanyNumber =
@@ -99,7 +102,6 @@
             _logger.LogInformation($@"Handling Create Organisation Search for UKPRN [{request.Ukprn}]");
   
             var command = _mapper.Map(request);
-
             return _organisationRepository.CreateOrganisation(command);
         }
 
@@ -114,6 +116,7 @@
                     && !_organisationValidator.DuplicateCharityNumberInAnotherOrganisation(request.CharityNumber, Guid.NewGuid()).DuplicateFound
                     && _organisationValidator.IsValidStatusDate(request.StatusDate)
                     && _organisationValidator.IsValidUKPRN(request.Ukprn)  
+                    && _organisationValidator.IsValidApplicationDeterminedDate(request.ApplicationDeterminedDate)
                     && _organisationValidator.IsValidCompanyNumber(request.CompanyNumber)  
                     && _organisationValidator.IsValidCharityNumber(request.CharityNumber)); 
         }
