@@ -269,6 +269,29 @@ namespace SFA.DAS.RoATPService.Data
             }
         }
 
+        public async Task<bool> UpdateApplicationDeterminedDate(Guid organisationId, DateTime applicationDeterminedDate, string updatedBy)
+        {
+            var connectionString = _configuration.SqlConnectionString;
+
+            var applicationDeterminedDateValue = applicationDeterminedDate.ToString(RoatpDateTimeFormat);
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                var updatedAt = DateTime.Now;
+
+                var updateSql =
+                    "update [Organisations] set OrganisationData = JSON_MODIFY(OrganisationData, '$.ApplicationDeterminedDate', @applicationDeterminedDateValue), UpdatedBy = @updatedBy, UpdatedAt = @updatedAt " +
+                    "WHERE Id = @organisationId";
+
+                int recordsAffected = await connection.ExecuteAsync(updateSql, new { applicationDeterminedDateValue = applicationDeterminedDateValue, organisationId, updatedBy, updatedAt });
+
+                return await Task.FromResult(recordsAffected > 0);
+            }
+        }
+
         public async Task<bool> UpdateFinancialTrackRecord(Guid organisationId, bool financialTrackRecord, string updatedBy)
         {
             var connectionString = _configuration.SqlConnectionString;

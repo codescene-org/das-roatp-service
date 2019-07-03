@@ -15,6 +15,9 @@ namespace SFA.DAS.RoATPService.Application.Validators
         bool IsValidLegalName(string legalName);
         bool IsValidTradingName(string tradingName);
         bool IsValidStatusDate(DateTime statusDate);
+
+        bool IsValidApplicationDeterminedDate(DateTime? applicationDeterminedDate);
+
         bool IsValidStatus(OrganisationStatus status);
         bool IsValidStatusId(int statusId);
         bool IsValidCompanyNumber(string companyNumber);

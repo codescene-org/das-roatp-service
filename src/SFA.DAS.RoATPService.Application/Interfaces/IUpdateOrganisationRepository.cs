@@ -21,5 +21,6 @@
         Task<bool> UpdateProviderTypeAndOrganisationType(Guid organisationId, int providerTypeId, int organisationTypeId, string updatedBy);
         Task<bool> WriteFieldChangesToAuditLog(AuditData auditFieldChanges);
         Task<bool> UpdateCharityNumber(Guid organisationId, string charityNumber, string updatedBy);
+        Task<bool> UpdateApplicationDeterminedDate(Guid organisationId, DateTime applicationDeterminedDate, string updatedBy);
     }
 }
