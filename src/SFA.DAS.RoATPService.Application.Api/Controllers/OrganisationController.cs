@@ -60,17 +60,5 @@
             return Ok(await _mediator.Send(getOrganisationReapplyStatusRequest));
         }
 
-        [Obsolete("Use operations in UpdateOrganisationController instead")]
-        [HttpPost]
-        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(bool))]
-        [SwaggerResponse((int)HttpStatusCode.BadRequest, typeof(IDictionary<string, string>))]
-        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
-        [Route("update")]
-        public async Task<IActionResult> Update([FromBody] UpdateOrganisationRequest updateOrganisationRequest)
-        {
-            bool result = await _mediator.Send(updateOrganisationRequest);
-
-            return Ok(result);
-        }
     }
 }

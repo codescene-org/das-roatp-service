@@ -10,5 +10,6 @@
 
         public string SessionRedisConnectionString { get; set; }
         
+        public UkrlpApiAuthentication UkrlpApiAuthentication { get; set; }
     }
 }
