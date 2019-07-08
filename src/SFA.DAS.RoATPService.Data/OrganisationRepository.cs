@@ -247,21 +247,23 @@
             {
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();
-                
+
                 var sql = "SELECT ProviderTypeId, StatusId FROM Organisations " +
                           "WHERE Id = @organisationId";
 
                 var reapplyStatus = await connection.QueryAsync<OrganisationReapplyStatus>(sql, new {organisationId});
 
                 return reapplyStatus.FirstOrDefault();
-            }
+
+             }
         }
-        
+                
         public async Task<DateTime?> GetApplicationDeterminedDate(Guid organisationId)
         {
             var connectionString = _configuration.SqlConnectionString;
 
             using (var connection = new SqlConnection(connectionString))
+
             {
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();

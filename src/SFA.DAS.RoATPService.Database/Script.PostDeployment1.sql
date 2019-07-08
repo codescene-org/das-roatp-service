@@ -355,6 +355,18 @@ BEGIN
 	SET IDENTITY_INSERT dbo.[ProviderTypeOrganisationStatus] OFF
 END
 
+UPDATE dbo.ProviderTypes
+SET Description = 'Your organisation can train apprentices for other organisations, its own employees, employees of connected organisations or act as a subcontractor for other main and employer providers.'
+WHERE Id = 1
+
+UPDATE dbo.ProviderTypes
+SET Description = 'Your organisation can train its own employees, employees of connected organisations or act as a subcontractor for other employer or main providers.'
+WHERE Id = 2
+
+UPDATE dbo.ProviderTypes
+SET Description = 'Your organisation will act as a subcontractor for main and employer providers to train apprentices up to a maximum of £500,000 per year. If your organisation is new on the register, this will be limited to £100,000 in its first year.'
+WHERE Id = 3
+
 -- APR-474 update any non-set SourceIsUKRLP to true for Organisations.OrganisationData
 update organisations set OrganisationData = JSON_Modify(OrganisationData,'$.SourceIsUKRLP',CAST(1 as BIT)) where JSON_VALUE(OrganisationData,'$.SourceIsUKRLP') is null
 
