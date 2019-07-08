@@ -49,5 +49,16 @@
         {
             return Ok(await _mediator.Send(createOrganisationRequest));
         }
+
+        [HttpGet]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(OrganisationReapplyStatus))]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, typeof(IDictionary<string, string>))]
+        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
+        [Route("reapply-status")]
+        public async Task<IActionResult> GetReapplyStatus(GetOrganisationReapplyStatusRequest getOrganisationReapplyStatusRequest)
+        {
+            return Ok(await _mediator.Send(getOrganisationReapplyStatusRequest));
+        }
+
     }
 }

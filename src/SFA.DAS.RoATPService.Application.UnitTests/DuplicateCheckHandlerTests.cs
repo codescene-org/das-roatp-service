@@ -11,6 +11,7 @@
     using Handlers;
     using Microsoft.Extensions.Logging;
     using System.Threading.Tasks;
+    using System.Xml.XPath;
 
     [TestFixture]
     public class DuplicateCheckHandlerTests
@@ -28,7 +29,7 @@
         {
             var response = new DuplicateCheckResponse
             {
-                DuplicateFound = true, DuplicateOrganisationName = "Legal Name"
+                DuplicateFound = true, DuplicateOrganisationName = "Legal Name", DuplicateOrganisationId = Guid.NewGuid()
             };
 
             _repository.Setup(x => x.DuplicateUKPRNExists(It.IsAny<Guid>(), It.IsAny<long>())).ReturnsAsync(response);
@@ -44,6 +45,8 @@
             var result = handler.Handle(request, new CancellationToken()).GetAwaiter().GetResult();
 
             result.DuplicateFound.Should().BeTrue();
+            result.DuplicateOrganisationId.Should().Be(response.DuplicateOrganisationId);
+            result.DuplicateOrganisationName.Should().Be(response.DuplicateOrganisationName);
         }
 
         [Test]
