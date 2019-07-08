@@ -29,6 +29,7 @@ namespace SFA.DAS.RoATPService.Application.Api.Controllers
         }
 
         [Route("lookup/{ukprn}")]
+        [HttpGet]
         public async Task<IActionResult> UkrlpLookup(string ukprn)
         {
             UkprnLookupResponse providerData;
