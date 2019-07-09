@@ -53,5 +53,11 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Handlers
             var sql = $@"DELETE from OrganisationStatus";
             DatabaseService.Execute(sql);
         }
+
+        public static int Removed => 0;
+        public static int Active => 1;
+        public static int ActiveNotTakingOnApprentices => 2;
+        public static int Onboarding => 3;
+
     }
 }
