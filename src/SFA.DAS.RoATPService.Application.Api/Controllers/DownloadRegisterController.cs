@@ -101,11 +101,11 @@ namespace SFA.DAS.RoATPService.Application.Api.Controllers
         {
             _logger.LogInformation($"Received request to download roatp summary for ukprn {ukprn}");
 
-            int ukprnAsInt;
+            int ukprnAsInt = 0;
 
-            if (!int.TryParse(ukprn, out ukprnAsInt))
+            if (!int.TryParse(ukprn, out ukprnAsInt) || (ukprnAsInt < 10000000 || ukprnAsInt > 99999999))
             {
-                _logger.LogInformation($"Could not generate data for invalid ukprn : {ukprn}");
+                _logger.LogError($"Could not generate data for invalid ukprn : {ukprn}");
                 return BadRequest();
             }
 
@@ -115,7 +115,7 @@ namespace SFA.DAS.RoATPService.Application.Api.Controllers
             }
             catch (SqlException sqlEx)
             {
-                _logger.LogInformation($"Could not generate data for roatp summary due to database error");
+                _logger.LogError($"Could not generate data for roatp summary due to database error",sqlEx);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -133,9 +133,9 @@ namespace SFA.DAS.RoATPService.Application.Api.Controllers
             {
                 return Ok(await _repository.GetLatestNonOnboardingOrganisationChangeDate());
             }
-            catch 
+            catch (Exception ex)
             {
-                _logger.LogInformation($"Could not generate data for latest organisation date change due to database or orther internal error");
+                _logger.LogError($"Could not generate data for latest organisation date change due to database or orther internal error", ex);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
