@@ -31,7 +31,7 @@
             return WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
                 .UseApplicationInsights()
-                .UseIIS()
+                .UseKestrel()
                 .UseNLog();
         }
     }
