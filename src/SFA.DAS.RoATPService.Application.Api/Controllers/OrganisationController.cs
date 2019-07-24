@@ -51,13 +51,13 @@
         }
 
         [HttpGet]
-        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(OrganisationReapplyStatus))]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(OrganisationRegisterStatus))]
         [SwaggerResponse((int)HttpStatusCode.BadRequest, typeof(IDictionary<string, string>))]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
-        [Route("reapply-status")]
-        public async Task<IActionResult> GetReapplyStatus(GetOrganisationReapplyStatusRequest getOrganisationReapplyStatusRequest)
+        [Route("register-status")]
+        public async Task<IActionResult> GetRegisterStatus(GetOrganisationRegisterStatusRequest getOrganisationRegisterStatusRequest)
         {
-            return Ok(await _mediator.Send(getOrganisationReapplyStatusRequest));
+            return Ok(await _mediator.Send(getOrganisationRegisterStatusRequest));
         }
 
     }
