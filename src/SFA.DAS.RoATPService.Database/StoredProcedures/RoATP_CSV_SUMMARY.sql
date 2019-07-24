@@ -1,25 +1,27 @@
 ﻿CREATE PROCEDURE [dbo].[RoATP_CSV_SUMMARY]
+	(@ukprn INT = null)
 AS
 
 SET NOCOUNT ON
 
-select ukprn AS UKPRN, 
+SELECT ukprn AS UKPRN, 
  LegalName + 
-	 case isnull(tradingName,'') when '' then ''
-	 else ' T/A ' + tradingName
+	 CASE ISNULL(tradingName,'') WHEN '' THEN ''
+	 ELSE ' T/A ' + tradingName
 	 END AS 'Organisation Name',
  pt.ProviderType AS 'Provider type',
- CASE Json_value(OrganisationData,'$.NonLevyContract')
-	WHEN 'true' then 'Y' else 'N' end  AS 'Contracted to deliver to non-levied employers',
- case Json_value(OrganisationData,'$.ParentCompanyGuarantee')
-	WHEN 'true' then 'Y' else 'N' end AS 'Parent company guarantee',
- case Json_value(OrganisationData,'$.FinancialTrackRecord')
-	WHEN 'true' then 'N' else 'Y' end AS 'New Organisation without financial track record',
- convert(varchar(10),convert(date,Json_value(OrganisationData,'$.StartDate')), 111) AS  'Start Date',
- Case StatusId WHEN 0 then convert(varchar(10),StatusDate,111) else NULL END AS 'End Date',
- CASE StatusId WHEN 2 THEN convert(varchar(10),StatusDate,111) ELSE NULL END AS 'Provider not currently starting new apprentices',
- convert(varchar(10),convert(date,Json_value(OrganisationData,'$.ApplicationDeterminedDate')), 111) AS  'Application Determined Date'
- from organisations o 
- left outer join providerTypes pt on o.ProviderTypeId = pt.Id
-	 where o.StatusId in (0,1,2) -- exclude on-boarding
-	  order by COALESCE(o.UpdatedAt, o.CreatedAt) desc
+ CASE JSON_VALUE(OrganisationData,'$.NonLevyContract')
+	WHEN 'true' THEN 'Y' ELSE 'N' END  AS 'Contracted to deliver to non-levied employers',
+ CASE JSON_VALUE(OrganisationData,'$.ParentCompanyGuarantee')
+	WHEN 'true' THEN 'Y' ELSE 'N' END AS 'Parent company guarantee',
+ CASE JSON_VALUE(OrganisationData,'$.FinancialTrackRecord')
+	WHEN 'true' THEN 'N' ELSE 'Y' END AS 'New Organisation without financial track record',
+ CONVERT(VARCHAR(10),CONVERT(DATE,JSON_VALUE(OrganisationData,'$.StartDate')), 111) AS  'Start Date',
+ CASE StatusId WHEN 0 THEN CONVERT(VARCHAR(10),StatusDate,111) ELSE NULL END AS 'End Date',
+ CASE StatusId WHEN 2 THEN CONVERT(VARCHAR(10),StatusDate,111) ELSE NULL END AS 'Provider not currently starting new apprentices',
+ CONVERT(VARCHAR(10),CONVERT(DATE,JSON_VALUE(OrganisationData,'$.ApplicationDeterminedDate')), 111) AS  'Application Determined Date'
+ FROM organisations o 
+ LEFT OUTER JOIN providerTypes pt ON o.ProviderTypeId = pt.Id
+	 WHERE o.StatusId IN (0,1,2) -- exclude on-boarding
+	 AND ukprn = ISNULL(@ukprn, ukprn)
+	  ORDER BY COALESCE(o.UpdatedAt, o.CreatedAt) DESC

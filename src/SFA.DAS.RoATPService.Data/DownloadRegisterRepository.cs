@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.RoATPService.Data
+﻿using System;
+
+namespace SFA.DAS.RoATPService.Data
 {
     using System.Collections.Generic;
     using System.Data;
@@ -41,6 +43,18 @@
         public async Task<IEnumerable<IDictionary<string, object>>> GetRoatpSummary()
         {
             return (await _connection.QueryAsync(RoatpCsvSummary, commandType: CommandType.StoredProcedure)).OfType<IDictionary<string, object>>().ToList();
+        }
+
+
+        public async Task<IEnumerable<IDictionary<string, object>>> GetRoatpSummaryUkprn(int ukprn)
+        {
+            return (await _connection.QueryAsync(RoatpCsvSummary, new{ukprn},commandType: CommandType.StoredProcedure)).OfType<IDictionary<string, object>>().ToList();
+        }
+
+        public async Task<DateTime?> GetLatestNonOnboardingOrganisationChangeDate()
+        {
+                const string sql = "select max(coalesce(updatedAt,createdAt)) latestDate from organisations o WHERE o.StatusId IN (0,1,2) ";
+                return await _connection.ExecuteScalarAsync<DateTime?>(sql);
         }
     }
 }
