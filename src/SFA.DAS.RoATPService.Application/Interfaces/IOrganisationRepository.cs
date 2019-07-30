@@ -8,7 +8,7 @@
     {
         
         Task<Organisation> GetOrganisation(Guid organisationId);
-        Task<OrganisationReapplyStatus> GetOrganisationReapplyStatus(Guid organisationId);
+        Task<OrganisationRegisterStatus> GetOrganisationRegisterStatus(string ukprn);
         Task<string> GetLegalName(Guid organisationId);
         Task<string> GetTradingName(Guid organisationId);
         Task<bool> GetFinancialTrackRecord(Guid organisationId);
