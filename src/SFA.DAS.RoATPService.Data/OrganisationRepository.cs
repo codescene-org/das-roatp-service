@@ -240,20 +240,32 @@
             }
         }
 
-
-        public async Task<OrganisationReapplyStatus> GetOrganisationReapplyStatus(Guid organisationId)
+        public async Task<OrganisationRegisterStatus> GetOrganisationRegisterStatus(string ukprn)
         {
             using (var connection = new SqlConnection(_configuration.SqlConnectionString))
             {
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();
 
-                var sql = "SELECT ProviderTypeId, StatusId FROM Organisations " +
-                          "WHERE Id = @organisationId";
+                var sql = "SELECT 1 FROM Organisations WHERE UKPRN = @ukprn";
 
-                var reapplyStatus = await connection.QueryAsync<OrganisationReapplyStatus>(sql, new {organisationId});
+                var ukPrnOnRegister = await connection.QueryAsync<bool>(sql, new {ukprn});
 
-                return reapplyStatus.FirstOrDefault();
+                if (!ukPrnOnRegister.FirstOrDefault())
+                {
+                    return new OrganisationRegisterStatus
+                    {
+                        UkprnOnRegister = false
+                    };
+                }
+
+                sql = "SELECT 1 AS UkprnOnRegister, Id AS [OrganisationId], ProviderTypeId, StatusId, StatusDate, "
+                    + "JSON_VALUE(OrganisationData, '$.RemovedReason.Id') AS RemovedReasonId FROM Organisations " +
+                      "WHERE UKPRN = @ukprn";
+
+                var registerStatus = await connection.QueryAsync<OrganisationRegisterStatus>(sql, new {ukprn});
+
+                return registerStatus.FirstOrDefault();
 
              }
         }
