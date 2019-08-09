@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.RoATPService.Application.Interfaces
+﻿using System.Collections.Generic;
+
+namespace SFA.DAS.RoATPService.Application.Interfaces
 {
     using System;
     using System.Threading.Tasks;
@@ -22,5 +24,7 @@
         Task<int> GetProviderType(Guid organisationId);
         Task<string> GetCharityNumber(Guid organisationId);
         Task<DateTime?> GetApplicationDeterminedDate(Guid organisationId);
+
+        Task<IEnumerable<Engagement>> GetEngagements();
     }
 }
