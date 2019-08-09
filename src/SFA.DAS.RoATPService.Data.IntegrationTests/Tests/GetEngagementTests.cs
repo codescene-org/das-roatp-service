@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using SFA.DAS.RoatpService.Data.IntegrationTests.Handlers;
@@ -20,7 +18,6 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
         private OrganisationModel _organisation1WithOnboarding;
         private OrganisationModel _organisation2WithOnboarding;
         private OrganisationModel _organisation3WithoutOnboarding;
-        private Guid _organisationId;
         private List<Engagement> _actualEngagements;
         private int _organisationTypeId;
 
@@ -86,13 +83,6 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
             OrganisationHandler.InsertRecord(_organisation1WithOnboarding);
             OrganisationHandler.InsertRecord(_organisation2WithOnboarding);
             OrganisationHandler.InsertRecord(_organisation3WithoutOnboarding);
-
-
-
-
-
-            //_actualEngagements = _repository.GetEngagements().Result.ToList();
-            //_newCharityNumber = _repository.GetCharityNumber(_organisationId).Result;
         }
 
         [Test]
@@ -110,8 +100,6 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
             OrganisationTypeHandler.DeleteAllRecords();
             OrganisationStatusHandler.DeleteAllRecords();
             ProviderTypeHandler.DeleteAllRecords();
-            //ProviderTypeHandler.DeleteAllRecords();
-            //OrganisationStatusHandler.DeleteRecords(new List<int> { _status1.Id });
         }
     }
 }
