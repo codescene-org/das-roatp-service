@@ -370,3 +370,8 @@ WHERE Id = 3
 -- APR-474 update any non-set SourceIsUKRLP to true for Organisations.OrganisationData
 update organisations set OrganisationData = JSON_Modify(OrganisationData,'$.SourceIsUKRLP',CAST(1 as BIT)) where JSON_VALUE(OrganisationData,'$.SourceIsUKRLP') is null
 
+--  APR-612  Populate the organisationStatusEvents table if it's not already populated for a given ukprn
+INSERT INTO [dbo].[OrganisationStatusEvent]
+           (OrganisationStatusId, CreatedOn,ProviderId)
+     select StatusId, StatusDate, ukprn from Organisations where ukprn not in (select providerId from OrganisationStatusEvent)
+

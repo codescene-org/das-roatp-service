@@ -20,6 +20,7 @@
         private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
         private readonly IAuditLogService _auditLogService;
 
+
         private const string FieldChanged = "Provider Type";
 
         public UpdateOrganisationProviderTypeHandler(ILogger<UpdateOrganisationProviderTypeHandler> logger,
