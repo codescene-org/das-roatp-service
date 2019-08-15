@@ -75,7 +75,7 @@
     <Build Include="StoredProcedures\RoATP_CSV_SUMMARY.sql" />
     <Build Include="Tables\ProviderTypeOrganisationStatus.sql" />
     <Build Include="Tables\OrganisationCategory.sql" />
-    <Build Include="Tables\OrganisationCategoryType.sql" />
+    <Build Include="Tables\OrganisationCategoryOrgTypeProviderType.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Script.PostDeployment1.sql" />

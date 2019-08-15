@@ -377,8 +377,6 @@ update organisations set OrganisationData = JSON_Modify(OrganisationData,'$.Sour
   
   SET IDENTITY_INSERT [OrganisationCategory] ON;
 
-  if (not exists(select * from organisationCategory where id = 0))
-	  insert into [OrganisationCategory] (Id,Category,CreatedAt,CreatedBy,Status) VALUES (0,'Unassigned',getdate(),'System','Live');   
 	 
   if (not exists(select * from organisationCategory where id = 1))
 	  insert into [OrganisationCategory] (Id,Category,CreatedAt,CreatedBy,Status) VALUES (1,'Educational institute',getdate(),'System','Live');
@@ -398,158 +396,393 @@ update organisations set OrganisationData = JSON_Modify(OrganisationData,'$.Sour
 	if (not exists(select * from organisationCategory where id = 19))
 	  insert into [OrganisationCategory] (Id,Category,CreatedAt,CreatedBy,Status) VALUES (19,'Employer',getdate(),'System','Live');
 
-	if (not exists(select * from organisationCategory where id = 20))
-	  insert into [OrganisationCategory] (Id,Category,CreatedAt,CreatedBy,Status) VALUES (20,'Other employer',getdate(),'System','Live');
+	if (not exists(select * from organisationCategory where id = 3))
+	  insert into [OrganisationCategory] (Id,Category,CreatedAt,CreatedBy,Status) VALUES (3,'None of the above',getdate(),'System','Live');
 
 SET IDENTITY_INSERT [OrganisationCategory] OFF;
 
 
-if (not exists (select * from OrganisationCategoryType where OrganisationCategoryId = 0 and OrganisationTypeId = 0 ))
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 1 and OrganisationTypeId = 1 and ProviderTypeId = 1 ))
 	BEGIN
-	INSERT INTO [dbo].[OrganisationCategoryType]
-			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
-		 VALUES (0,0,GetDate(),'System','Live')
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (1,1,1,GetDate(),'System','Live')
 	END
 
-if (not exists (select * from OrganisationCategoryType where OrganisationCategoryId = 1 and OrganisationTypeId = 1 ))
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 1 and OrganisationTypeId = 1 and ProviderTypeId = 2 ))
 	BEGIN
-	INSERT INTO [dbo].[OrganisationCategoryType]
-			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
-		 VALUES (1,1,GetDate(),'System','Live')
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (1,1,2,GetDate(),'System','Live')
 	END
 
-if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 1 and OrganisationTypeId = 2))
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 1 and OrganisationTypeId = 1 and ProviderTypeId = 3 ))
 	BEGIN
-	INSERT INTO [dbo].[OrganisationCategoryType]
-			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
-		 VALUES (1,2,GetDate(),'System','Live')
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (1,1,3,GetDate(),'System','Live')
 	END
 
-if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 1 and OrganisationTypeId = 3))
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 1 and OrganisationTypeId = 2 and ProviderTypeId = 1 ))
 	BEGIN
-	INSERT INTO [dbo].[OrganisationCategoryType]
-			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
-		 VALUES (1,3,GetDate(),'System','Live')
-	END          
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (1,2,1,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 1 and OrganisationTypeId = 2 and ProviderTypeId = 2 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (1,2,2,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 1 and OrganisationTypeId = 2 and ProviderTypeId = 3 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (1,2,3,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 1 and OrganisationTypeId = 3 and ProviderTypeId = 1 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (1,3,1,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 1 and OrganisationTypeId = 3 and ProviderTypeId = 2 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (1,3,2,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 1 and OrganisationTypeId = 3 and ProviderTypeId = 3 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (1,3,3,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 1 and OrganisationTypeId = 4 and ProviderTypeId = 1 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (1,4,1,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 1 and OrganisationTypeId = 4 and ProviderTypeId = 2 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (1,4,2,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 1 and OrganisationTypeId = 4 and ProviderTypeId = 3 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (1,4,3,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 1 and OrganisationTypeId = 5 and ProviderTypeId = 1 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (1,5,1,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 1 and OrganisationTypeId = 5 and ProviderTypeId = 2 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (1,5,2,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 1 and OrganisationTypeId = 5 and ProviderTypeId = 3 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (1,5,3,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 1 and OrganisationTypeId = 6 and ProviderTypeId = 1 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (1,6,1,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 1 and OrganisationTypeId = 6 and ProviderTypeId = 2 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (1,6,2,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 1 and OrganisationTypeId = 6 and ProviderTypeId = 3 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (1,6,3,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 1 and OrganisationTypeId = 7 and ProviderTypeId = 1 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (1,7,1,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 1 and OrganisationTypeId = 7 and ProviderTypeId = 2 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (1,7,2,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 1 and OrganisationTypeId = 7 and ProviderTypeId = 3 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (1,7,3,GetDate(),'System','Live')
+	END
+
 	
-if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 1 and OrganisationTypeId = 4))
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 1 and OrganisationTypeId = 8 and ProviderTypeId = 1 ))
 	BEGIN
-	INSERT INTO [dbo].[OrganisationCategoryType]
-			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
-		 VALUES (1,4,GetDate(),'System','Live')
-	END 
-
-if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 1 and OrganisationTypeId = 5))
-	BEGIN
-	INSERT INTO [dbo].[OrganisationCategoryType]
-			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
-		 VALUES (1,5,GetDate(),'System','Live')
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (1,8,1,GetDate(),'System','Live')
 	END
 
-if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 1 and OrganisationTypeId = 6))
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 1 and OrganisationTypeId = 8 and ProviderTypeId = 2 ))
 	BEGIN
-	INSERT INTO [dbo].[OrganisationCategoryType]
-			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
-		 VALUES (1,6,GetDate(),'System','Live')
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (1,8,2,GetDate(),'System','Live')
 	END
 
-if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 1 and OrganisationTypeId = 7))
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 1 and OrganisationTypeId = 8 and ProviderTypeId = 3 ))
 	BEGIN
-	INSERT INTO [dbo].[OrganisationCategoryType]
-			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
-		 VALUES (1,7,GetDate(),'System','Live')
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (1,8,3,GetDate(),'System','Live')
 	END
 
-if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 1 and OrganisationTypeId = 8))
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 2 and OrganisationTypeId = 9 and ProviderTypeId = 1 ))
 	BEGIN
-	INSERT INTO [dbo].[OrganisationCategoryType]
-			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
-		 VALUES (1,8,GetDate(),'System','Live')
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (2,9,1,GetDate(),'System','Live')
 	END
 
-if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 2 and OrganisationTypeId = 9))
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 2 and OrganisationTypeId = 9 and ProviderTypeId = 2 ))
 	BEGIN
-	INSERT INTO [dbo].[OrganisationCategoryType]
-			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
-		 VALUES (2,9,GetDate(),'System','Live')
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (2,9,2,GetDate(),'System','Live')
 	END
 
-if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 2 and OrganisationTypeId = 10))
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 2 and OrganisationTypeId = 9 and ProviderTypeId = 3 ))
 	BEGIN
-	INSERT INTO [dbo].[OrganisationCategoryType]
-			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
-		 VALUES (2,10,GetDate(),'System','Live')
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (2,9,3,GetDate(),'System','Live')
 	END
 
-if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 2 and OrganisationTypeId = 11))
+
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 2 and OrganisationTypeId = 10 and ProviderTypeId = 1 ))
 	BEGIN
-	INSERT INTO [dbo].[OrganisationCategoryType]
-			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
-		 VALUES (2,11,GetDate(),'System','Live')
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (2,10,1,GetDate(),'System','Live')
 	END
 
-if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 2 and OrganisationTypeId = 12))
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 2 and OrganisationTypeId = 10 and ProviderTypeId = 2 ))
 	BEGIN
-	INSERT INTO [dbo].[OrganisationCategoryType]
-			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
-		 VALUES (2,12,GetDate(),'System','Live')
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (2,10,2,GetDate(),'System','Live')
 	END
 
-if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 2 and OrganisationTypeId = 13))
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 2 and OrganisationTypeId = 10 and ProviderTypeId = 3 ))
 	BEGIN
-	INSERT INTO [dbo].[OrganisationCategoryType]
-			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
-		 VALUES (2,13,GetDate(),'System','Live')
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (2,10,3,GetDate(),'System','Live')
+	END	
+
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 2 and OrganisationTypeId = 11 and ProviderTypeId = 1 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (2,11,1,GetDate(),'System','Live')
 	END
 
-if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 2 and OrganisationTypeId = 14))
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 2 and OrganisationTypeId = 11 and ProviderTypeId = 2 ))
 	BEGIN
-	INSERT INTO [dbo].[OrganisationCategoryType]
-			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
-		 VALUES (2,14,GetDate(),'System','Live')
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (2,11,2,GetDate(),'System','Live')
 	END
 
-if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 2 and OrganisationTypeId = 15))
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 2 and OrganisationTypeId = 11 and ProviderTypeId = 3 ))
 	BEGIN
-	INSERT INTO [dbo].[OrganisationCategoryType]
-			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
-		 VALUES (2,15,GetDate(),'System','Live')
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (2,11,3,GetDate(),'System','Live')
 	END
 
-if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 16 and OrganisationTypeId = 16))
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 2 and OrganisationTypeId = 12 and ProviderTypeId = 1 ))
 	BEGIN
-	INSERT INTO [dbo].[OrganisationCategoryType]
-			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
-		 VALUES (16,16,GetDate(),'System','Live')
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (2,12,1,GetDate(),'System','Live')
 	END
 
-if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 17 and OrganisationTypeId = 17))
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 2 and OrganisationTypeId = 12 and ProviderTypeId = 2 ))
 	BEGIN
-	INSERT INTO [dbo].[OrganisationCategoryType]
-			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
-		 VALUES (17,17,GetDate(),'System','Live')
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (2,12,2,GetDate(),'System','Live')
 	END
 
-if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 18 and OrganisationTypeId = 18))
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 2 and OrganisationTypeId = 12 and ProviderTypeId = 3 ))
 	BEGIN
-	INSERT INTO [dbo].[OrganisationCategoryType]
-			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
-		 VALUES (18,18,GetDate(),'System','Live')
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (2,12,3,GetDate(),'System','Live')
+	END		
+
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 2 and OrganisationTypeId = 13 and ProviderTypeId = 1 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (2,13,1,GetDate(),'System','Live')
 	END
 
-if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 19 and OrganisationTypeId = 19))
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 2 and OrganisationTypeId = 13 and ProviderTypeId = 2 ))
 	BEGIN
-	INSERT INTO [dbo].[OrganisationCategoryType]
-			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
-		 VALUES (19,19,GetDate(),'System','Live')
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (2,13,2,GetDate(),'System','Live')
 	END
 
-if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 20 and OrganisationTypeId = 20))
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 2 and OrganisationTypeId = 13 and ProviderTypeId = 3 ))
 	BEGIN
-	INSERT INTO [dbo].[OrganisationCategoryType]
-			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
-		 VALUES (20,20,GetDate(),'System','Live')
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (2,13,3,GetDate(),'System','Live')
+	END		
+
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 2 and OrganisationTypeId = 14 and ProviderTypeId = 1 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (2,14,1,GetDate(),'System','Live')
 	END
+
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 2 and OrganisationTypeId = 14 and ProviderTypeId = 2 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (2,14,2,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 2 and OrganisationTypeId = 14 and ProviderTypeId = 3 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (2,14,3,GetDate(),'System','Live')
+	END
+	
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 2 and OrganisationTypeId = 15 and ProviderTypeId = 1 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (2,15,1,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 2 and OrganisationTypeId = 15 and ProviderTypeId = 2 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (2,15,2,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 2 and OrganisationTypeId = 15 and ProviderTypeId = 3 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (2,15,3,GetDate(),'System','Live')
+	END				
+
+
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 16 and OrganisationTypeId = 16 and ProviderTypeId = 1 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (16,16,1,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 16 and OrganisationTypeId = 16 and ProviderTypeId = 3 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (16,16,3,GetDate(),'System','Live')
+	END	
+	
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 17 and OrganisationTypeId = 17 and ProviderTypeId = 1 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (17,17,1,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 17 and OrganisationTypeId = 17 and ProviderTypeId = 3 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (17,17,3,GetDate(),'System','Live')
+	END	
+	
+	
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 18 and OrganisationTypeId = 18 and ProviderTypeId = 1 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (18,18,1,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 18 and OrganisationTypeId = 18 and ProviderTypeId = 3 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (18,18,3,GetDate(),'System','Live')
+	END		
+	
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 19 and OrganisationTypeId = 19 and ProviderTypeId = 1 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (19,19,1,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 19 and OrganisationTypeId = 19 and ProviderTypeId = 3 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (19,19,3,GetDate(),'System','Live')
+	END		
+	
+if (not exists (select * from OrganisationCategoryOrgTypeProviderType where OrganisationCategoryId = 3 and OrganisationTypeId = 20 and ProviderTypeId = 2 ))
+	BEGIN
+	INSERT INTO [dbo].OrganisationCategoryOrgTypeProviderType
+			   ([OrganisationCategoryId],[OrganisationTypeId],ProviderTypeId,[CreatedAt],[CreatedBy],[Status])
+		 VALUES (3,20,2,GetDate(),'System','Live')
+	END		
 
 ---- END OF APR-638 ------------------
 
