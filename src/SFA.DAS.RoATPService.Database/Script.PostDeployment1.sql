@@ -376,13 +376,40 @@ update organisations set OrganisationData = JSON_Modify(OrganisationData,'$.Sour
 -- APR-638 adding categories to types --------
   
   SET IDENTITY_INSERT [OrganisationCategory] ON;
+
+  if (not exists(select * from organisationCategory where id = 0))
+	  insert into [OrganisationCategory] (Id,Category,CreatedAt,CreatedBy,Status) VALUES (0,'Unassigned',getdate(),'System','Live');   
+	 
   if (not exists(select * from organisationCategory where id = 1))
-	  insert into [OrganisationCategory] (Id,Category,CreatedAt,CreatedBy,Status) VALUES (1,'Educational Institute',getdate(),'System','Live');
+	  insert into [OrganisationCategory] (Id,Category,CreatedAt,CreatedBy,Status) VALUES (1,'Educational institute',getdate(),'System','Live');
   
    if (not exists(select * from organisationCategory where id = 2))
-	  insert into [OrganisationCategory] (Id,Category,CreatedAt,CreatedBy,Status) VALUES (2,'Public Sector Body',getdate(),'System','Live');
-   
+	  insert into [OrganisationCategory] (Id,Category,CreatedAt,CreatedBy,Status) VALUES (2,'Public sector body',getdate(),'System','Live');
+
+   if (not exists(select * from organisationCategory where id = 16))
+	  insert into [OrganisationCategory] (Id,Category,CreatedAt,CreatedBy,Status) VALUES (16,'Independent training provider',getdate(),'System','Live');
+
+  if (not exists(select * from organisationCategory where id = 17))
+	  insert into [OrganisationCategory] (Id,Category,CreatedAt,CreatedBy,Status) VALUES (17,'Apprenticeship training agency',getdate(),'System','Live');
+
+	if (not exists(select * from organisationCategory where id = 18))
+		insert into [OrganisationCategory] (Id,Category,CreatedAt,CreatedBy,Status) VALUES (18,'Group training association',getdate(),'System','Live');
+
+	if (not exists(select * from organisationCategory where id = 19))
+	  insert into [OrganisationCategory] (Id,Category,CreatedAt,CreatedBy,Status) VALUES (19,'Employer',getdate(),'System','Live');
+
+	if (not exists(select * from organisationCategory where id = 20))
+	  insert into [OrganisationCategory] (Id,Category,CreatedAt,CreatedBy,Status) VALUES (20,'Other employer',getdate(),'System','Live');
+
 SET IDENTITY_INSERT [OrganisationCategory] OFF;
+
+
+if (not exists (select * from OrganisationCategoryType where OrganisationCategoryId = 0 and OrganisationTypeId = 0 ))
+	BEGIN
+	INSERT INTO [dbo].[OrganisationCategoryType]
+			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
+		 VALUES (0,0,GetDate(),'System','Live')
+	END
 
 if (not exists (select * from OrganisationCategoryType where OrganisationCategoryId = 1 and OrganisationTypeId = 1 ))
 	BEGIN
@@ -489,7 +516,40 @@ if (not exists (select * from OrganisationCategoryType where  OrganisationCatego
 		 VALUES (2,15,GetDate(),'System','Live')
 	END
 
+if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 16 and OrganisationTypeId = 16))
+	BEGIN
+	INSERT INTO [dbo].[OrganisationCategoryType]
+			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
+		 VALUES (16,16,GetDate(),'System','Live')
+	END
 
+if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 17 and OrganisationTypeId = 17))
+	BEGIN
+	INSERT INTO [dbo].[OrganisationCategoryType]
+			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
+		 VALUES (17,17,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 18 and OrganisationTypeId = 18))
+	BEGIN
+	INSERT INTO [dbo].[OrganisationCategoryType]
+			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
+		 VALUES (18,18,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 19 and OrganisationTypeId = 19))
+	BEGIN
+	INSERT INTO [dbo].[OrganisationCategoryType]
+			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
+		 VALUES (19,19,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 20 and OrganisationTypeId = 20))
+	BEGIN
+	INSERT INTO [dbo].[OrganisationCategoryType]
+			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
+		 VALUES (20,20,GetDate(),'System','Live')
+	END
 
 ---- END OF APR-638 ------------------
 
