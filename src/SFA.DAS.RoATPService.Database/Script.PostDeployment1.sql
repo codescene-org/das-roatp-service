@@ -368,5 +368,20 @@ SET Description = 'Your organisation will act as a subcontractor for main and em
 WHERE Id = 3
 
 -- APR-474 update any non-set SourceIsUKRLP to true for Organisations.OrganisationData
-update organisations set OrganisationData = JSON_Modify(OrganisationData,'$.SourceIsUKRLP',CAST(1 as BIT)) where JSON_VALUE(OrganisationData,'$.SourceIsUKRLP') is null
+update organisations set OrganisationData = JSON_Modify(OrganisationData,'$.SourceIsUKRLP',CAST(1 as BIT)) where JSON_VALUE(OrganisationData,'$.SourceIsUKRLP') is NULL
+
+
+
+
+-- APR-638 adding categories to types
+  
+  SET IDENTITY_INSERT [OrganisationCategory] ON;
+  if (not exists(select * from organisationCategory where id = 1))
+	  insert into [OrganisationCategory] (Id,Category,CreatedAt,CreatedBy,Status) VALUES (1,'Educational Institute',getdate(),'System','Live');
+  
+   if (not exists(select * from organisationCategory where id = 2))
+	  insert into [OrganisationCategory] (Id,Category,CreatedAt,CreatedBy,Status) VALUES (2,'Public Sector Body',getdate(),'System','Live');
+   
+SET IDENTITY_INSERT [OrganisationCategory] OFF;
+
 
