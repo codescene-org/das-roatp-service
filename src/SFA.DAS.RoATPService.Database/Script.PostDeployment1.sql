@@ -373,7 +373,7 @@ update organisations set OrganisationData = JSON_Modify(OrganisationData,'$.Sour
 
 
 
--- APR-638 adding categories to types
+-- APR-638 adding categories to types --------
   
   SET IDENTITY_INSERT [OrganisationCategory] ON;
   if (not exists(select * from organisationCategory where id = 1))
@@ -384,4 +384,112 @@ update organisations set OrganisationData = JSON_Modify(OrganisationData,'$.Sour
    
 SET IDENTITY_INSERT [OrganisationCategory] OFF;
 
+if (not exists (select * from OrganisationCategoryType where OrganisationCategoryId = 1 and OrganisationTypeId = 1 ))
+	BEGIN
+	INSERT INTO [dbo].[OrganisationCategoryType]
+			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
+		 VALUES (1,1,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 1 and OrganisationTypeId = 2))
+	BEGIN
+	INSERT INTO [dbo].[OrganisationCategoryType]
+			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
+		 VALUES (1,2,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 1 and OrganisationTypeId = 3))
+	BEGIN
+	INSERT INTO [dbo].[OrganisationCategoryType]
+			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
+		 VALUES (1,3,GetDate(),'System','Live')
+	END          
+	
+if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 1 and OrganisationTypeId = 4))
+	BEGIN
+	INSERT INTO [dbo].[OrganisationCategoryType]
+			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
+		 VALUES (1,4,GetDate(),'System','Live')
+	END 
+
+if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 1 and OrganisationTypeId = 5))
+	BEGIN
+	INSERT INTO [dbo].[OrganisationCategoryType]
+			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
+		 VALUES (1,5,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 1 and OrganisationTypeId = 6))
+	BEGIN
+	INSERT INTO [dbo].[OrganisationCategoryType]
+			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
+		 VALUES (1,6,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 1 and OrganisationTypeId = 7))
+	BEGIN
+	INSERT INTO [dbo].[OrganisationCategoryType]
+			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
+		 VALUES (1,7,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 1 and OrganisationTypeId = 8))
+	BEGIN
+	INSERT INTO [dbo].[OrganisationCategoryType]
+			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
+		 VALUES (1,8,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 2 and OrganisationTypeId = 9))
+	BEGIN
+	INSERT INTO [dbo].[OrganisationCategoryType]
+			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
+		 VALUES (2,9,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 2 and OrganisationTypeId = 10))
+	BEGIN
+	INSERT INTO [dbo].[OrganisationCategoryType]
+			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
+		 VALUES (2,10,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 2 and OrganisationTypeId = 11))
+	BEGIN
+	INSERT INTO [dbo].[OrganisationCategoryType]
+			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
+		 VALUES (2,11,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 2 and OrganisationTypeId = 12))
+	BEGIN
+	INSERT INTO [dbo].[OrganisationCategoryType]
+			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
+		 VALUES (2,12,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 2 and OrganisationTypeId = 13))
+	BEGIN
+	INSERT INTO [dbo].[OrganisationCategoryType]
+			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
+		 VALUES (2,13,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 2 and OrganisationTypeId = 14))
+	BEGIN
+	INSERT INTO [dbo].[OrganisationCategoryType]
+			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
+		 VALUES (2,14,GetDate(),'System','Live')
+	END
+
+if (not exists (select * from OrganisationCategoryType where  OrganisationCategoryId = 2 and OrganisationTypeId = 15))
+	BEGIN
+	INSERT INTO [dbo].[OrganisationCategoryType]
+			   ([OrganisationCategoryId],[OrganisationTypeId],[CreatedAt],[CreatedBy],[Status])
+		 VALUES (2,15,GetDate(),'System','Live')
+	END
+
+
+
+---- END OF APR-638 ------------------
 
