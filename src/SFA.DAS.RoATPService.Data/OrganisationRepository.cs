@@ -298,7 +298,7 @@ namespace SFA.DAS.RoATPService.Data
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();
 
-                var sql = $@"select ProviderId, CreatedOn,
+                var sql = $@"select ID, ProviderId, CreatedOn,
                                 Case OrganisationStatusId
                                 When 0 then 'REMOVED'
                                 WHEN 1 then 'ACTIVE'
