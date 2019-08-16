@@ -218,6 +218,24 @@ namespace SFA.DAS.RoATPService.Data
                 x => selectedproviderTypeOrganisationTypes.Any(z => z.OrganisationTypeId == x.Id));
         }
 
+        public async Task<IEnumerable<OrganisationType>> GetOrganisationTypesForProviderTypeIdCategoryId(int providerTypeId, int categoryId)
+        {   
+            using (var connection = new SqlConnection(_configuration.SqlConnectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                var sql = $@"select id, Type,Description from organisationTypes where id in
+                    (select organisationTypeId from OrganisationCategoryOrgTypeProviderType 
+                    where ProviderTypeId = @providerTypeId and OrganisationCategoryId = @categoryId)
+                            order by ID";
+
+                var organisationTypes = await connection.QueryAsync<OrganisationType>(sql, new { providerTypeId, categoryId });
+
+                return await Task.FromResult(organisationTypes);
+            }
+        }
+
 
         public async Task<IEnumerable<OrganisationStatus>> GetOrganisationStatusesForProviderTypeId(int? providerTypeId)
         {
