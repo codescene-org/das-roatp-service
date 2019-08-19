@@ -225,10 +225,11 @@ namespace SFA.DAS.RoATPService.Data
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();
 
-                var sql = $@"select id, Type,Description from organisationTypes where id in
-                    (select organisationTypeId from OrganisationCategoryOrgTypeProviderType 
-                    where ProviderTypeId = @providerTypeId and OrganisationCategoryId = @categoryId)
-                            order by ID";
+                var sql = $@"select id, Type,Description, CreatedAt, CreatedBy, UpdatedAt, UpdatedBy, Status
+                                    from organisationTypes where id in
+                                    (select organisationTypeId from OrganisationCategoryOrgTypeProviderType 
+                                    where ProviderTypeId = @providerTypeId and OrganisationCategoryId = @categoryId)
+                                            order by ID";
 
                 var organisationTypes = await connection.QueryAsync<OrganisationType>(sql, new { providerTypeId, categoryId });
 
@@ -250,6 +251,22 @@ namespace SFA.DAS.RoATPService.Data
 
             return organisationStatuses.Where(
                 x => selectedProviderTypeOrganisationStatuses.Any(z => z.OrganisationStatusId == x.Id));
+        }
+
+        public async Task<IEnumerable<OrganisationCategory>> GetOrganisationCategories(int providerTypeId)
+        {
+            using (var connection = new SqlConnection(_configuration.SqlConnectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                var sql = $@"select id,category, CreatedAt, CreatedBy, UpdatedAt, UpdatedBy, Status from organisationCategory where id in
+                            (select distinct OrganisationCategoryId from OrganisationCategoryOrgTypeProviderType where ProviderTypeId = @providerTypeId)";
+
+                var organisationTypes = await connection.QueryAsync<OrganisationCategory>(sql, new { providerTypeId });
+
+                return await Task.FromResult(organisationTypes);
+            }
         }
     }
 }

@@ -23,5 +23,6 @@ namespace SFA.DAS.RoATPService.Application.Interfaces
         Task<IEnumerable<OrganisationType>> GetOrganisationTypesForProviderTypeIdCategoryId(int providerTypeId, int categoryId);
 
         Task<IEnumerable<OrganisationStatus>> GetOrganisationStatusesForProviderTypeId(int? providerTypeId);
+        Task<IEnumerable<OrganisationCategory>> GetOrganisationCategories(int providerTypeId);
     }
 }

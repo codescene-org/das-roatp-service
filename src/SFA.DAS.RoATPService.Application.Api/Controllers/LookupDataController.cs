@@ -41,6 +41,14 @@
         }
 
         [HttpGet]
+        [Route("organisationCategories/{providerTypeId}")]
+        public async Task<IActionResult> OrganisationCategories(int providerTypeId)
+        {
+            var request = new GetOrganisationCategoriesRequest { ProviderTypeId = providerTypeId };
+
+            return Ok(await _mediator.Send(request));
+        }
+        [HttpGet]
         [Route("organisationTypes/{providerTypeId}/{categoryId}")]
         public async Task<IActionResult> OrganisationTypesByCategory(int providerTypeId, int categoryId)
         {
