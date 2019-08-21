@@ -40,7 +40,7 @@ namespace SFA.DAS.RoATPService.Api.Client.IntegrationTests
             {
                 QueryId = "2",
                 StakeholderId = "2",
-                ApiBaseAddress = "http://webservices.ukrlp.co.uk/UkrlpProviderQueryWS5/ProviderQueryServiceV5"
+                ApiBaseAddress = "http://webservices.ukrlp.co.uk/UkrlpProviderQueryWS6/ProviderQueryServiceV6"
             };
 
             _config.SetupGet(x => x.UkrlpApiAuthentication).Returns(apiConfig);
@@ -66,6 +66,24 @@ namespace SFA.DAS.RoATPService.Api.Client.IntegrationTests
                 .FirstOrDefault(x => x.VerificationAuthority == "Sole Trader or Non-limited Partnership")
                 .Should().NotBeNull();
             matchResult.ProviderAliases.Count.Should().Be(1);
+        }
+
+        [Test]
+        public void Matching_UKPRN_has_a_primary_verification_source()
+        {
+            var ukprn = 10006287;
+            var client = new UkrlpApiClient(_logger.Object, _config.Object, new HttpClient(),
+                new UkrlpSoapSerializer());
+
+            var result = client.GetTrainingProviderByUkprn(ukprn).GetAwaiter().GetResult();
+
+            result.Should().NotBeNull();
+            result.Results.Count.Should().Be(1);
+            var matchResult = result.Results[0];
+            matchResult.UKPRN.Should().Be(ukprn.ToString());
+            var primaryVerification =
+                matchResult.VerificationDetails.FirstOrDefault(x => x.PrimaryVerificationSource == true);
+            primaryVerification.VerificationAuthority.Should().Be("Charity Commission");
         }
 
         [Test]

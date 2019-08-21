@@ -88,7 +88,8 @@ namespace SFA.DAS.RoATPService.Api.Client.AutoMapper
             CreateMap<VerificationDetailsStructure, VerificationDetails>()
                 .ForMember(dest => dest.VerificationAuthority,
                     opt => opt.MapFrom(source => source.VerificationAuthority))
-                .ForMember(dest => dest.VerificationId, opt => opt.MapFrom(source => source.VerificationId));
+                .ForMember(dest => dest.VerificationId, opt => opt.MapFrom(source => source.VerificationId))
+                .ForMember(dest => dest.PrimaryVerificationSource, opt => opt.MapFrom(source => source.PrimaryVerificationSource));
         }
     }
 }
