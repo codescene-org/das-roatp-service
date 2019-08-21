@@ -36,7 +36,7 @@ namespace SFA.DAS.RoATPService.Application.Handlers
                 throw new BadRequestException(invalidProviderTypeError);
             }
 
-            _logger.LogInformation($@"Handling Organisation Types lookup for Provider Type Id [{request.ProviderTypeId}]");
+            _logger.LogInformation($@"Handling Organisation Categories lookup for Provider Type Id [{request.ProviderTypeId}]");
 
             try
             {
@@ -44,7 +44,7 @@ namespace SFA.DAS.RoATPService.Application.Handlers
             }
             catch (Exception ex)
             {
-                _logger.LogError("Unable to retrieve Organisation Types", ex);
+                _logger.LogError($@"Unable to retrieve Organisation Categories for Provider Type Id [{request.ProviderTypeId}]", ex);
                 throw new ApplicationException(ex.Message);
             }
         }

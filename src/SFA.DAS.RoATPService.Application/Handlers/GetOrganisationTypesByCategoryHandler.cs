@@ -21,13 +21,14 @@ namespace SFA.DAS.RoATPService.Application.Handlers
         private readonly ILookupDataRepository _repository;
         private readonly ILogger<GetOrganisationTypesByCategoryHandler> _logger;
         private readonly IProviderTypeValidator _providerTypeValidator;
-
+        private readonly IOrganisationCategoryValidator _categoryValidator;
         public GetOrganisationTypesByCategoryHandler(ILookupDataRepository repository,
-            ILogger<GetOrganisationTypesByCategoryHandler> logger, IProviderTypeValidator providerTypeValidator)
+            ILogger<GetOrganisationTypesByCategoryHandler> logger, IProviderTypeValidator providerTypeValidator, IOrganisationCategoryValidator categoryValidator)
         {
             _repository = repository;
             _logger = logger;
             _providerTypeValidator = providerTypeValidator;
+            _categoryValidator = categoryValidator;
         }
 
         public async Task<IEnumerable<OrganisationType>> Handle(GetOrganisationTypesByCategoryRequest request, CancellationToken cancellationToken)
@@ -39,7 +40,14 @@ namespace SFA.DAS.RoATPService.Application.Handlers
                 throw new BadRequestException(invalidProviderTypeError);
             }
 
-            _logger.LogInformation($@"Handling Organisation Types lookup for Provider Type Id [{request.ProviderTypeId}]");
+            if (!_categoryValidator.IsValidCategoryId(request.CategoryId))
+            {
+                string invalidMessage = $@"Invalid Category Id [{request.CategoryId}]";
+                _logger.LogInformation(invalidMessage);
+                throw new BadRequestException(invalidMessage);
+            }
+
+            _logger.LogInformation($@"Handling Organisation Types for a category lookup for Provider Type Id [{request.ProviderTypeId}], Category Id [{request.CategoryId}]");
 
             try
             {
@@ -47,7 +55,7 @@ namespace SFA.DAS.RoATPService.Application.Handlers
             }
             catch (Exception ex)
             {
-                _logger.LogError("Unable to retrieve Organisation Types", ex);
+                _logger.LogError("Unable to retrieve Organisation Types for a category lookup for Provider Type Id [{request.ProviderTypeId}], Category Id [{request.CategoryId}]", ex);
                 throw new ApplicationException(ex.Message);
             }
         }

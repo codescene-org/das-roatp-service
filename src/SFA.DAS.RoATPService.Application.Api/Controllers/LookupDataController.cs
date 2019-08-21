@@ -32,7 +32,7 @@
         }
 
         [HttpGet]
-        [Route("organisationTypes/{providerTypeId}")]
+        [Route("organisationTypes")]
         public async Task<IActionResult> OrganisationTypes(int providerTypeId)
         {
             var request = new GetOrganisationTypesRequest {ProviderTypeId = providerTypeId};

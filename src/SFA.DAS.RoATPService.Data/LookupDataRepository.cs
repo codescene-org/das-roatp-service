@@ -21,8 +21,8 @@ namespace SFA.DAS.RoATPService.Data
         private readonly IWebConfiguration _configuration;
 
         private readonly ICacheHelper _cacheHelper;
-     
-        public LookupDataRepository( IWebConfiguration configuration, ICacheHelper cacheHelper)
+
+        public LookupDataRepository(IWebConfiguration configuration, ICacheHelper cacheHelper)
         {
             _configuration = configuration;
             _cacheHelper = cacheHelper;
@@ -31,7 +31,7 @@ namespace SFA.DAS.RoATPService.Data
         public async Task<IEnumerable<ProviderType>> GetProviderTypes()
         {
             var results = _cacheHelper.Get<ProviderType>();
-           
+
             if (results != null)
             {
                 return await Task.FromResult(results.ToList());
@@ -49,7 +49,7 @@ namespace SFA.DAS.RoATPService.Data
 
                 var providerTypes = await connection.QueryAsync<ProviderType>(sql);
                 _cacheHelper.Cache(providerTypes);
-                
+
 
                 return await Task.FromResult(providerTypes);
             }
@@ -75,9 +75,10 @@ namespace SFA.DAS.RoATPService.Data
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();
 
-                var sql = $"select ot.Id, ot.Type, ot.Description, ot.CreatedBy, ot.CreatedAt, ot.UpdatedBy, ot.UpdatedAt, ot.Status "
-                          + "from [OrganisationTypes] ot " +
-                          "order by Id";
+                var sql =
+                    $"select ot.Id, ot.Type, ot.Description, ot.CreatedBy, ot.CreatedAt, ot.UpdatedBy, ot.UpdatedAt, ot.Status "
+                    + "from [OrganisationTypes] ot " +
+                    "order by Id";
 
                 var organisationTypes = await connection.QueryAsync<OrganisationType>(sql);
                 _cacheHelper.Cache(organisationTypes);
@@ -209,7 +210,7 @@ namespace SFA.DAS.RoATPService.Data
             if (providerTypeId == null)
                 return organisationTypes;
 
-            var providerTypeOrganisationTypes =  await GetProviderTypeOrganisationTypes();
+            var providerTypeOrganisationTypes = await GetProviderTypeOrganisationTypes();
 
             var selectedproviderTypeOrganisationTypes =
                 providerTypeOrganisationTypes.Where(x => x.ProviderTypeId == providerTypeId);
@@ -218,8 +219,9 @@ namespace SFA.DAS.RoATPService.Data
                 x => selectedproviderTypeOrganisationTypes.Any(z => z.OrganisationTypeId == x.Id));
         }
 
-        public async Task<IEnumerable<OrganisationType>> GetOrganisationTypesForProviderTypeIdCategoryId(int providerTypeId, int categoryId)
-        {   
+        public async Task<IEnumerable<OrganisationType>> GetOrganisationTypesForProviderTypeIdCategoryId(
+            int providerTypeId, int categoryId)
+        {
             using (var connection = new SqlConnection(_configuration.SqlConnectionString))
             {
                 if (connection.State != ConnectionState.Open)
@@ -231,42 +233,60 @@ namespace SFA.DAS.RoATPService.Data
                                     where ProviderTypeId = @providerTypeId and OrganisationCategoryId = @categoryId)
                                             order by ID";
 
-                var organisationTypes = await connection.QueryAsync<OrganisationType>(sql, new { providerTypeId, categoryId });
+                var organisationTypes =
+                    await connection.QueryAsync<OrganisationType>(sql, new {providerTypeId, categoryId});
 
                 return await Task.FromResult(organisationTypes);
             }
         }
 
-
-        public async Task<IEnumerable<OrganisationStatus>> GetOrganisationStatusesForProviderTypeId(int? providerTypeId)
-        {
-
-            var organisationStatuses = await GetOrganisationStatuses();
-            if (providerTypeId == null)
-                return organisationStatuses;
-
-            var providerTypeOrganisationStatuses = await GetProviderTypeOrganisationStatuses();
-            var selectedProviderTypeOrganisationStatuses =
-                providerTypeOrganisationStatuses.Where(x => x.ProviderTypeId == providerTypeId);
-
-            return organisationStatuses.Where(
-                x => selectedProviderTypeOrganisationStatuses.Any(z => z.OrganisationStatusId == x.Id));
-        }
-
-        public async Task<IEnumerable<OrganisationCategory>> GetOrganisationCategories(int providerTypeId)
+        public async Task<IEnumerable<int>> GetValidOrganisationCategoryIds()
         {
             using (var connection = new SqlConnection(_configuration.SqlConnectionString))
             {
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();
 
-                var sql = $@"select id,category, CreatedAt, CreatedBy, UpdatedAt, UpdatedBy, Status from organisationCategory where id in
+                var sql = $@"select id from OrganisationCategory";
+
+                var validCategoryIds = await connection.QueryAsync<int>(sql);
+
+                return await Task.FromResult(validCategoryIds);
+            }
+        }
+
+        public async Task<IEnumerable<OrganisationStatus>>
+            GetOrganisationStatusesForProviderTypeId(int? providerTypeId)
+            {
+
+                var organisationStatuses = await GetOrganisationStatuses();
+                if (providerTypeId == null)
+                    return organisationStatuses;
+
+                var providerTypeOrganisationStatuses = await GetProviderTypeOrganisationStatuses();
+                var selectedProviderTypeOrganisationStatuses =
+                    providerTypeOrganisationStatuses.Where(x => x.ProviderTypeId == providerTypeId);
+
+                return organisationStatuses.Where(
+                    x => selectedProviderTypeOrganisationStatuses.Any(z => z.OrganisationStatusId == x.Id));
+            }
+
+            public async Task<IEnumerable<OrganisationCategory>> GetOrganisationCategories(int providerTypeId)
+            {
+                using (var connection = new SqlConnection(_configuration.SqlConnectionString))
+                {
+                    if (connection.State != ConnectionState.Open)
+                        await connection.OpenAsync();
+
+                    var sql =
+                        $@"select id,category, CreatedAt, CreatedBy, UpdatedAt, UpdatedBy, Status from organisationCategory where id in
                             (select distinct OrganisationCategoryId from OrganisationCategoryOrgTypeProviderType where ProviderTypeId = @providerTypeId)";
 
-                var organisationTypes = await connection.QueryAsync<OrganisationCategory>(sql, new { providerTypeId });
+                    var organisationTypes =
+                        await connection.QueryAsync<OrganisationCategory>(sql, new {providerTypeId});
 
-                return await Task.FromResult(organisationTypes);
+                    return await Task.FromResult(organisationTypes);
+                }
             }
         }
     }
-}

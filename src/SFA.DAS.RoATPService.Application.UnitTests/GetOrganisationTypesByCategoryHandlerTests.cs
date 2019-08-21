@@ -22,7 +22,8 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         private GetOrganisationTypesByCategoryHandler _handler;
         private Mock<ILookupDataRepository> _repository;
         private Mock<ILogger<GetOrganisationTypesByCategoryHandler>> _logger;
-        private IProviderTypeValidator _validator;
+        private IProviderTypeValidator _providerTypeValidator;
+        private IOrganisationCategoryValidator _categoryValidator;
 
         [SetUp]
         public void Before_each_test()
@@ -43,8 +44,9 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             };
             _repository.Setup(x => x.GetOrganisationTypesForProviderTypeIdCategoryId(It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(organisationTypes);
             _logger = new Mock<ILogger<GetOrganisationTypesByCategoryHandler>>();
-            _validator = new ProviderTypeValidator();
-            _handler = new GetOrganisationTypesByCategoryHandler(_repository.Object, _logger.Object, _validator);
+            _providerTypeValidator = new ProviderTypeValidator();
+            _categoryValidator = new OrganisationCategoryValidator(_repository.Object);
+            _handler = new GetOrganisationTypesByCategoryHandler(_repository.Object, _logger.Object, _providerTypeValidator, _categoryValidator);
         }
 
 
@@ -53,7 +55,8 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         [TestCase(3,1)]
         public void Handler_retrieves_list_of_organisations_by_provider_type(int providerTypeId, int categoryId)
         {
-            var request = new GetOrganisationTypesByCategoryRequest { ProviderTypeId = providerTypeId, CategoryId = 1};
+            _repository.Setup((x => x.GetValidOrganisationCategoryIds())).ReturnsAsync(new List<int>{categoryId});
+            var request = new GetOrganisationTypesByCategoryRequest { ProviderTypeId = providerTypeId, CategoryId = categoryId};
 
             var result = _handler.Handle(request, new CancellationToken()).Result;
 
@@ -82,7 +85,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
 
             Func<Task> result = async () => await
                 _handler.Handle(request, new CancellationToken());
-            result.Should().Throw<ApplicationException>();
+            result.Should().Throw<BadRequestException>();
         }
     }
 }

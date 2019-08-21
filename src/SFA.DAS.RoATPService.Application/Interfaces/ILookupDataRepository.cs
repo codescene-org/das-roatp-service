@@ -20,5 +20,7 @@
         Task<IEnumerable<OrganisationStatus>> GetOrganisationStatusesForProviderTypeId(int? providerTypeId);
         Task<IEnumerable<OrganisationCategory>> GetOrganisationCategories(int providerTypeId);
         Task<IEnumerable<OrganisationType>> GetOrganisationTypesForProviderTypeIdCategoryId(int providerTypeId, int categoryId);
+
+        Task<IEnumerable<int>> GetValidOrganisationCategoryIds();
     }
 }
