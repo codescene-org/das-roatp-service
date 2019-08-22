@@ -28,18 +28,6 @@ BEGIN
 
 	SET IDENTITY_INSERT dbo.ProviderTypes OFF
 END
-ELSE
-BEGIN
-	UPDATE dbo.ProviderTypes
-	SET [ProviderType] = 'Main provider'
-	WHERE Id = 1
-	UPDATE dbo.ProviderTypes
-	SET [ProviderType] = 'Employer provider'
-	WHERE Id = 2
-	UPDATE dbo.ProviderTypes
-	SET [ProviderType] = 'Supporting provider'
-	WHERE Id = 3
-END
 
 -- Set up lookup data for organisation types
 
@@ -74,42 +62,6 @@ BEGIN
 
 	SET IDENTITY_INSERT dbo.OrganisationTypes OFF
 END
-ELSE
-BEGIN
-	DELETE FROM dbo.ProviderTypeOrganisationTypes
-	WHERE OrganisationTypeId NOT IN (0)
-
-	DELETE FROM dbo.OrganisationTypes
-	WHERE Id NOT IN (0)
-
-	SET IDENTITY_INSERT dbo.OrganisationTypes ON
-
-	INSERT INTO dbo.OrganisationTypes
-	([Id], [Type], [CreatedBy], [CreatedAt], [Status])
-	VALUES
-	(1, 'School', 'System', SYSDATETIME(), 'Live'),
-	(2, 'GFE college', 'System', SYSDATETIME(), 'Live'),
-	(3, 'National college', 'System', SYSDATETIME(), 'Live'),
-	(4, 'Sixth form college', 'System', SYSDATETIME(), 'Live'),
-	(5, 'Further education institution', 'System', SYSDATETIME(), 'Live'),
-	(6, 'Higher education institution', 'System', SYSDATETIME(), 'Live'),
-	(7, 'Academy', 'System', SYSDATETIME(), 'Live'),
-	(8, 'Multi-academy trust', 'System', SYSDATETIME(), 'Live'),
-	(9, 'NHS Trust', 'System', SYSDATETIME(), 'Live'),
-	(10, 'Police', 'System', SYSDATETIME(), 'Live'),
-	(11, 'Fire authority', 'System', SYSDATETIME(), 'Live'),
-	(12, 'Local authority', 'System', SYSDATETIME(), 'Live'),
-	(13, 'Government department', 'System', SYSDATETIME(), 'Live'),
-	(14, 'Non-departmental public body', 'System', SYSDATETIME(), 'Live'),
-	(15, 'Executive agency', 'System', SYSDATETIME(), 'Live'),
-	(16, 'Independent training provider', 'System', SYSDATETIME(), 'Live'),
-	(17, 'Apprenticeship training agency', 'System', SYSDATETIME(), 'Live'),
-	(18, 'Group training association', 'System', SYSDATETIME(), 'Live'),
-	(19, 'Employer', 'System', SYSDATETIME(), 'Live'),
-	(20, 'Other employer', 'System', SYSDATETIME(), 'Live')
-
-	SET IDENTITY_INSERT dbo.OrganisationTypes OFF
-END
 
 -- Map provider types to available organisation types
 
@@ -123,70 +75,6 @@ BEGIN
 	(1, 1, 0, 'System', SYSDATETIME(), 'Live'),
 	(2, 2, 0, 'System', SYSDATETIME(), 'Live'),
 	(3, 3, 0, 'System', SYSDATETIME(), 'Live'),
-	(4, 1, 1, 'System', SYSDATETIME(), 'Live'),
-	(5, 3, 1, 'System', SYSDATETIME(), 'Live'),
-	(6, 1, 2, 'System', SYSDATETIME(), 'Live'),
-	(7, 3, 2, 'System', SYSDATETIME(), 'Live'),
-	(8, 1, 3, 'System', SYSDATETIME(), 'Live'),
-	(9, 3, 3, 'System', SYSDATETIME(), 'Live'),
-	(10, 1, 4, 'System', SYSDATETIME(), 'Live'),
-	(11, 3, 4, 'System', SYSDATETIME(), 'Live'),
-	(12, 1, 5, 'System', SYSDATETIME(), 'Live'),
-	(13, 3, 5, 'System', SYSDATETIME(), 'Live'),
-	(14, 1, 6, 'System', SYSDATETIME(), 'Live'),
-	(15, 3, 6, 'System', SYSDATETIME(), 'Live'),
-	(16, 1, 7, 'System', SYSDATETIME(), 'Live'),
-	(17, 3, 7, 'System', SYSDATETIME(), 'Live'),
-	(18, 1, 8, 'System', SYSDATETIME(), 'Live'),
-	(19, 3, 8, 'System', SYSDATETIME(), 'Live'),
-	(20, 1, 9, 'System', SYSDATETIME(), 'Live'),
-	(21, 3, 9, 'System', SYSDATETIME(), 'Live'),
-	(22, 1, 10, 'System', SYSDATETIME(), 'Live'),
-	(23, 3, 10, 'System', SYSDATETIME(), 'Live'),
-	(24, 1, 11, 'System', SYSDATETIME(), 'Live'),
-	(25, 3, 11, 'System', SYSDATETIME(), 'Live'),
-	(26, 1, 12, 'System', SYSDATETIME(), 'Live'),
-	(27, 3, 12, 'System', SYSDATETIME(), 'Live'),
-	(28, 1, 13, 'System', SYSDATETIME(), 'Live'),
-	(29, 3, 13, 'System', SYSDATETIME(), 'Live'),
-	(30, 1, 14, 'System', SYSDATETIME(), 'Live'),
-	(31, 3, 14, 'System', SYSDATETIME(), 'Live'),
-	(32, 1, 15, 'System', SYSDATETIME(), 'Live'),
-	(33, 3, 15, 'System', SYSDATETIME(), 'Live'),
-	(34, 1, 16, 'System', SYSDATETIME(), 'Live'),
-	(35, 3, 16, 'System', SYSDATETIME(), 'Live'),
-	(36, 1, 17, 'System', SYSDATETIME(), 'Live'),
-	(37, 3, 17, 'System', SYSDATETIME(), 'Live'),
-	(38, 1, 18, 'System', SYSDATETIME(), 'Live'),
-	(39, 3, 18, 'System', SYSDATETIME(), 'Live'),
-	(40, 1, 19, 'System', SYSDATETIME(), 'Live'),
-	(41, 3, 19, 'System', SYSDATETIME(), 'Live'),
-	(42, 2, 1, 'System', SYSDATETIME(), 'Live'),
-	(43, 2, 2, 'System', SYSDATETIME(), 'Live'),
-	(44, 2, 3, 'System', SYSDATETIME(), 'Live'),
-	(45, 2, 4, 'System', SYSDATETIME(), 'Live'),
-	(46, 2, 5, 'System', SYSDATETIME(), 'Live'),
-	(47, 2, 6, 'System', SYSDATETIME(), 'Live'),
-	(48, 2, 7, 'System', SYSDATETIME(), 'Live'),
-	(49, 2, 8, 'System', SYSDATETIME(), 'Live'),
-	(50, 2, 9, 'System', SYSDATETIME(), 'Live'),
-	(51, 2, 10, 'System', SYSDATETIME(), 'Live'),
-	(52, 2, 11, 'System', SYSDATETIME(), 'Live'),
-	(53, 2, 12, 'System', SYSDATETIME(), 'Live'),
-	(54, 2, 13, 'System', SYSDATETIME(), 'Live'),
-	(55, 2, 14, 'System', SYSDATETIME(), 'Live'),
-	(56, 2, 15, 'System', SYSDATETIME(), 'Live'),
-	(57, 2, 20, 'System', SYSDATETIME(), 'Live')
-
-	SET IDENTITY_INSERT dbo.ProviderTypeOrganisationTypes OFF
-END
-ELSE 
-BEGIN 
-	SET IDENTITY_INSERT dbo.ProviderTypeOrganisationTypes ON
-
-	INSERT INTO dbo.ProviderTypeOrganisationTypes
-	([Id], [ProviderTypeId], [OrganisationTypeId], [CreatedBy], [CreatedAt], [Status])
-	VALUES
 	(4, 1, 1, 'System', SYSDATETIME(), 'Live'),
 	(5, 3, 1, 'System', SYSDATETIME(), 'Live'),
 	(6, 1, 2, 'System', SYSDATETIME(), 'Live'),
@@ -283,35 +171,6 @@ BEGIN
 	SET IDENTITY_INSERT dbo.OrganisationStatus OFF
 	
 END
-
--- Drop old lookup tables
-
-IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES   
-     WHERE TABLE_CATALOG = db_name() 
-      AND TABLE_SCHEMA = 'dbo' 
-      AND TABLE_NAME = 'InactiveReasons'))
-BEGIN
-   DROP TABLE dbo.InactiveReasons
-END
-
-IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES   
-     WHERE TABLE_CATALOG = db_name() 
-      AND TABLE_SCHEMA = 'dbo' 
-      AND TABLE_NAME = 'ApplicationRouteOrganisationTypes'))
-BEGIN
-   DROP TABLE dbo.ApplicationRouteOrganisationTypes
-END
-
-IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES   
-     WHERE TABLE_CATALOG = db_name() 
-      AND TABLE_SCHEMA = 'dbo' 
-      AND TABLE_NAME = 'ApplicationRoutes'))
-BEGIN
-   DROP TABLE dbo.ApplicationRoutes
-END
-
-
-
 
  -- STORY APR-388  April 2019
 IF NOT EXISTS (SELECT 1 FROM dbo.organisationStatus WHERE id = 3) 
