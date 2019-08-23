@@ -232,5 +232,8 @@ update organisations set OrganisationData = JSON_Modify(OrganisationData,'$.Sour
 --  APR-612  Populate the organisationStatusEvents table if it's not already populated for a given ukprn
 INSERT INTO [dbo].[OrganisationStatusEvent]
            (OrganisationStatusId, CreatedOn,ProviderId)
-     select StatusId, StatusDate, ukprn from Organisations where ukprn not in (select providerId from OrganisationStatusEvent)
+	  select o.StatusId, o.StatusDate, o.ukprn from Organisations o 
+	  left outer join OrganisationStatusEvent ose on o.ukprn = ose.providerId
+	  and o.StatusId = ose.OrganisationStatusId and o.StatusDate = ose.CreatedOn
+	  where ose.ProviderId is null
 
