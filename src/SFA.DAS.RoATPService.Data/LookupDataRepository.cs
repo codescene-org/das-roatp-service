@@ -57,8 +57,26 @@ namespace SFA.DAS.RoATPService.Data
 
         public async Task<ProviderType> GetProviderType(int providerTypeId)
         {
-            var types = await GetProviderTypes();
-            return types.FirstOrDefault(x => x.Id == providerTypeId);
+            var results = _cacheHelper.Get<ProviderType>();
+            if (results != null)
+            {
+                return await Task.FromResult(results.FirstOrDefault(x => x.Id == providerTypeId));
+            }
+
+            using (var connection = new SqlConnection(_configuration.SqlConnectionString))
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                var sql = $"select Id, ProviderType AS [Type], Description, " +
+                          "CreatedAt, CreatedBy, UpdatedAt, UpdatedBy, Status " +
+                          "from [ProviderTypes] " +
+                          "where id = @providerTypeId";
+
+                var providerTypes = await connection.QueryAsync<ProviderType>(sql, new {providerTypeId});
+              
+                return await Task.FromResult(providerTypes.FirstOrDefault());
+            }
         }
 
         public async Task<IEnumerable<OrganisationType>> GetOrganisationTypes()
@@ -131,11 +149,7 @@ namespace SFA.DAS.RoATPService.Data
             {
                 return await Task.FromResult(results);
             }
-
-            if (results != null)
-            {
-                return await Task.FromResult(results);
-            }
+  
             using (var connection = new SqlConnection(_configuration.SqlConnectionString))
             {
                 if (connection.State != ConnectionState.Open)
