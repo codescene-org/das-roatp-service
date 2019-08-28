@@ -1,4 +1,14 @@
-﻿namespace SFA.DAS.RoATPService.Application.Api.StartupConfiguration
+﻿using System.Reflection;
+using FluentValidation;
+using Microsoft.AspNetCore.Http;
+using SFA.DAS.RoATPService.Api.Types.Models;
+using SFA.DAS.RoATPService.Application.Api.Extensions;
+using SFA.DAS.RoATPService.Application.Api.Helpers;
+using SFA.DAS.RoATPService.Application.Handlers;
+using SFA.DAS.RoATPService.Application.Interfaces;
+using SFA.DAS.RoATPService.Domain;
+
+namespace SFA.DAS.RoATPService.Application.Api.StartupConfiguration
 {
     using System;
     using System.Collections.Generic;
@@ -21,7 +31,6 @@
     using Microsoft.Extensions.Logging;
     using Middleware;
     using Settings;
-    using StructureMap;
     using Swashbuckle.AspNetCore.Swagger;
 
     public class Startup
@@ -46,7 +55,7 @@
 
         public IWebConfiguration Configuration { get; }
 
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
             IServiceProvider serviceProvider;
             try
@@ -109,8 +118,10 @@
                         c.IncludeXmlComments(xmlPath);
                     }
                 });
+                //services.AddMediatR(typeof(Startup));
 
-                serviceProvider = ConfigureIOC(services);
+
+                ConfigureDependencyInjection(services);
 
                 if (_env.IsDevelopment())
                 {
@@ -122,37 +133,54 @@
                 _logger.LogError(e, "Error during Startup Configure Services");
                 throw;
             }
-
-            return serviceProvider;
         }
 
-        private IServiceProvider ConfigureIOC(IServiceCollection services)
+        private void ConfigureDependencyInjection(IServiceCollection services)
         {
-            var container = new Container();
+            //var container = new Container();
 
-            container.Configure(config =>
-            {
-                config.Scan(_ =>
-                {
-                    _.AssembliesFromApplicationBaseDirectory(c => c.FullName.StartsWith("SFA"));
-                    _.WithDefaultConventions();
+            //container.Configure(config =>
+            //{
+            //    config.Scan(_ =>
+            //    {
+            //        _.AssembliesFromApplicationBaseDirectory(c => c.FullName.StartsWith("SFA"));
+            //        _.WithDefaultConventions();
 
-                    _.ConnectImplementationsToTypesClosing(typeof(IRequestHandler<>)); // Handlers with no response
-                    _.ConnectImplementationsToTypesClosing(typeof(IRequestHandler<,>)); // Handlers with a response
-                    _.ConnectImplementationsToTypesClosing(typeof(INotificationHandler<>));
-                });
+            //        _.ConnectImplementationsToTypesClosing(typeof(IRequestHandler<>)); // Handlers with no response
+            //        _.ConnectImplementationsToTypesClosing(typeof(IRequestHandler<,>)); // Handlers with a response
+            //        _.ConnectImplementationsToTypesClosing(typeof(INotificationHandler<>));
+            //    });
 
-                config.For<IWebConfiguration>().Use(Configuration);
-                config.For<SingleInstanceFactory>().Use<SingleInstanceFactory>(ctx => t => ctx.GetInstance(t));
-                config.For<MultiInstanceFactory>().Use<MultiInstanceFactory>(ctx => t => ctx.GetAllInstances(t));
-                config.For<IMediator>().Use<Mediator>();
-                config.For<IDbConnection>().Use(c => new SqlConnection(Configuration.SqlConnectionString));
+            //    config.For<IWebConfiguration>().Use(Configuration);
+            //    config.For<SingleInstanceFactory>().Use<SingleInstanceFactory>(ctx => t => ctx.GetInstance(t));
+            //    config.For<MultiInstanceFactory>().Use<MultiInstanceFactory>(ctx => t => ctx.GetAllInstances(t));
+            //    config.For<IMediator>().Use<Mediator>();
+            //    config.For<IDbConnection>().Use(c => new SqlConnection(Configuration.SqlConnectionString));
 
-                config.Populate(services);
-            });
+            //    config.Populate(services);
+            //});
 
-            return container.GetInstance<IServiceProvider>();
+            // return container.GetInstance<IServiceProvider>();
+
+            //services.RegisterAllTypes<IValidator>(new[] { typeof(IValidator).Assembly });
+
+
+            services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
+
+
+
+            services.AddTransient(x => Configuration);
+            services.AddScoped<IMediator, Mediator>();
+            services.AddTransient(c => new SqlConnection(Configuration.SqlConnectionString));
+            services.AddTransient<IDownloadRegisterRepository, DownloadRegisterRepository>();
+            services.AddTransient<IDataTableHelper, DataTableHelper>();
+
+            services.AddMediatR(typeof(IRequestHandler<GetProviderTypesRequest, IEnumerable<ProviderType>>).GetTypeInfo().Assembly);
+            services.AddMediatR(typeof(GetProviderTypesHandler).GetTypeInfo().Assembly);
+
+
         }
+
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
