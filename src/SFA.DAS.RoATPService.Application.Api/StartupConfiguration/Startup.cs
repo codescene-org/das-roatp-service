@@ -84,6 +84,7 @@
                 ApplicationConfiguration.Bind("RegisterAuditLogSettings", auditLogSettings);
                 services.AddSingleton(auditLogSettings);
 
+                services.AddHealthChecks();
                 IMvcBuilder mvcBuilder;
                 if (_env.IsDevelopment())
                     mvcBuilder = services.AddMvc(opt => { opt.Filters.Add(new AllowAnonymousFilter()); });
@@ -171,6 +172,7 @@
                 app.UseMiddleware(typeof(ErrorHandlingMiddleware));
 
                 app.UseRequestLocalization();
+                app.UseHealthChecks("/health");
 
                 app.UseMvc();
             }
