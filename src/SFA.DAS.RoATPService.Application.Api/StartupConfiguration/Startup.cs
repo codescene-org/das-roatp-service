@@ -170,15 +170,11 @@ namespace SFA.DAS.RoATPService.Application.Api.StartupConfiguration
 
 
             services.AddTransient(x => Configuration);
-            services.AddScoped<IMediator, Mediator>();
             services.AddTransient(c => new SqlConnection(Configuration.SqlConnectionString));
             services.AddTransient<IDownloadRegisterRepository, DownloadRegisterRepository>();
             services.AddTransient<IDataTableHelper, DataTableHelper>();
 
-            services.AddMediatR(typeof(IRequestHandler<GetProviderTypesRequest, IEnumerable<ProviderType>>).GetTypeInfo().Assembly);
             services.AddMediatR(typeof(GetProviderTypesHandler).GetTypeInfo().Assembly);
-
-
         }
 
 
