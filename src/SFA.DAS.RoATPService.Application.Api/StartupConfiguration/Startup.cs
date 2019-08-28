@@ -138,7 +138,6 @@ namespace SFA.DAS.RoATPService.Application.Api.StartupConfiguration
         {
             services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
             services.AddTransient(x => Configuration);
-            services.AddTransient(c => new SqlConnection(Configuration.SqlConnectionString));
             services.AddTransient<IDownloadRegisterRepository, DownloadRegisterRepository>();
             services.AddTransient<ILookupDataRepository, LookupDataRepository>();
             services.AddTransient<IOrganisationRepository, OrganisationRepository>();
@@ -157,7 +156,7 @@ namespace SFA.DAS.RoATPService.Application.Api.StartupConfiguration
             services.AddTransient<IUkrlpApiClient, UkrlpApiClient>();
             services.AddTransient<IAuditLogService, AuditLogService>();
             services.AddTransient<IOrganisationStatusManager, OrganisationStatusManager>();        
-            services.AddTransient<HttpClient,HttpClient>();
+            services.AddTransient<HttpClient>();
             services.AddTransient<IUkrlpSoapSerializer, UkrlpSoapSerializer>();
             services.AddMediatR(typeof(GetProviderTypesHandler).GetTypeInfo().Assembly);
         }
