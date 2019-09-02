@@ -113,7 +113,15 @@
                             {
                                 "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
                                 "value": "[reference('InternalApiAppInsights').outputs.InstrumentationKey.value]"
-                            }
+                            },
+							{
+								"name": "WEBSITE_SWAP_WARMUP_PING_PATH",
+								"value": "/health"
+							},
+							{
+								"name": "WEBSITE_SWAP_WARMUP_PING_STATUSES",
+								"value": "200"
+							}
                         ]
                     },
                     "appServiceConnectionStrings": {
