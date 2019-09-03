@@ -13,17 +13,20 @@
     public class CreateOrganisationHandler : IRequestHandler<CreateOrganisationRequest, Guid?>
     {
         private readonly ICreateOrganisationRepository _organisationRepository;
+        private readonly IEventsRepository _eventsRepository;
         private readonly ILogger<CreateOrganisationHandler> _logger;
         private readonly IOrganisationValidator _organisationValidator;
         private readonly IProviderTypeValidator _providerTypeValidator;
         private readonly IMapCreateOrganisationRequestToCommand _mapper;
         private readonly ITextSanitiser _textSanitiser;
 
-        public CreateOrganisationHandler(ICreateOrganisationRepository repository, ILogger<CreateOrganisationHandler> logger, 
-                                         IOrganisationValidator organisationValidator, IProviderTypeValidator providerTypeValidator, 
-                                         IMapCreateOrganisationRequestToCommand mapper, ITextSanitiser textSanitiser)
+        public CreateOrganisationHandler(ICreateOrganisationRepository repository, IEventsRepository eventsRepository, 
+                                            ILogger<CreateOrganisationHandler> logger, IOrganisationValidator organisationValidator, 
+                                            IProviderTypeValidator providerTypeValidator, IMapCreateOrganisationRequestToCommand mapper, 
+                                            ITextSanitiser textSanitiser)
         {
             _organisationRepository = repository;
+            _eventsRepository = eventsRepository;
             _logger = logger;
             _organisationValidator = organisationValidator;
             _providerTypeValidator = providerTypeValidator;
@@ -102,7 +105,12 @@
             _logger.LogInformation($@"Handling Create Organisation Search for UKPRN [{request.Ukprn}]");
   
             var command = _mapper.Map(request);
-            return _organisationRepository.CreateOrganisation(command);
+            var organisationId = _organisationRepository.CreateOrganisation(command);
+
+            _eventsRepository.AddOrganisationStatusEvents(command.Ukprn, command.OrganisationStatusId,
+                command.StatusDate);
+
+            return organisationId;
         }
 
         private bool IsValidCreateOrganisation(CreateOrganisationRequest request)
