@@ -298,15 +298,9 @@ namespace SFA.DAS.RoATPService.Data
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();
 
-                var sql = $@"select ID, ProviderId, CreatedOn,
-                                Case OrganisationStatusId
-                                When 0 then 'REMOVED'
-                                WHEN 1 then 'ACTIVE'
-                                WHEN 2 then 'ACTIVENOSTARTS'
-                                WHEN 3 then 'INITIATED'
-                                else 'UNKNOWN'
-                                End as Event
-                                from organisationStatusEvent";
+                var sql = $@"select ose.ID, ose.providerId, ose.CreatedOn, isnull(os.EventDescription, 'UNKNOWN') as Event
+	                                        from OrganisationStatusEvent ose left join organisationStatus os
+	                                        on os.Id = ose.OrganisationStatusId";
                 return await connection.QueryAsync<Engagement>(sql);
 
             }
