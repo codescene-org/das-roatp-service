@@ -10,7 +10,7 @@
 
     public class OrganisationValidator : IOrganisationValidator
     {
-        private const string CompaniesHouseNumberRegex = "[A-Za-z0-9]{2}[0-9]{5}[A-Za-z0-9]{1}";
+        private const string CompaniesHouseNumberRegex = "[A-Za-z0-9]{2}[0-9]{4}[A-Za-z0-9]{2}";
         private const string CharityNumberInvalidCharactersRegex = "[^a-zA-Z0-9\\-]";
         private readonly IDuplicateCheckRepository _duplicateCheckRepository;
         private readonly ILookupDataRepository _lookupRepository;
