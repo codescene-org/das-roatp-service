@@ -43,10 +43,10 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Tests
 
         _repository = new OrganisationRepository(_databaseService.WebConfiguration);
 
-        OrganisationStatusHandler.InsertRecord(new OrganisationStatusModel { Id = OrganisationStatus.Active, CreatedAt = DateTime.Now, CreatedBy = "system", Status = "Active" });
-        OrganisationStatusHandler.InsertRecord(new OrganisationStatusModel { Id = OrganisationStatus.Onboarding, CreatedAt = DateTime.Now, CreatedBy = "system", Status = "Onboarding" });
-        OrganisationStatusHandler.InsertRecord(new OrganisationStatusModel { Id = OrganisationStatus.ActiveNotTakingOnApprentices, CreatedAt = DateTime.Now, CreatedBy = "system", Status = "active not taking" });
-        OrganisationStatusHandler.InsertRecord(new OrganisationStatusModel { Id = OrganisationStatus.Removed, CreatedAt = DateTime.Now, CreatedBy = "system", Status = "Removed" });
+        OrganisationStatusHandler.InsertRecord(new OrganisationStatusModel { Id = OrganisationStatus.Active, CreatedAt = DateTime.Now, CreatedBy = "system", Status = "Active", EventDescription = "ACTIVE"});
+        OrganisationStatusHandler.InsertRecord(new OrganisationStatusModel { Id = OrganisationStatus.Onboarding, CreatedAt = DateTime.Now, CreatedBy = "system", Status = "Onboarding", EventDescription = "INITIATED"});
+        OrganisationStatusHandler.InsertRecord(new OrganisationStatusModel { Id = OrganisationStatus.ActiveNotTakingOnApprentices, CreatedAt = DateTime.Now, CreatedBy = "system", Status = "active not taking", EventDescription = "ACTIVENOSTARTS"});
+        OrganisationStatusHandler.InsertRecord(new OrganisationStatusModel { Id = OrganisationStatus.Removed, CreatedAt = DateTime.Now, CreatedBy = "system", Status = "Removed", EventDescription = "REMOVED"});
 
         event1Active = new OrganisationStatusEventModel { Id = 1, CreatedOn = event1CreatedOn, OrganisationStatusId = OrganisationStatus.Active, ProviderId = 11112221 };
         event2Onboarding = new OrganisationStatusEventModel { Id = 2, CreatedOn = event2CreatedOn, OrganisationStatusId = OrganisationStatus.Onboarding, ProviderId = 11112222 };
