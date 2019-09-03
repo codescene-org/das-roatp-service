@@ -10,5 +10,7 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Models
         public string CreatedBy { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public string UpdatedBy { get; set; }
+
+        public string EventDescription { get; set; }
     }
 }
