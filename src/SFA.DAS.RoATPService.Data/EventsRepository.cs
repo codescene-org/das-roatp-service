@@ -24,14 +24,12 @@ namespace SFA.DAS.RoATPService.Data
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();
 
-
                 var sql = $@"INSERT INTO [dbo].[OrganisationStatusEvent]
                                     ([OrganisationStatusId]
                                     ,[CreatedOn]
                                     ,[ProviderId]) " +
                           "VALUES " +
                           "(@organisationStatusId, @createdOn, @ukprn)";
-
 
                 var eventsCreated = await connection.ExecuteAsync(sql,
                     new
@@ -52,14 +50,12 @@ namespace SFA.DAS.RoATPService.Data
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();
 
-
                 var sql = $@"INSERT INTO [dbo].[OrganisationStatusEvent]
                                     ([OrganisationStatusId]
                                     ,[CreatedOn]
                                     ,[ProviderId]) " +
                           "VALUES " +
                           "(@organisationStatusId, @createdOn, (select top 1 ukprn from organisations where  id=@organisationId))";
-
 
                 var eventsCreated = await connection.ExecuteAsync(sql,
                     new
