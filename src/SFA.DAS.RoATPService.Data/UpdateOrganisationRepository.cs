@@ -105,25 +105,7 @@ namespace SFA.DAS.RoATPService.Data
                           "WHERE Id = @organisationId";
                 int recordsAffected = await connection.ExecuteAsync(sql, new { organisationStatusId, updatedBy, updatedAt, organisationId });
 
-                var success = await Task.FromResult(recordsAffected > 0);
-
-                if (!success) return false;
-
-                sql = $@"INSERT INTO [dbo].[OrganisationStatusEvent]
-                                    ([OrganisationStatusId]
-                                    ,[CreatedOn]
-                                    ,[ProviderId]) 
-                                    VALUES (@organisationStatusId, @updatedAt, (select top 1 ukprn from organisations where  id=@organisationId))";
-
-                await connection.ExecuteAsync(sql,
-                    new
-                    {
-                        organisationStatusId,
-                        updatedAt,
-                        organisationId
-                    });
-
-                return true;
+                return await Task.FromResult(recordsAffected > 0);
             }
         }
 
