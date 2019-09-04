@@ -17,21 +17,20 @@
     {
         private readonly ILogger<UpdateOrganisationProviderTypeHandler> _logger;
         private readonly IOrganisationValidator _validator;
+
         private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
-        private readonly IEventsRepository _eventsRepository;
         private readonly IAuditLogService _auditLogService;
 
         private const string FieldChanged = "Provider Type";
 
         public UpdateOrganisationProviderTypeHandler(ILogger<UpdateOrganisationProviderTypeHandler> logger,
             IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository,
-            IAuditLogService auditLogService, IEventsRepository eventsRepository)
+            IAuditLogService auditLogService)
         {
             _logger = logger;
             _validator = validator;
             _updateOrganisationRepository = updateOrganisationRepository;
             _auditLogService = auditLogService;
-            _eventsRepository = eventsRepository;
         }
 
         public async Task<bool> Handle(UpdateOrganisationProviderTypeRequest request, CancellationToken cancellationToken)
@@ -63,10 +62,6 @@
             if (success && auditData.FieldChanges.Any(x => x.FieldChanged == AuditLogField.OrganisationStatus))
             {
                 success = await _updateOrganisationRepository.UpdateOrganisationStatus(request.OrganisationId, OrganisationStatus.Active, request.UpdatedBy);
-                if(success)
-                    success = await _eventsRepository.AddOrganisationStatusEventsFromOrganisationId(request.OrganisationId,
-                        OrganisationStatus.Active,
-                        DateTime.Now);
             }
 
             if (success && auditData.FieldChanges.Any(x => x.FieldChanged == AuditLogField.StartDate))

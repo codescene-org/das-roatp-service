@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.RoATPService.Application.Handlers
+﻿using SFA.DAS.RoATPService.Domain;
+
+namespace SFA.DAS.RoATPService.Application.Handlers
 {
     using System;
     using System.Threading;
@@ -107,8 +109,9 @@
             var command = _mapper.Map(request);
             var organisationId = _organisationRepository.CreateOrganisation(command);
 
-            _eventsRepository.AddOrganisationStatusEvents(command.Ukprn, command.OrganisationStatusId,
-                command.StatusDate);
+            if (request.ProviderTypeId!= ProviderType.SupportingProvider)  
+                _eventsRepository.AddOrganisationStatusEvents(command.Ukprn, command.OrganisationStatusId,
+                    command.StatusDate);
 
             return organisationId;
         }

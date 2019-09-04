@@ -58,9 +58,16 @@ namespace SFA.DAS.RoATPService.Application.Handlers
                 success = await _updateOrganisationRepository.UpdateOrganisationStatus(request.OrganisationId,
                     request.OrganisationStatusId, request.UpdatedBy);
                 if (success)
-                success = await _eventsRepository.AddOrganisationStatusEventsFromOrganisationId(request.OrganisationId, 
-                    request.OrganisationStatusId,
-                    DateTime.Now);
+                {
+                    var providerTypeId = await _organisationRepository.GetProviderType(request.OrganisationId);
+                    if (providerTypeId != ProviderType.SupportingProvider)
+                    {
+                        success = await _eventsRepository.AddOrganisationStatusEventsFromOrganisationId(
+                            request.OrganisationId,
+                            request.OrganisationStatusId,
+                            DateTime.Now);
+                    }
+                }
             }
 
             if (auditData.FieldChanges.Any(x => x.FieldChanged == AuditLogField.RemovedReason))
