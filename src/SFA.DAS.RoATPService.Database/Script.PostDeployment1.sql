@@ -239,7 +239,7 @@ update organisations set OrganisationData = JSON_Modify(OrganisationData,'$.Sour
 	END
 
 
--- APR-652 create events from existing data
+-- APR-652 create events from existing data for main and employer providers only
 INSERT INTO [dbo].[OrganisationStatusEvent]
            (OrganisationStatusId, CreatedOn,ProviderId)
 	  select o.StatusId, o.StatusDate, o.ukprn from Organisations o 
