@@ -229,3 +229,11 @@ WHERE Id = 3
 -- APR-474 update any non-set SourceIsUKRLP to true for Organisations.OrganisationData
 update organisations set OrganisationData = JSON_Modify(OrganisationData,'$.SourceIsUKRLP',CAST(1 as BIT)) where JSON_VALUE(OrganisationData,'$.SourceIsUKRLP') is null
 
+-- APR-690 create end point for engagement events
+ if exists(select * from organisationStatus where EventDescription is null)
+	BEGIN
+		update organisationStatus set EventDescription = 'REMOVED' where id = 0
+		update organisationStatus set EventDescription = 'ACTIVE' where id = 1
+		update organisationStatus set EventDescription = 'ACTIVENOSTARTS' where id = 2
+		update organisationStatus set EventDescription = 'INITIATED' where id = 3
+	END

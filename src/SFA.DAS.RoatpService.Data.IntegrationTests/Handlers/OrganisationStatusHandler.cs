@@ -14,8 +14,8 @@ namespace SFA.DAS.RoatpService.Data.IntegrationTests.Handlers
         public static void InsertRecord(OrganisationStatusModel organisationStatus)
         {
             var sql =
-                @"set identity_insert [OrganisationStatus] ON; INSERT INTO [OrganisationStatus] ([id], [Status],[CreatedAt],[CreatedBy] ,[UpdatedAt],[UpdatedBy]) VALUES " +
-                $@"(@id,@status, @createdAt, @createdBy, @updatedAt, @updatedBy); set identity_insert [OrganisationStatus] OFF; ";
+                @"set identity_insert [OrganisationStatus] ON; INSERT INTO [OrganisationStatus] ([id], [Status],[CreatedAt],[CreatedBy] ,[UpdatedAt],[UpdatedBy], EventDescription) VALUES " +
+                $@"(@id,@status, @createdAt, @createdBy, @updatedAt, @updatedBy, @eventDescription); set identity_insert [OrganisationStatus] OFF; ";
 
             DatabaseService.Execute(sql, organisationStatus);
         }

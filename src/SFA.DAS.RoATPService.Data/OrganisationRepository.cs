@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.RoATPService.Data
+﻿using System.Collections.Generic;
+
+namespace SFA.DAS.RoATPService.Data
 {
     using System;
     using System.Data;
@@ -282,6 +284,24 @@
 
                 const string sql = "SELECT Json_value(organisationData,'$.ApplicationDeterminedDate') FROM [Organisations] WHERE Id = @organisationId";
                 return await connection.ExecuteScalarAsync<DateTime?>(sql, new { organisationId });
+
+            }
+        }
+
+        public async Task<IEnumerable<Engagement>> GetEngagements()
+        {
+            var connectionString = _configuration.SqlConnectionString;
+
+            using (var connection = new SqlConnection(connectionString))
+
+            {
+                if (connection.State != ConnectionState.Open)
+                    await connection.OpenAsync();
+
+                var sql = $@"select ose.ID, ose.providerId, ose.CreatedOn, isnull(os.EventDescription, 'UNKNOWN') as Event
+	                                        from OrganisationStatusEvent ose left join organisationStatus os
+	                                        on os.Id = ose.OrganisationStatusId";
+                return await connection.QueryAsync<Engagement>(sql);
 
             }
         }
