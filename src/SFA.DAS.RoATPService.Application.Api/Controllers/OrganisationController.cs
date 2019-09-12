@@ -40,6 +40,19 @@
             return Ok(organisation);
         }
 
+        [HttpGet]
+        [Route("engagements")]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(IEnumerable<Engagement>))]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, typeof(IEnumerable<Engagement>))]
+        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
+        public async Task<IActionResult> GetEngagements()
+        {
+            var request = new GetEngagementsRequest();
+
+            return Ok(await _mediator.Send(request));
+        }
+
+
         [HttpPost]
         [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(bool))]
         [SwaggerResponse((int)HttpStatusCode.BadRequest, typeof(IDictionary<string, string>))]

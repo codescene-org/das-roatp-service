@@ -1,8 +1,20 @@
-﻿namespace SFA.DAS.RoATPService.Application.Api.StartupConfiguration
+﻿using System.Net.Http;
+using System.Reflection;
+using Microsoft.AspNetCore.Http;
+using SFA.DAS.RoATPService.Api.Client;
+using SFA.DAS.RoATPService.Api.Client.Interfaces;
+using SFA.DAS.RoATPService.Application.Api.Helpers;
+using SFA.DAS.RoATPService.Application.Handlers;
+using SFA.DAS.RoATPService.Application.Interfaces;
+using SFA.DAS.RoATPService.Application.Mappers;
+using SFA.DAS.RoATPService.Application.Services;
+using SFA.DAS.RoATPService.Application.Validators;
+using SFA.DAS.RoATPService.Data.Helpers;
+
+namespace SFA.DAS.RoATPService.Application.Api.StartupConfiguration
 {
     using System;
     using System.Collections.Generic;
-    using System.Data;
     using System.Data.SqlClient;
     using System.Globalization;
     using System.IO;
@@ -21,7 +33,6 @@
     using Microsoft.Extensions.Logging;
     using Middleware;
     using Settings;
-    using StructureMap;
     using Swashbuckle.AspNetCore.Swagger;
 
     public class Startup
@@ -46,9 +57,8 @@
 
         public IWebConfiguration Configuration { get; }
 
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
-            IServiceProvider serviceProvider;
             try
             {
                 services.AddAuthentication(o => { o.DefaultScheme = JwtBearerDefaults.AuthenticationScheme; })
@@ -84,6 +94,7 @@
                 ApplicationConfiguration.Bind("RegisterAuditLogSettings", auditLogSettings);
                 services.AddSingleton(auditLogSettings);
 
+                services.AddHealthChecks();
                 IMvcBuilder mvcBuilder;
                 if (_env.IsDevelopment())
                     mvcBuilder = services.AddMvc(opt => { opt.Filters.Add(new AllowAnonymousFilter()); });
@@ -109,7 +120,7 @@
                     }
                 });
 
-                serviceProvider = ConfigureIOC(services);
+                ConfigureDependencyInjection(services);
 
                 if (_env.IsDevelopment())
                 {
@@ -121,37 +132,35 @@
                 _logger.LogError(e, "Error during Startup Configure Services");
                 throw;
             }
-
-            return serviceProvider;
         }
 
-        private IServiceProvider ConfigureIOC(IServiceCollection services)
+        private void ConfigureDependencyInjection(IServiceCollection services)
         {
-            var container = new Container();
-
-            container.Configure(config =>
-            {
-                config.Scan(_ =>
-                {
-                    _.AssembliesFromApplicationBaseDirectory(c => c.FullName.StartsWith("SFA"));
-                    _.WithDefaultConventions();
-
-                    _.ConnectImplementationsToTypesClosing(typeof(IRequestHandler<>)); // Handlers with no response
-                    _.ConnectImplementationsToTypesClosing(typeof(IRequestHandler<,>)); // Handlers with a response
-                    _.ConnectImplementationsToTypesClosing(typeof(INotificationHandler<>));
-                });
-
-                config.For<IWebConfiguration>().Use(Configuration);
-                config.For<SingleInstanceFactory>().Use<SingleInstanceFactory>(ctx => t => ctx.GetInstance(t));
-                config.For<MultiInstanceFactory>().Use<MultiInstanceFactory>(ctx => t => ctx.GetAllInstances(t));
-                config.For<IMediator>().Use<Mediator>();
-                config.For<IDbConnection>().Use(c => new SqlConnection(Configuration.SqlConnectionString));
-
-                config.Populate(services);
-            });
-
-            return container.GetInstance<IServiceProvider>();
+            services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddTransient(x => Configuration);
+            services.AddTransient<IDownloadRegisterRepository, DownloadRegisterRepository>();
+            services.AddTransient<ILookupDataRepository, LookupDataRepository>();
+            services.AddTransient<IOrganisationRepository, OrganisationRepository>();
+            services.AddTransient<IDuplicateCheckRepository, DuplicateCheckRepository>();
+            services.AddTransient<ICreateOrganisationRepository, CreateOrganisationRepository>();
+            services.AddTransient<IOrganisationSearchRepository, OrganisationSearchRepository>();
+            services.AddTransient<IUpdateOrganisationRepository, UpdateOrganisationRepository>();
+            services.AddTransient<IDataTableHelper, DataTableHelper>();
+            services.AddTransient<ICacheHelper, CacheHelper>();
+            services.AddTransient<IProviderTypeValidator, ProviderTypeValidator>();
+            services.AddTransient<IOrganisationSearchValidator, OrganisationSearchValidator>();
+            services.AddTransient<IOrganisationValidator, OrganisationValidator>();
+            services.AddTransient<IOrganisationSearchValidator, OrganisationSearchValidator>();
+            services.AddTransient<IMapCreateOrganisationRequestToCommand, MapCreateOrganisationRequestToCommand>();
+            services.AddTransient<ITextSanitiser, TextSanitiser>();
+            services.AddTransient<IUkrlpApiClient, UkrlpApiClient>();
+            services.AddTransient<IAuditLogService, AuditLogService>();
+            services.AddTransient<IOrganisationStatusManager, OrganisationStatusManager>();        
+            services.AddTransient<HttpClient>();
+            services.AddTransient<IUkrlpSoapSerializer, UkrlpSoapSerializer>();
+            services.AddMediatR(typeof(GetProviderTypesHandler).GetTypeInfo().Assembly);
         }
+
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
@@ -171,6 +180,7 @@
                 app.UseMiddleware(typeof(ErrorHandlingMiddleware));
 
                 app.UseRequestLocalization();
+                app.UseHealthChecks("/health");
 
                 app.UseMvc();
             }

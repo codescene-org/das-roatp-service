@@ -5,5 +5,6 @@
 	[CreatedAt] DATETIME2 NOT NULL, 
     [CreatedBy] NVARCHAR(30) NOT NULL, 
     [UpdatedAt] DATETIME2 NULL, 
-    [UpdatedBy] NVARCHAR(30) NULL
+    [UpdatedBy] NVARCHAR(30) NULL, 
+    [EventDescription] NVARCHAR(20) NULL
 )

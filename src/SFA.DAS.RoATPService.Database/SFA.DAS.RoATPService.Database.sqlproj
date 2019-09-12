@@ -76,6 +76,7 @@
     <Build Include="Tables\ProviderTypeOrganisationStatus.sql" />
     <Build Include="Tables\OrganisationCategory.sql" />
     <Build Include="Tables\OrganisationCategoryOrgTypeProviderType.sql" />
+    <Build Include="Tables\OrganisationStatusEvent.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Script.PostDeployment1.sql" />
