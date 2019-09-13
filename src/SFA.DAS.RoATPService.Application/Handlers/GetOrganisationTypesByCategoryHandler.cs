@@ -15,9 +15,7 @@ namespace SFA.DAS.RoATPService.Application.Handlers
 {
     public class GetOrganisationTypesByCategoryHandler : IRequestHandler<GetOrganisationTypesByCategoryRequest, IEnumerable<OrganisationType>>
     {
-      
-
-
+        
         private readonly ILookupDataRepository _repository;
         private readonly ILogger<GetOrganisationTypesByCategoryHandler> _logger;
         private readonly IProviderTypeValidator _providerTypeValidator;

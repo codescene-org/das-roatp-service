@@ -48,6 +48,12 @@
 
             return Ok(await _mediator.Send(request));
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="providerTypeId"></param>
+        /// <param name="categoryId"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("organisationTypes/{providerTypeId}/{categoryId}")]
         public async Task<IActionResult> OrganisationTypesByCategory(int providerTypeId, int categoryId)
