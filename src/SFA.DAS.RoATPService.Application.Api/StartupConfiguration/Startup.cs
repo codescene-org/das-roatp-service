@@ -158,6 +158,8 @@ namespace SFA.DAS.RoATPService.Application.Api.StartupConfiguration
             services.AddTransient<IOrganisationStatusManager, OrganisationStatusManager>();        
             services.AddTransient<HttpClient>();
             services.AddTransient<IUkrlpSoapSerializer, UkrlpSoapSerializer>();
+            services.AddTransient<IEventsRepository, EventsRepository>();
+
             services.AddMediatR(typeof(GetProviderTypesHandler).GetTypeInfo().Assembly);
         }
 

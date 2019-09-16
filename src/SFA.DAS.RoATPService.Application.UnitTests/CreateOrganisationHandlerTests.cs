@@ -22,6 +22,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         private CreateOrganisationRequest _request;
         private CreateOrganisationHandler _handler;
         private Mock<ICreateOrganisationRepository> _repository;
+        private Mock<IEventsRepository> _eventsRepository;
         private Mock<ILogger<CreateOrganisationHandler>> _logger;
         private Mock<IOrganisationValidator> _validator;
         private Mock<IDuplicateCheckRepository> _duplicateCheckRepository;
@@ -34,6 +35,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         {
             _organisationId = Guid.NewGuid();
             _repository = new Mock<ICreateOrganisationRepository>();
+            _eventsRepository = new Mock<IEventsRepository>();
             _repository.Setup(x => x.CreateOrganisation(It.IsAny<CreateOrganisationCommand>()))
                 .ReturnsAsync(_organisationId);
             _duplicateCheckRepository = new Mock<IDuplicateCheckRepository>();
@@ -62,7 +64,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _textSanitiser = new Mock<ITextSanitiser>();
             _textSanitiser.Setup(x => x.SanitiseInputText(It.IsAny<string>())).Returns<string>(x => x);
 
-            _handler = new CreateOrganisationHandler(_repository.Object, _logger.Object, _validator.Object, new ProviderTypeValidator(), _mapper, _textSanitiser.Object);
+            _handler = new CreateOrganisationHandler(_repository.Object, _eventsRepository.Object, _logger.Object, _validator.Object, new ProviderTypeValidator(), _mapper, _textSanitiser.Object);
 
             _request = new CreateOrganisationRequest
             {                                                                       
