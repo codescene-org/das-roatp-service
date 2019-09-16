@@ -41,6 +41,29 @@
         }
 
         [HttpGet]
+        [Route("organisationCategories/{providerTypeId}")]
+        public async Task<IActionResult> OrganisationCategories(int providerTypeId)
+        {
+            var request = new GetOrganisationCategoriesRequest { ProviderTypeId = providerTypeId };
+
+            return Ok(await _mediator.Send(request));
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="providerTypeId"></param>
+        /// <param name="categoryId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("organisationTypes/{providerTypeId}/{categoryId}")]
+        public async Task<IActionResult> OrganisationTypesByCategory(int providerTypeId, int categoryId)
+        {
+            var request = new GetOrganisationTypesByCategoryRequest { ProviderTypeId = providerTypeId, CategoryId = categoryId };
+
+            return Ok(await _mediator.Send(request));
+        }
+
+        [HttpGet]
         [Route("organisationStatuses")]
         public async Task<IActionResult> OrganisationStatuses(int? providerTypeId)
         {

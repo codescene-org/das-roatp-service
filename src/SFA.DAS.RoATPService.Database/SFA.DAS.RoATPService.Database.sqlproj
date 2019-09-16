@@ -74,6 +74,8 @@
     <Build Include="StoredProcedures\RoATP_Complete_Register.sql" />
     <Build Include="StoredProcedures\RoATP_CSV_SUMMARY.sql" />
     <Build Include="Tables\ProviderTypeOrganisationStatus.sql" />
+    <Build Include="Tables\OrganisationCategory.sql" />
+    <Build Include="Tables\OrganisationCategoryOrgTypeProviderType.sql" />
     <Build Include="Tables\OrganisationStatusEvent.sql" />
   </ItemGroup>
   <ItemGroup>

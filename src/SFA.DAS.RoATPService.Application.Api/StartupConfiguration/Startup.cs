@@ -145,6 +145,7 @@ namespace SFA.DAS.RoATPService.Application.Api.StartupConfiguration
             services.AddTransient<ICreateOrganisationRepository, CreateOrganisationRepository>();
             services.AddTransient<IOrganisationSearchRepository, OrganisationSearchRepository>();
             services.AddTransient<IUpdateOrganisationRepository, UpdateOrganisationRepository>();
+            services.AddTransient<IOrganisationCategoryValidator, OrganisationCategoryValidator>();
             services.AddTransient<IDataTableHelper, DataTableHelper>();
             services.AddTransient<ICacheHelper, CacheHelper>();
             services.AddTransient<IProviderTypeValidator, ProviderTypeValidator>();
