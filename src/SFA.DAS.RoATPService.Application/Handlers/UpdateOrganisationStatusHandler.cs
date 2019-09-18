@@ -21,12 +21,13 @@ namespace SFA.DAS.RoATPService.Application.Handlers
         private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
         private readonly ILookupDataRepository _lookupDataRepository;
         private readonly IOrganisationRepository _organisationRepository;
+        private readonly IEventsRepository _eventsRepository;
         private readonly IAuditLogService _auditLogService;
 
         public UpdateOrganisationStatusHandler(ILogger<UpdateOrganisationStatusHandler> logger,
             IOrganisationValidator validator, IUpdateOrganisationRepository updateOrganisationRepository,
             ILookupDataRepository lookupDataRepository, IOrganisationRepository organisationRepository,
-            IAuditLogService auditLogService)
+            IAuditLogService auditLogService, IEventsRepository eventsRepository)
         {
             _logger = logger;
             _validator = validator;
@@ -34,6 +35,7 @@ namespace SFA.DAS.RoATPService.Application.Handlers
             _lookupDataRepository = lookupDataRepository;
             _organisationRepository = organisationRepository;
             _auditLogService = auditLogService;
+            _eventsRepository = eventsRepository;
         }
 
         public async Task<bool> Handle(UpdateOrganisationStatusRequest request, CancellationToken cancellationToken)
@@ -55,12 +57,24 @@ namespace SFA.DAS.RoATPService.Application.Handlers
             {
                 success = await _updateOrganisationRepository.UpdateOrganisationStatus(request.OrganisationId,
                     request.OrganisationStatusId, request.UpdatedBy);
+                if (success)
+                {
+                    var providerTypeId = await _organisationRepository.GetProviderType(request.OrganisationId);
+                    if (providerTypeId != ProviderType.SupportingProvider)
+                    {
+                        success = await _eventsRepository.AddOrganisationStatusEventsFromOrganisationId(
+                            request.OrganisationId,
+                            request.OrganisationStatusId,
+                            DateTime.Now);
+                    }
+                }
             }
 
             if (auditData.FieldChanges.Any(x => x.FieldChanged == AuditLogField.RemovedReason))
             {
                 success = await _updateOrganisationRepository.UpdateRemovedReason(request.OrganisationId, 
                                                                                         request.RemovedReasonId, request.UpdatedBy);
+                
             }
 
             if (success && auditData.FieldChanges.Any(x => x.FieldChanged == AuditLogField.StartDate))

@@ -26,6 +26,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
         private Mock<IOrganisationValidator> _validator;
         private Mock<IUpdateOrganisationRepository> _updateRepository;
         private Mock<ILookupDataRepository> _lookupDataRepository;
+        private Mock<IEventsRepository> _eventsRepository;
         private Mock<IOrganisationRepository> _repository;
         private Mock<IAuditLogService> _auditLogService;
 
@@ -52,6 +53,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _updateRepository = new Mock<IUpdateOrganisationRepository>();
             _lookupDataRepository = new Mock<ILookupDataRepository>();
             _repository = new Mock<IOrganisationRepository>();
+            _eventsRepository = new Mock<IEventsRepository>();
 
             var activeStatus = new OrganisationStatus { Id = 1, Status = "Active" };
             _lookupDataRepository.Setup(x => x.GetOrganisationStatus(1)).ReturnsAsync(activeStatus);
@@ -62,6 +64,9 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             var onboardingStatus = new OrganisationStatus { Id = 3, Status = "On-boarding" };
             _lookupDataRepository.Setup(x => x.GetOrganisationStatus(3)).ReturnsAsync(onboardingStatus);
 
+            _eventsRepository
+                .Setup((x => x.AddOrganisationStatusEventsFromOrganisationId(It.IsAny<Guid>(), It.IsAny<int>(),
+                    It.IsAny<DateTime>()))).ReturnsAsync(true);
             RemovedReason nullReason = null;
             _repository.Setup(x => x.GetRemovedReason(It.IsAny<Guid>())).ReturnsAsync(nullReason);
             _auditLogService = new Mock<IAuditLogService>();
@@ -71,7 +76,8 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
                 .Returns(new AuditData { FieldChanges = new List<AuditLogEntry>() });
             _handler = new UpdateOrganisationStatusHandler(_logger.Object, _validator.Object, 
                                                            _updateRepository.Object,
-                                                           _lookupDataRepository.Object, _repository.Object, _auditLogService.Object);
+                                                           _lookupDataRepository.Object, _repository.Object,
+                                                           _auditLogService.Object, _eventsRepository.Object);
         }
 
         [TestCase(-1)]
@@ -135,6 +141,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             result.Should().BeTrue();
 
             _updateRepository.Verify(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>(), It.IsAny<string>()), Times.Never);
+            _eventsRepository.Verify(x=>x.AddOrganisationStatusEventsFromOrganisationId(It.IsAny<Guid>(), It.IsAny<int>() ,It.IsAny<DateTime>()),Times.Once);
         }
 
         [Test]
@@ -160,6 +167,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             result.Should().BeTrue();
 
             _updateRepository.Verify(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>(), It.IsAny<string>()), Times.Never);
+            _eventsRepository.Verify(x => x.AddOrganisationStatusEventsFromOrganisationId(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<DateTime>()), Times.Once);
         }
 
         [Test]
@@ -186,6 +194,7 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             result.Should().BeTrue();
 
             _updateRepository.Verify(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>(), It.IsAny<string>()), Times.Once);
+            _eventsRepository.Verify(x => x.AddOrganisationStatusEventsFromOrganisationId(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<DateTime>()), Times.Once);
         }
 
         [Test]
@@ -216,6 +225,8 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _updateRepository.Verify(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>(), It.IsAny<string>()), Times.Never);
             _updateRepository.Verify(x => x.UpdateRemovedReason(It.IsAny<Guid>(), It.IsAny<int?>(), It.IsAny<string>()), Times.Once);
             _updateRepository.Verify(x => x.WriteFieldChangesToAuditLog(It.IsAny<AuditData>()), Times.Once);
+            _eventsRepository.Verify(x => x.AddOrganisationStatusEventsFromOrganisationId(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<DateTime>()), Times.Never);
+
         }
 
         [Test]
@@ -245,6 +256,8 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _updateRepository.Verify(x => x.UpdateRemovedReason(It.IsAny<Guid>(), It.IsAny<int?>(), It.IsAny<string>()), Times.Never);
             _updateRepository.Verify(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>(), It.IsAny<string>()), Times.Once);
             _updateRepository.Verify(x => x.UpdateOrganisationStatus(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<string>()), Times.Once);
+            _eventsRepository.Verify(x => x.AddOrganisationStatusEventsFromOrganisationId(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<DateTime>()), Times.Once);
+
         }
 
         [TestCase(OrganisationStatus.Active, 1)]
@@ -301,6 +314,8 @@ namespace SFA.DAS.RoATPService.Application.UnitTests
             _updateRepository.Verify(x => x.UpdateStartDate(It.IsAny<Guid>(), It.IsAny<DateTime>(), It.IsAny<string>()), Times.Never);
             _updateRepository.Verify(x => x.UpdateRemovedReason(It.IsAny<Guid>(), It.IsAny<int?>(), It.IsAny<string>()), Times.Once);
             _updateRepository.Verify(x => x.UpdateOrganisationStatus(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<string>()), Times.Once);
+            _eventsRepository.Verify(x => x.AddOrganisationStatusEventsFromOrganisationId(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<DateTime>()), Times.Once);
+
 
         }
     }
