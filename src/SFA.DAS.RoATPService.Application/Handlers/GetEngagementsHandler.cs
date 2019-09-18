@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -13,8 +12,8 @@ namespace SFA.DAS.RoATPService.Application.Handlers
 {
     public class GetEngagementsHandler : IRequestHandler<GetEngagementsRequest, IEnumerable<Engagement>>
     {
-        private IOrganisationRepository _repository;
-        private ILogger<GetEngagementsHandler> _logger;
+        private readonly IOrganisationRepository _repository;
+        private readonly ILogger<GetEngagementsHandler> _logger;
 
         public GetEngagementsHandler(IOrganisationRepository repository, ILogger<GetEngagementsHandler> logger)
         {

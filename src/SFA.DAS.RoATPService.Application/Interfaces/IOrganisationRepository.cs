@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-
-namespace SFA.DAS.RoATPService.Application.Interfaces
+﻿namespace SFA.DAS.RoATPService.Application.Interfaces
 {
     using System;
     using System.Threading.Tasks;
     using Domain;
+    using System.Collections.Generic;
 
     public interface IOrganisationRepository
     {

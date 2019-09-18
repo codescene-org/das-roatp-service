@@ -17,6 +17,7 @@
     {
         private readonly ILogger<UpdateOrganisationProviderTypeHandler> _logger;
         private readonly IOrganisationValidator _validator;
+
         private readonly IUpdateOrganisationRepository _updateOrganisationRepository;
         private readonly IAuditLogService _auditLogService;
 
