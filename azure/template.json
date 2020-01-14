@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "resourceEnvironmentName": {
@@ -8,7 +8,7 @@
         "environmentName": {
             "type": "string"
         },
-        "sharedAppServicePlanName": {
+        "sharedBackendAppServicePlanName": {
             "type": "string"
         },
         "sharedAppServicePlanResourceGroup": {
@@ -39,29 +39,29 @@
             "type": "string"
         },
         "configurationStorageConnectionString": {
-            "type": "string"
+            "type": "securestring"
         },
         "loggingRedisConnectionString": {
-            "type": "string"
+            "type": "securestring"
         },
-        "internalApiCustomHostname": {
+        "apiCustomHostname": {
             "type": "string",
             "defaultValue": ""
         },
-        "internalApiCertificateName": {
+        "apiCertificateName": {
             "type": "string"
         }
     },
     "variables": {
         "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
         "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName')))]",
-        "internalApiAppServiceName": "[concat(variables('resourceNamePrefix'), '-roatpintapi-as')]",
+        "apiAppServiceName": "[concat(variables('resourceNamePrefix'), '-roatpapi-as')]",
         "databaseName": "[concat(variables('resourceNamePrefix'), '-roatp-db')]"
     },
     "resources": [
         {
             "apiVersion": "2017-08-01",
-            "name": "InternalApiAppInsights",
+            "name": "api-app-insights",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
@@ -71,18 +71,17 @@
                 },
                 "parameters": {
                     "appInsightsName": {
-                        "value": "[variables('internalApiAppServiceName')]"
+                        "value": "[variables('apiAppServiceName')]"
                     },
                     "attachedService": {
-                        "value": "[variables('internalApiAppServiceName')]"
+                        "value": "[variables('apiAppServiceName')]"
                     }
                 }
-            },
-            "dependsOn": []
+            }
         },
         {
             "apiVersion": "2017-08-01",
-            "name": "InternalApiAppService",
+            "name": "api-app-service",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
@@ -92,10 +91,10 @@
                 },
                 "parameters": {
                     "appServiceName": {
-                        "value": "[variables('internalApiAppServiceName')]"
+                        "value": "[variables('apiAppServiceName')]"
                     },
                     "appServicePlanName": {
-                        "value": "[parameters('SharedAppServicePlanName')]"
+                        "value": "[parameters('SharedBackendAppServicePlanName')]"
                     },
                     "appServicePlanResourceGroup": {
                         "value": "[parameters('SharedAppServicePlanResourceGroup')]"
@@ -112,16 +111,16 @@
                             },
                             {
                                 "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                                "value": "[reference('InternalApiAppInsights').outputs.InstrumentationKey.value]"
+                                "value": "[reference('api-app-insights').outputs.InstrumentationKey.value]"
                             },
-							{
-								"name": "WEBSITE_SWAP_WARMUP_PING_PATH",
-								"value": "/health"
-							},
-							{
-								"name": "WEBSITE_SWAP_WARMUP_PING_STATUSES",
-								"value": "200"
-							}
+                            {
+                                "name": "WEBSITE_SWAP_WARMUP_PING_PATH",
+                                "value": "/health"
+                            },
+                            {
+                                "name": "WEBSITE_SWAP_WARMUP_PING_STATUSES",
+                                "value": "200"
+                            }
                         ]
                     },
                     "appServiceConnectionStrings": {
@@ -134,20 +133,17 @@
                         ]
                     },
                     "customHostName": {
-                        "value": "[parameters('internalApiCustomHostname')]"
+                        "value": "[parameters('apiCustomHostname')]"
                     },
                     "certificateThumbprint": {
-                        "value": "[reference(resourceId(parameters('sharedAppServicePlanResourceGroup'), 'Microsoft.Web/certificates', parameters('internalApiCertificateName')), '2016-03-01').Thumbprint]"
+                        "value": "[reference(resourceId(parameters('sharedAppServicePlanResourceGroup'), 'Microsoft.Web/certificates', parameters('apiCertificateName')), '2016-03-01').Thumbprint]"
                     }
                 }
-            },
-            "dependsOn": [
-                "InternalApiAppInsights"
-            ]
+            }
         },
         {
             "apiVersion": "2017-05-10",
-            "name": "sqlDatabase",
+            "name": "roatp-sql-database",
             "type": "Microsoft.Resources/deployments",
             "resourceGroup": "[parameters('sharedSqlResourceGroup')]",
             "properties": {
@@ -183,9 +179,9 @@
         }
     ],
     "outputs": {
-        "InternalApiAppServiceName": {
+        "ApiAppServiceName": {
             "type": "string",
-            "value": "[variables('internalApiAppServiceName')]"
+            "value": "[variables('apiAppServiceName')]"
         },
         "DatabaseName": {
             "type": "string",
