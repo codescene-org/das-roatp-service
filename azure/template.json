@@ -28,10 +28,6 @@
             "type": "string",
             "defaultValue": "Standard"
         },
-        "logAnalyticsSubscriptionId": {
-            "type": "string",
-            "defaultValue": "[subscription().subscriptionId]"
-        },
         "logAnalyticsResourceGroup": {
             "type": "string"
         },
@@ -174,7 +170,7 @@
                         "value": "[parameters('databaseTier')]"
                     },
                     "logAnalyticsSubscriptionId": {
-                        "value": "[parameters('logAnalyticsSubscriptionId')]"
+                        "value": "[subscription().subscriptionId]"
                     },
                     "logAnalyticsResourceGroup": {
                         "value": "[parameters('logAnalyticsResourceGroup')]"
