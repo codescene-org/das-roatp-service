@@ -50,6 +50,11 @@
         },
         "apiCertificateName": {
             "type": "string"
+        },
+        "appServiceAllowedIPs": {
+            "type": "array",
+            "defaultValue": [
+            ]
         }
     },
     "variables": {
@@ -137,6 +142,9 @@
                     },
                     "certificateThumbprint": {
                         "value": "[reference(resourceId(parameters('sharedAppServicePlanResourceGroup'), 'Microsoft.Web/certificates', parameters('apiCertificateName')), '2016-03-01').Thumbprint]"
+                    },
+                    "ipSecurityRestrictions": {
+                        "value": "[parameters('appServiceAllowedIPs')]"
                     }
                 }
             }
