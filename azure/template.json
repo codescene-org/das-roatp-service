@@ -11,9 +11,6 @@
         "sharedBackendAppServicePlanName": {
             "type": "string"
         },
-        "sharedAppServicePlanResourceGroup": {
-            "type": "string"
-        },
         "sharedSqlServerName": {
             "type": "string"
         },
@@ -47,6 +44,12 @@
         "apiCertificateName": {
             "type": "string"
         },
+        "sharedKeyVaultName": {
+            "type": "string"
+        },
+        "sharedManagementResourceGroup": {
+            "type": "string"
+        },
         "appServiceAllowedIPs": {
             "type": "array",
             "defaultValue": [
@@ -60,6 +63,30 @@
         "databaseName": "[concat(variables('resourceNamePrefix'), '-roatp-db')]"
     },
     "resources": [
+        {
+            "apiVersion": "2017-05-10",
+            "name": "app-service-certificate",
+            "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'app-service-certificate.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "keyVaultCertificateName": {
+                        "value": "[parameters('apiCertificateName')]"
+                    },
+                    "keyVaultName": {
+                        "value": "[parameters('sharedKeyVaultName')]"
+                    },
+                    "keyVaultResourceGroup": {
+                        "value": "[parameters('sharedManagementResourceGroup')]"
+                    }
+                }
+            }
+        },
         {
             "apiVersion": "2017-08-01",
             "name": "api-app-insights",
@@ -98,7 +125,7 @@
                         "value": "[parameters('SharedBackendAppServicePlanName')]"
                     },
                     "appServicePlanResourceGroup": {
-                        "value": "[parameters('SharedAppServicePlanResourceGroup')]"
+                        "value": "[parameters('sharedEnvResourceGroup')]"
                     },
                     "appServiceAppSettings": {
                         "value": [
@@ -137,7 +164,7 @@
                         "value": "[parameters('apiCustomHostname')]"
                     },
                     "certificateThumbprint": {
-                        "value": "[reference(resourceId(parameters('sharedAppServicePlanResourceGroup'), 'Microsoft.Web/certificates', parameters('apiCertificateName')), '2016-03-01').Thumbprint]"
+                        "value": "[reference('campaignSSLCert').outputs.certificateThumbprint.value]"
                     },
                     "ipSecurityRestrictions": {
                         "value": "[parameters('appServiceAllowedIPs')]"
