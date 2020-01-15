@@ -17,7 +17,7 @@
         "sharedSqlServerName": {
             "type": "string"
         },
-        "sharedSqlResourceGroup": {
+        "sharedEnvResourceGroup": {
             "type": "string"
         },
         "databaseSkuName": {
@@ -153,7 +153,7 @@
             "apiVersion": "2017-05-10",
             "name": "roatp-sql-database",
             "type": "Microsoft.Resources/deployments",
-            "resourceGroup": "[parameters('sharedSqlResourceGroup')]",
+            "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
