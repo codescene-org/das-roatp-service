@@ -45,9 +45,21 @@
         [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(IEnumerable<Engagement>))]
         [SwaggerResponse((int)HttpStatusCode.BadRequest, typeof(IEnumerable<Engagement>))]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
-        public async Task<IActionResult> GetEngagements()
+        public async Task<IActionResult> GetEngagements(int fromEventId, int pageSize, int pageNumber)
         {
             var request = new GetEngagementsRequest();
+
+            return Ok(await _mediator.Send(request));
+        }
+
+        [HttpGet]
+        [Route("engagements/{fromEventId}/{pageSize}/{pageNumber}")]
+        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(IEnumerable<Engagement>))]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, typeof(IEnumerable<Engagement>))]
+        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
+        public async Task<IActionResult> GetEngagementsFromEventIdPaged(int fromEventId, int pageSize, int pageNumber)
+        {
+            var request = new GetEngagementsFromEventIdPagedRequest { FromEventId = fromEventId, PageSize = pageSize, PageNumber = pageNumber };
 
             return Ok(await _mediator.Send(request));
         }
