@@ -6,5 +6,8 @@ namespace SFA.DAS.RoATPService.Api.Types.Models
 {
     public class GetEngagementsRequest : IRequest<IEnumerable<Engagement>>
     {
+        public long SinceEventId { get; set; }
+        public int PageSize { get; set; }
+        public int PageNumber { get; set; }
     }
 }

@@ -45,25 +45,14 @@
         [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(IEnumerable<Engagement>))]
         [SwaggerResponse((int)HttpStatusCode.BadRequest, typeof(IEnumerable<Engagement>))]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
-        public async Task<IActionResult> GetEngagements(int fromEventId, int pageSize, int pageNumber)
+        public async Task<IActionResult> GetEngagements(long sinceEventId = 0, int pageSize = 1000, int pageNumber = 1)
         {
-            var request = new GetEngagementsRequest();
+            _logger.LogInformation($"Processing Organisation-GetEngagements, sinceEventId={sinceEventId}, pageSize={pageSize}, pageNumber={pageNumber}");
+
+            var request = new GetEngagementsRequest { SinceEventId = sinceEventId, PageSize = pageSize, PageNumber = pageNumber };
 
             return Ok(await _mediator.Send(request));
         }
-
-        [HttpGet]
-        [Route("engagements/{fromEventId}/{pageSize}/{pageNumber}")]
-        [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(IEnumerable<Engagement>))]
-        [SwaggerResponse((int)HttpStatusCode.BadRequest, typeof(IEnumerable<Engagement>))]
-        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Type = typeof(ApiResponse))]
-        public async Task<IActionResult> GetEngagementsFromEventIdPaged(int fromEventId, int pageSize, int pageNumber)
-        {
-            var request = new GetEngagementsFromEventIdPagedRequest { FromEventId = fromEventId, PageSize = pageSize, PageNumber = pageNumber };
-
-            return Ok(await _mediator.Send(request));
-        }
-
 
         [HttpPost]
         [SwaggerResponse((int)HttpStatusCode.OK, Type = typeof(bool))]

@@ -25,7 +25,7 @@ namespace SFA.DAS.RoATPService.Application.Handlers
         {
             try
             {
-                return await _repository.GetEngagements();
+                return await _repository.GetEngagements(request);
             }
             catch (Exception ex)
             {
