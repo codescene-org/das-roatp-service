@@ -4,6 +4,7 @@
     using System.Threading.Tasks;
     using Domain;
     using System.Collections.Generic;
+    using SFA.DAS.RoATPService.Api.Types.Models;
 
     public interface IOrganisationRepository
     {
@@ -23,6 +24,6 @@
         Task<int> GetProviderType(Guid organisationId);
         Task<string> GetCharityNumber(Guid organisationId);
         Task<DateTime?> GetApplicationDeterminedDate(Guid organisationId);
-        Task<IEnumerable<Engagement>> GetEngagements();
+        Task<IEnumerable<Engagement>> GetEngagements(GetEngagementsRequest request);
     }
 }

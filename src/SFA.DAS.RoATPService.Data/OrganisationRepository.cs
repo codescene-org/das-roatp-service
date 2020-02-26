@@ -13,6 +13,7 @@ namespace SFA.DAS.RoATPService.Data
     using Settings;
     using RoatpService.Data.DapperTypeHandlers;
     using Newtonsoft.Json;
+    using SFA.DAS.RoATPService.Api.Types.Models;
 
     public class OrganisationRepository : IOrganisationRepository
     {
@@ -288,21 +289,24 @@ namespace SFA.DAS.RoATPService.Data
             }
         }
 
-        public async Task<IEnumerable<Engagement>> GetEngagements()
+        public async Task<IEnumerable<Engagement>> GetEngagements(GetEngagementsRequest request)
         {
             var connectionString = _configuration.SqlConnectionString;
 
             using (var connection = new SqlConnection(connectionString))
-
             {
                 if (connection.State != ConnectionState.Open)
                     await connection.OpenAsync();
 
+                var sqlIfPaginated = request.SinceEventId.Equals(0) ? string.Empty : $@" where ose.Id >= @SinceEventId
+                                            order by ose.Id
+                                            OFFSET ((@PageNumber - 1) * @PageSize) rows
+                                            fetch next @PageSize rows ONLY";
+
                 var sql = $@"select ose.ID, ose.providerId, ose.CreatedOn, isnull(os.EventDescription, 'UNKNOWN') as Event
 	                                        from OrganisationStatusEvent ose left join organisationStatus os
-	                                        on os.Id = ose.OrganisationStatusId";
-                return await connection.QueryAsync<Engagement>(sql);
-
+	                                        on os.Id = ose.OrganisationStatusId" + sqlIfPaginated;
+                return await connection.QueryAsync<Engagement>(sql, new { request.SinceEventId, request.PageSize, request.PageNumber });
             }
         }
     }
