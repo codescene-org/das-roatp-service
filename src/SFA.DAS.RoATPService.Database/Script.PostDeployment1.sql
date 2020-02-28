@@ -40,25 +40,25 @@ BEGIN
 	VALUES
 	(0, 'Unassigned', 'System', SYSDATETIME(), 'Live'),
 	(1, 'School', 'System', SYSDATETIME(), 'Live'),
-	(2, 'GFE college', 'System', SYSDATETIME(), 'Live'),
-	(3, 'National college', 'System', SYSDATETIME(), 'Live'),
-	(4, 'Sixth form college', 'System', SYSDATETIME(), 'Live'),
-	(5, 'Further education institution', 'System', SYSDATETIME(), 'Live'),
-	(6, 'Higher education institution', 'System', SYSDATETIME(), 'Live'),
+	(2, 'General Further Education College', 'System', SYSDATETIME(), 'Live'),
+	(3, 'National College', 'System', SYSDATETIME(), 'Live'),
+	(4, 'Sixth Form College', 'System', SYSDATETIME(), 'Live'),
+	(5, 'Further Education Institute', 'System', SYSDATETIME(), 'Live'),
+	(6, 'Higher Education Institute', 'System', SYSDATETIME(), 'Live'),
 	(7, 'Academy', 'System', SYSDATETIME(), 'Live'),
-	(8, 'Multi-academy trust', 'System', SYSDATETIME(), 'Live'),
+	(8, 'Multi-Academy Trust', 'System', SYSDATETIME(), 'Live'),
 	(9, 'NHS Trust', 'System', SYSDATETIME(), 'Live'),
 	(10, 'Police', 'System', SYSDATETIME(), 'Live'),
 	(11, 'Fire authority', 'System', SYSDATETIME(), 'Live'),
 	(12, 'Local authority', 'System', SYSDATETIME(), 'Live'),
 	(13, 'Government department', 'System', SYSDATETIME(), 'Live'),
-	(14, 'Non-departmental public body', 'System', SYSDATETIME(), 'Live'),
-	(15, 'Execute agency', 'System', SYSDATETIME(), 'Live'),
-	(16, 'Independent training provider', 'System', SYSDATETIME(), 'Live'),
-	(17, 'Apprenticeship training agency', 'System', SYSDATETIME(), 'Live'),
-	(18, 'Group training association', 'System', SYSDATETIME(), 'Live'),
-	(19, 'Employer', 'System', SYSDATETIME(), 'Live'),
-	(20, 'Other employer', 'System', SYSDATETIME(), 'Live')
+	(14, 'Non-departmental public body (NDPB)', 'System', SYSDATETIME(), 'Live'),
+	(15, 'Executive agency', 'System', SYSDATETIME(), 'Live'),
+	(16, 'An Independent Training Provider', 'System', SYSDATETIME(), 'Live'),
+	(17, 'An Apprenticeship Training Agency', 'System', SYSDATETIME(), 'Live'),
+	(18, 'A Group Training Association', 'System', SYSDATETIME(), 'Live'),
+	(19, 'An employer training apprentices in other organisations', 'System', SYSDATETIME(), 'Live'),
+	(20, 'None of the above', 'System', SYSDATETIME(), 'Live')
 
 	SET IDENTITY_INSERT dbo.OrganisationTypes OFF
 END
@@ -664,3 +664,15 @@ INSERT INTO [dbo].[OrganisationStatusEvent]
 	  where ose.ProviderId is null and ose.OrganisationStatusId is null and ose.CreatedOn is null
 	  and o.ProviderTypeId in (1,2)
 
+UPDATE OrganisationTypes SET [Type] = 'General Further Education College' WHERE Id = 2
+UPDATE OrganisationTypes SET [Type] = 'National College' WHERE Id = 3
+UPDATE OrganisationTypes SET [Type] = 'Sixth Form College' WHERE Id = 4
+UPDATE OrganisationTypes SET [Type] = 'Further Education Institute' WHERE Id = 5
+UPDATE OrganisationTypes SET [Type] = 'Higher Education Institute' WHERE Id = 6
+UPDATE OrganisationTypes SET [Type] = 'Multi-Academy Trust' WHERE Id = 8
+UPDATE OrganisationTypes SET [Type] = 'Non-departmental public body (NDPB)' WHERE Id = 14
+UPDATE OrganisationTypes SET [Type] = 'An Independent Training Provider' WHERE Id = 16
+UPDATE OrganisationTypes SET [Type] = 'An Apprenticeship Training Provider' WHERE Id = 17
+UPDATE OrganisationTypes SET [Type] = 'An Apprenticeship Training Agency' WHERE Id = 18
+UPDATE OrganisationTypes SET [Type] = 'An employer training apprentices in other organisations' WHERE Id = 19
+UPDATE OrganisationTypes SET [Type] = 'None of the above' WHERE Id = 20
